@@ -56,7 +56,7 @@ std::string sit_sha::result_str()
 	}
 	std::ostringstream oss;
 	for (auto x : sha_value) {
-		oss << std::ios::hex << x;
+		oss << std::hex << x;
 	}
 	return oss.str();
 }
