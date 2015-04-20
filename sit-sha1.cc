@@ -61,9 +61,12 @@ std::string sit_sha::result_str()
 	return oss.str();
 }
 
-std::tuple<int, int, int, int, int> sit_sha::result_tup()
+std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned> sit_sha::result_tup()
 {
-	return std::tuple<int, int, int, int, int>(
+	if (!this->processed) {
+		this->process();
+	}
+	return std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned>(
 		this->sha_value[0],
 		this->sha_value[1],
 		this->sha_value[2],
