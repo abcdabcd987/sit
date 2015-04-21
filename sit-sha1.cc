@@ -74,5 +74,4 @@ std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned> sit_sha::result_tup
 		this->sha_value[4]
 		);
 }
-
 }

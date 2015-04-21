@@ -6,6 +6,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
+extern const boost::filesystem::path repo_dir;
+
 namespace util {
 inline void safe_copy_file(
 	const boost::filesystem::path &from,
