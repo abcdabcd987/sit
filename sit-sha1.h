@@ -6,6 +6,7 @@
 #include <boost/filesystem/fstream.hpp>
 #include <sstream>
 #include <iostream>
+#include <iomanip>
 
 #include <string>
 #include <array>
