@@ -1,4 +1,4 @@
-#include "options.h"
+#include "sit-options.h"
 
 namespace MainFrame {
 void init_repo()

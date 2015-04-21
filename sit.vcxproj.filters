@@ -21,7 +21,7 @@
     <ClInclude Include="sit-util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="options.h">
+    <ClInclude Include="sit-options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -32,7 +32,7 @@
     <ClCompile Include="sit.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="options.cc">
+    <ClCompile Include="sit-options.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

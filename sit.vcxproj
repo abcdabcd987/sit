@@ -80,12 +80,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="options.h" />
+    <ClInclude Include="sit-options.h" />
     <ClInclude Include="sit-sha1.h" />
     <ClInclude Include="sit-util.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="options.cc" />
+    <ClCompile Include="sit-options.cc" />
     <ClCompile Include="sit-sha1.cc" />
     <ClCompile Include="sit.cc" />
   </ItemGroup>

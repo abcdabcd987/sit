@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstring>
 
-#include "options.h"
+#include "sit-options.h"
 
 extern const boost::filesystem::path repo_dir(".sit");
 
