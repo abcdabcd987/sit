@@ -1,8 +1,6 @@
-#ifndef OPTIONS_H_
-#define OPTIONS_H_
+#ifndef SIT_OPERATIONS_H_
+#define SIT_OPERATIONS_H_
 #include <boost/filesystem.hpp>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
 
 #include <iostream>
 #include "sit-util.h"
