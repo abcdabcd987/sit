@@ -11,34 +11,34 @@
 #include <string>
 #include <array>
 
-namespace util {
+namespace Util {
 
-class sit_sha {
-	boost::filesystem::path input_file;
-	boost::uuids::detail::sha1 sha_engine;
-	unsigned sha_value[5];
+class SitSha {
+	boost::filesystem::path inputFile;
+	boost::uuids::detail::sha1 shaEngine;
+	unsigned shaValue[5];
 	bool processed;
 public:
-	sit_sha();
-	sit_sha(const boost::filesystem::path &_input_file);
-	void reset();
-	void set_file(const boost::filesystem::path &_input_file);
+	SitSha();
+	SitSha(const boost::filesystem::path &_inputFile);
+	void Reset();
+	void SetFile(const boost::filesystem::path &_inputFile);
 	/**
 	 * Get bytes from @input_file and run sha1 algorithm, final result is saved in @sha_value.
 	 */
-	void process();
+	void Process();
 	/**
 	 * Convert the result of sha1 algorithm into std::string
 	 * If the result has not been calculate (@processed == false), function process() would call before converting.
 	 * @return the sha1 result represented by std::string
 	 */
-	std::string result_str();
+	std::string ResultStr();
 	/**
 	 * Convert the result of sha1 algorithm into std::tuple
 	 * If the result has not been calculate (@processed == false), function process() would call before converting.
 	 * @return the sha1 result represented by five integers.
 	 */
-	std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned> result_tup();
+	std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned> ResultTup();
 };
 
 }

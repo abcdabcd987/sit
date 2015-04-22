@@ -1,45 +1,45 @@
 #include "sit-sha1.h"
 
-namespace util {
-sit_sha::sit_sha()
+namespace Util {
+SitSha::SitSha()
 {
-	this->sha_engine.reset();
+	this->shaEngine.reset();
 	this->processed = false;
 }
 
-sit_sha::sit_sha(const boost::filesystem::path &_input_file)
-	: input_file(_input_file)
+SitSha::SitSha(const boost::filesystem::path &_inputFile)
+	: inputFile(_inputFile)
 {
-	this->sha_engine.reset();
+	this->shaEngine.reset();
 	this->processed = false;
 }
 
-void sit_sha::reset()
+void SitSha::Reset()
 {
-	this->sha_engine.reset();
+	this->shaEngine.reset();
 	this->processed = false;
 }
 
-void sit_sha::set_file(const boost::filesystem::path &_input_file)
+void SitSha::SetFile(const boost::filesystem::path &_inputFile)
 {
-	this->input_file = _input_file;
+	this->inputFile = _inputFile;
 	if (this->processed) {
 		this->processed = false;
-		this->sha_engine.reset();
+		this->shaEngine.reset();
 	}
 }
 
-void sit_sha::process()
+void SitSha::Process()
 {
 	using namespace boost::filesystem;
 	try {
-		auto ifsize = boost::filesystem::file_size(input_file);
+		auto ifsize = boost::filesystem::file_size(inputFile);
 		char *s = new char [ifsize];
-		ifstream ifile(input_file, std::ios::in | std::ios::binary);
+		ifstream ifile(inputFile, std::ios::in | std::ios::binary);
 
 		ifile.read(s, ifsize);
-		this->sha_engine.process_bytes(s, ifsize);
-		this->sha_engine.get_digest(this->sha_value);
+		this->shaEngine.process_bytes(s, ifsize);
+		this->shaEngine.get_digest(this->shaValue);
 		this->processed = true;
 
 		delete[] s;
@@ -49,29 +49,29 @@ void sit_sha::process()
 	}
 }
 
-std::string sit_sha::result_str()
+std::string SitSha::ResultStr()
 {
 	if (!this->processed) {
-		this->process();
+		this->Process();
 	}
 	std::ostringstream oss;
-	for (auto x : sha_value) {
+	for (auto x : shaValue) {
 		oss << std::hex << x;
 	}
 	return oss.str();
 }
 
-std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned> sit_sha::result_tup()
+std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned> SitSha::ResultTup()
 {
 	if (!this->processed) {
-		this->process();
+		this->Process();
 	}
 	return std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned>(
-		this->sha_value[0],
-		this->sha_value[1],
-		this->sha_value[2],
-		this->sha_value[3],
-		this->sha_value[4]
+		this->shaValue[0],
+		this->shaValue[1],
+		this->shaValue[2],
+		this->shaValue[3],
+		this->shaValue[4]
 		);
 }
 }

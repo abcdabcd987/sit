@@ -8,7 +8,7 @@
 
 extern const boost::filesystem::path repo_dir;
 
-namespace util {
+namespace Util {
 inline void safe_copy_file(
 	const boost::filesystem::path &from,
 	const boost::filesystem::path &to)
