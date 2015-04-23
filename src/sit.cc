@@ -8,6 +8,7 @@ extern const boost::filesystem::path stage_dir(".sit/stage");
 extern const boost::filesystem::path files_dir(".sit/files");
 extern const boost::filesystem::path objects_dir(".sit/objects");
 extern boost::uuids::uuid HEAD = boost::uuids::nil_uuid();
+extern std::string curBranch = "master";
 
 int main(int argc, char *const argv[])
 {

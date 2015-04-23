@@ -10,7 +10,6 @@ void InitRepo()
 	try {
 		/**
 		 * Create sit repository directories
-		 * Because
 		 */
 		boost::filesystem::create_directories(".sit");
 #ifdef WIN32
@@ -34,7 +33,12 @@ void InitRepo()
 		boost::filesystem::ofstream headFile(objects_dir / "HEAD", std::ios::binary);
 		boost::archive::binary_oarchive headBoArch(headFile);
 
-		headBoArch << rootVersion;
+		boost::filesystem::ofstream branchMasterFile(objects_dir / "master", std::ios::binary);
+		boost::archive::binary_oarchive masterBoArch(branchMasterFile);
+
+		masterBoArch << rootVersion;
+
+		headBoArch << std::string("master");
 	} catch (const boost::filesystem::filesystem_error &ec) {
 		std::cerr << ec.what() << std::endl;
 	} catch (const boost::archive::archive_exception &ae) {

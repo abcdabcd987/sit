@@ -13,11 +13,22 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/date_time/posix_time/time_serialize.hpp>
 
+#include <string>
+
+#ifdef _DEBUG
+#include <cstdlib>
+#endif
+
 extern const boost::filesystem::path repo_dir;
 extern const boost::filesystem::path stage_dir;
 extern const boost::filesystem::path files_dir;
 extern const boost::filesystem::path objects_dir;
 extern boost::uuids::uuid HEAD;
+extern std::string curBranch;
+
+namespace {
+const boost::filesystem::directory_iterator endDirIter;
+}
 
 namespace Util {
 inline void safe_copy_file(
@@ -28,39 +39,63 @@ inline void safe_copy_file(
 	boost::filesystem::copy_file(from, to, boost::filesystem::copy_option::overwrite_if_exists);
 }
 
-inline void dos2unix(const boost::filesystem::path &opt_file)
+inline void safe_copy(
+	const boost::filesystem::path &from,
+	const boost::filesystem::path &to)
 {
-	auto fileSize = boost::filesystem::file_size(opt_file);
-	char *s = new char[fileSize];
-
-	boost::filesystem::ifstream getData(opt_file, std::ios::in | std::ios::binary);
-	getData.read(s, fileSize);
-	getData.close();
-	
-	boost::filesystem::ofstream writeData(opt_file, std::ios::out | std::ios::trunc | std::ios::binary);
-	for (unsigned i = 0; i < fileSize; ++i) {
-		if (i < fileSize - 1 && s[i] == '\r' && s[i + 1] == '\n') {
-			continue;
-		}
-		writeData.write(s + i, 1);
+#ifdef _DEBUG
+	std::cerr << "Try to Copy " << from << " To " << to << std::endl;
+	system("pause");
+#endif
+	boost::filesystem::create_directories(to.parent_path());
+#ifdef _DEBUG
+	std::cerr << "Try to Remove " << to << std::endl;
+	system("pause");
+#endif
+	auto removeCnt = boost::filesystem::remove_all(to);
+#ifdef _DEBUG
+	std::cerr << "Removed " << removeCnt << " files" << std::endl;
+	system("pause");
+#endif
+	if (!boost::filesystem::is_directory(from)) {
+#ifdef _DEBUG
+		std::cerr << "Try to Copy a file" << std::endl;
+		system("pause");
+#endif
+		boost::filesystem::copy(from, to);
+	} else {
+#ifdef _DEBUG
+		std::cerr << "Try to Copy a directory" << std::endl;
+		system("pause");
+#endif
+		boost::filesystem::copy_directory(from, to);
 	}
-	writeData.close();
-	delete[] s;
 }
 
 inline void GetHead()
 {
-	boost::filesystem::ifstream ifs(objects_dir / "HEAD", std::ios::binary);
-	boost::archive::binary_iarchive biarch(ifs);
-	biarch >> HEAD;
+	boost::filesystem::ifstream headIfs(objects_dir / "HEAD", std::ios::binary);
+	boost::archive::binary_iarchive headBranchIarch(headIfs);
+	headBranchIarch >> curBranch;
+	headIfs.close();
+	boost::filesystem::ifstream branchIfs(objects_dir / curBranch, std::ios::binary);
+	boost::archive::binary_iarchive headUuidIarch(branchIfs);
+	branchIfs >> HEAD;
 }
 
-inline void SetHead(const boost::uuids::uuid &newHead)
+inline void SetHead()
 {
-	boost::filesystem::ofstream ofs(objects_dir / "HEAD", std::ios::binary);
-	boost::archive::binary_oarchive boarch(ofs);
-	boarch << HEAD;
+	boost::filesystem::ofstream headOfs(objects_dir / "HEAD", std::ios::binary);
+	boost::archive::binary_oarchive headBranchOarch(headOfs);
+	headBranchOarch << curBranch;
+	boost::filesystem::ofstream branchOfs(objects_dir / curBranch, std::ios::binary);
+	boost::archive::binary_oarchive headUuidOarch(branchOfs);
+	headUuidOarch << HEAD;
 }
+
+void dos2unix(const boost::filesystem::path &opt_file);
+
+void for_all(const boost::filesystem::path &, void(*opt)(const boost::filesystem::path&));
 }
 
 #endif
