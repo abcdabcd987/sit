@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sit", "src\sit.vcxproj", "{B390CF59-B51D-4CB8-9933-EE414FFDF356}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sit-main", "src\sit.vcxproj", "{B390CF59-B51D-4CB8-9933-EE414FFDF356}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sha-test", "test\sha_test\sit_sha_test.vcxproj", "{8046BAAF-911D-460F-9D48-296701CA3A35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{B390CF59-B51D-4CB8-9933-EE414FFDF356}.Debug|Win32.Build.0 = Debug|Win32
 		{B390CF59-B51D-4CB8-9933-EE414FFDF356}.Release|Win32.ActiveCfg = Release|Win32
 		{B390CF59-B51D-4CB8-9933-EE414FFDF356}.Release|Win32.Build.0 = Release|Win32
+		{8046BAAF-911D-460F-9D48-296701CA3A35}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8046BAAF-911D-460F-9D48-296701CA3A35}.Debug|Win32.Build.0 = Debug|Win32
+		{8046BAAF-911D-460F-9D48-296701CA3A35}.Release|Win32.ActiveCfg = Release|Win32
+		{8046BAAF-911D-460F-9D48-296701CA3A35}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
