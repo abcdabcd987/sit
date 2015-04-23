@@ -11,10 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{B390CF59-B51D-4CB8-9933-EE414FFDF356}</ProjectGuid>
+    <ProjectGuid>{8046BAAF-911D-460F-9D48-296701CA3A35}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>sit</RootNamespace>
-    <ProjectName>sit-main</ProjectName>
+    <RootNamespace>sit_sha_test</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -42,12 +41,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Boost\include\boost-1_58;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>C:\Boost\include\boost-1_58;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>C:\Boost\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Boost\include\boost-1_58;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>C:\Boost\include\boost-1_58;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>C:\Boost\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -81,15 +80,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="sit-operations.h" />
-    <ClInclude Include="sit-sha1.h" />
-    <ClInclude Include="sit-util.h" />
+    <ClCompile Include="sit-sha1.cc" />
+    <ClCompile Include="main.cc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="sit-add.cc" />
-    <ClCompile Include="sit-init.cc" />
-    <ClCompile Include="sit-sha1.cc" />
-    <ClCompile Include="sit.cc" />
+    <ClInclude Include="sit-sha1.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
