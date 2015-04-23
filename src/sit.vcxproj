@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{48A49CCC-9439-49B4-BE49-D02278855527}</ProjectGuid>
+    <ProjectGuid>{B390CF59-B51D-4CB8-9933-EE414FFDF356}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>sit</RootNamespace>
   </PropertyGroup>
@@ -41,13 +41,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Boost\include\boost-1_58;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Boost\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Boost\include\boost-1_58;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Boost\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Boost\include\boost-1_58;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Boost\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Boost\include\boost-1_58;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Boost\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

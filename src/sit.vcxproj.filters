@@ -15,27 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="sit-operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="sit-sha1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sit-util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sit-operations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="sit-sha1.cc">
+    <ClCompile Include="sit.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sit.cc">
+    <ClCompile Include="sit-add.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sit-init.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sit-add.cc">
+    <ClCompile Include="sit-sha1.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
