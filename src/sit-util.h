@@ -11,6 +11,7 @@
 #include <boost/uuid/uuid_serialize.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
+#include <boost/date_time/posix_time/time_serialize.hpp>
 
 extern const boost::filesystem::path repo_dir;
 extern const boost::filesystem::path stage_dir;
