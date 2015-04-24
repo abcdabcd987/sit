@@ -1,8 +1,8 @@
 CXX = g++
 CXXFLAGS = -Wall -O2 -std=c++11
-LIBS = -lpthread -lboost_system -lboost_filesystem
+LIBS = -lpthread -lboost_system -lboost_filesystem -lboost_date_time -lboost_serialization 
 
-SOURCES = sit.cc sit-add.cc sit-init.cc sit-sha1.cc
+SOURCES = sit.cc sit-add.cc sit-init.cc sit-sha1.cc sit-util.cc
 OBJECTS = $(SOURCES:.cc=.o)
 EXECUTABLE = sit
 
