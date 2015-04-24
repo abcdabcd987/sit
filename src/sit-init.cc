@@ -1,6 +1,5 @@
 #include "sit-operations.h"
 
-#include <boost/archive/binary_oarchive.hpp>
 #include <sstream>
 #include <string>
 
@@ -24,18 +23,18 @@ void InitRepo()
 		uuidStr << rootVersion;
 		std::string rootUuidStr = uuidStr.str();
 
-		boost::filesystem::ofstream object(objects_dir / rootUuidStr, std::ios::binary);
-		boost::archive::binary_oarchive boarch(object);
+		boost::filesystem::ofstream object(objects_dir / rootUuidStr);
+		boost::archive::text_oarchive boarch(object);
 
 		boarch << rootVersion;
 		boarch << static_cast<const boost::posix_time::ptime>(boost::posix_time::microsec_clock::universal_time());
 		
 
-		boost::filesystem::ofstream headFile(objects_dir / "HEAD", std::ios::binary);
-		boost::archive::binary_oarchive headBoArch(headFile);
+		boost::filesystem::ofstream headFile(objects_dir / "HEAD");
+		boost::archive::text_oarchive headBoArch(headFile);
 
-		boost::filesystem::ofstream branchMasterFile(objects_dir / "master", std::ios::binary);
-		boost::archive::binary_oarchive masterBoArch(branchMasterFile);
+		boost::filesystem::ofstream branchMasterFile(objects_dir / "master");
+		boost::archive::text_oarchive masterBoArch(branchMasterFile);
 
 		masterBoArch << rootVersion;
 
