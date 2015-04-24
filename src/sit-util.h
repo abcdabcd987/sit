@@ -15,10 +15,6 @@
 
 #include <string>
 
-#ifdef _DEBUG
-#include <cstdlib>
-#endif
-
 extern const boost::filesystem::path repo_dir;
 extern const boost::filesystem::path stage_dir;
 extern const boost::filesystem::path files_dir;
@@ -37,39 +33,6 @@ inline void safe_copy_file(
 {
 	boost::filesystem::create_directories(to.parent_path());
 	boost::filesystem::copy_file(from, to, boost::filesystem::copy_option::overwrite_if_exists);
-}
-
-inline void safe_copy(
-	const boost::filesystem::path &from,
-	const boost::filesystem::path &to)
-{
-#ifdef _DEBUG
-	std::cerr << "Try to Copy " << from << " To " << to << std::endl;
-	system("pause");
-#endif
-	boost::filesystem::create_directories(to.parent_path());
-#ifdef _DEBUG
-	std::cerr << "Try to Remove " << to << std::endl;
-	system("pause");
-#endif
-	auto removeCnt = boost::filesystem::remove_all(to);
-#ifdef _DEBUG
-	std::cerr << "Removed " << removeCnt << " files" << std::endl;
-	system("pause");
-#endif
-	if (!boost::filesystem::is_directory(from)) {
-#ifdef _DEBUG
-		std::cerr << "Try to Copy a file" << std::endl;
-		system("pause");
-#endif
-		boost::filesystem::copy(from, to);
-	} else {
-#ifdef _DEBUG
-		std::cerr << "Try to Copy a directory" << std::endl;
-		system("pause");
-#endif
-		boost::filesystem::copy_directory(from, to);
-	}
 }
 
 inline void GetHead()
