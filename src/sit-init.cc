@@ -28,7 +28,7 @@ void InitRepo()
 		boost::archive::binary_oarchive boarch(object);
 
 		boarch << rootVersion;
-		boarch << boost::posix_time::microsec_clock::universal_time();
+		boarch << static_cast<const boost::posix_time::ptime>(boost::posix_time::microsec_clock::universal_time());
 		
 
 		boost::filesystem::ofstream headFile(objects_dir / "HEAD", std::ios::binary);
@@ -39,7 +39,7 @@ void InitRepo()
 
 		masterBoArch << rootVersion;
 
-		headBoArch << std::string("master");
+		headBoArch << static_cast<const std::string>(std::string("master"));
 	} catch (const boost::filesystem::filesystem_error &ec) {
 		std::cerr << ec.what() << std::endl;
 	} catch (const boost::archive::archive_exception &ae) {
