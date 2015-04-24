@@ -13,6 +13,5 @@
 namespace MainFrame {
 void InitRepo();
 void AddFile(const boost::filesystem::path &file);
-void RemoveFile(const boost::filesystem::path &file);
 }
 #endif

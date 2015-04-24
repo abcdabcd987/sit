@@ -41,8 +41,5 @@
     <ClCompile Include="sit-util.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sit-remove.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

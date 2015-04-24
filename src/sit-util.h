@@ -9,10 +9,8 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_serialize.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 #include <boost/date_time/posix_time/time_serialize.hpp>
 
 #include <string>
@@ -40,21 +38,21 @@ inline void safe_copy_file(
 inline void GetHead()
 {
 	boost::filesystem::ifstream headIfs(objects_dir / "HEAD");
-	boost::archive::binary_iarchive headBranchIarch(headIfs);
+	boost::archive::text_iarchive headBranchIarch(headIfs);
 	headBranchIarch >> curBranch;
 	headIfs.close();
 	boost::filesystem::ifstream branchIfs(objects_dir / curBranch);
-	boost::archive::binary_iarchive headUuidIarch(branchIfs);
+	boost::archive::text_iarchive headUuidIarch(branchIfs);
 	branchIfs >> HEAD;
 }
 
 inline void SetHead()
 {
 	boost::filesystem::ofstream headOfs(objects_dir / "HEAD");
-	boost::archive::binary_oarchive headBranchOarch(headOfs);
+	boost::archive::text_oarchive headBranchOarch(headOfs);
 	headBranchOarch << curBranch;
 	boost::filesystem::ofstream branchOfs(objects_dir / curBranch);
-	boost::archive::binary_oarchive headUuidOarch(branchOfs);
+	boost::archive::text_oarchive headUuidOarch(branchOfs);
 	headUuidOarch << HEAD;
 }
 

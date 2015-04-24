@@ -24,17 +24,17 @@ void InitRepo()
 		std::string rootUuidStr = uuidStr.str();
 
 		boost::filesystem::ofstream object(objects_dir / rootUuidStr);
-		boost::archive::binary_oarchive boarch(object);
+		boost::archive::text_oarchive boarch(object);
 
 		boarch << rootVersion;
 		boarch << static_cast<const boost::posix_time::ptime>(boost::posix_time::microsec_clock::universal_time());
 		
 
 		boost::filesystem::ofstream headFile(objects_dir / "HEAD");
-		boost::archive::binary_oarchive headBoArch(headFile);
+		boost::archive::text_oarchive headBoArch(headFile);
 
 		boost::filesystem::ofstream branchMasterFile(objects_dir / "master");
-		boost::archive::binary_oarchive masterBoArch(branchMasterFile);
+		boost::archive::text_oarchive masterBoArch(branchMasterFile);
 
 		masterBoArch << rootVersion;
 
