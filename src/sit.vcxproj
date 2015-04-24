@@ -88,6 +88,7 @@
   <ItemGroup>
     <ClCompile Include="sit-add.cc" />
     <ClCompile Include="sit-init.cc" />
+    <ClCompile Include="sit-remove.cc" />
     <ClCompile Include="sit-sha1.cc" />
     <ClCompile Include="sit-util.cc" />
     <ClCompile Include="sit.cc" />
