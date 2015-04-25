@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{48A49CCC-9439-49B4-BE49-D02278855527}</ProjectGuid>
+    <ProjectGuid>{68DF02A3-E609-4EE4-B19F-32FEAB5BA924}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>sit</RootNamespace>
   </PropertyGroup>
@@ -41,9 +41,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Boost\include\boost-1_58;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Boost\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Boost\include\boost-1_58;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Boost\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -76,6 +80,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Core.hpp" />
+    <ClInclude Include="Diff.hpp" />
+    <ClInclude Include="FileSystem.hpp" />
+    <ClInclude Include="Objects.hpp" />
+    <ClInclude Include="Util.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core.cc" />
+    <ClCompile Include="Diff.cc" />
+    <ClCompile Include="FileSystem.cc" />
+    <ClCompile Include="Index.cc" />
+    <ClCompile Include="Objects.cc" />
+    <ClCompile Include="sit.cc" />
+    <ClCompile Include="Util.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

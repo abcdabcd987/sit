@@ -1,5 +1,8 @@
 #ifndef _SRC_CORE_HPP_
 #define _SRC_CORE_HPP_
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
+
 namespace Sit {
 namespace Core {
 

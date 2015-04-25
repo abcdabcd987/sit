@@ -1,5 +1,10 @@
 #ifndef _SRC_DIFF_HPP_
 #define _SRC_DIFF_HPP_
+#include <boost/filesystem.hpp>
+
+#include <string>
+#include <map>
+
 namespace Sit {
 namespace Diff {
 
@@ -14,8 +19,8 @@ enum FileStatus { Added, Modified, Deleted, Same };
  * An item of a `Diff` object
  */
 struct DiffItem {
-    FileStatus status;            // File status
-    std::string diff;             // Diff string
+	FileStatus status;            // File status
+	std::string diff;             // Diff string
 };
 
 

@@ -14,10 +14,10 @@ enum ObjectType { BLOB, TREE, COMMIT };
  * A tree item
  */
 struct TreeItem {
-    int mode;                         // Linux permission mode
-    ObjectType type;                  // The type of the item, either blob or tree
-    std::string id;                   // The sha1 of the item
-    boost::filesystem::path filename; // The filename
+	int mode;                         // Linux permission mode
+	ObjectType type;                  // The type of the item, either blob or tree
+	std::string id;                   // The sha1 of the item
+	boost::filesystem::path filename; // The filename
 };
 
 
@@ -38,15 +38,15 @@ typedef std::vector<TreeItem> Tree;
  *     parent 5a174a6c45eadc12180f5e9466e547777c3b3118
  *     author Scott Chacon <schacon@gmail.com> 1243040974 -0700
  *     committer Scott Chacon <schacon@gmail.com> 1243040974 -0700
- *     
+ *
  *     This is my second commit.
  */
 struct Commit {
-    std::string tree;      // The sha1 value of the repo root tree
-    std::string parent;    // The sha1 value of the parent commit.
-    std::string author;    // The author's name, email, timestamp, timezone
-    std::string committer; // The committer's name, email, timestamp, timezone
-    std::string message;   // Commit log
+	std::string tree;      // The sha1 value of the repo root tree
+	std::string parent;    // The sha1 value of the parent commit.
+	std::string author;    // The author's name, email, timestamp, timezone
+	std::string committer; // The committer's name, email, timestamp, timezone
+	std::string message;   // Commit log
 };
 
 
@@ -106,7 +106,7 @@ void WriteCommit(const Commit& commit);
  */
 void _write(const std::string& content);
 
-    
+
 }
 }
 #endif

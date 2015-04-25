@@ -1,6 +1,10 @@
 #ifndef _SRC_UTIL_HPP
 #define _SRC_UTIL_HPP
+#include <sstream>
+
 #include <string>
+#include <vector>
+#include <boost/uuid/sha1.hpp>
 
 namespace Sit {
 namespace Util {
@@ -10,18 +14,18 @@ namespace Util {
  * The struct to represent exception
  */
 struct SitException {
-    /**
-     * The message intended to be shown to user
-     */
-    const std::string message;
+	/**
+	 * The message intended to be shown to user
+	 */
+	const std::string message;
 
 
-    /**
-     * The details for debug
-     */
-    const std::string detail;
-    SitException(const std::string& Message, const std::string& Detail = ""):
-        message(Message), detail(Detail) {}
+	/**
+	 * The details for debug
+	 */
+	const std::string detail;
+	SitException(const std::string& Message, const std::string& Detail = "")
+		: message(Message), detail(Detail) {}
 };
 
 
