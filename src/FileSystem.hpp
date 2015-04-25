@@ -4,6 +4,7 @@
 #include <vector>
 #include <boost/filesystem.hpp>
 #include "Util.hpp"
+#include "Objects.hpp"
 
 namespace Sit {
 namespace FileSystem {
@@ -17,7 +18,7 @@ extern const boost::filesystem::path SIT_ROOT;
 
 
 /**
- * Absolute path to the repo root, i.e., `.sit/../`
+ * Relative path to the repo root, i.e., `./`
  */
 extern const boost::filesystem::path REPO_ROOT;
 
@@ -41,16 +42,20 @@ void AssertInRepo();
 std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path& path);
 
 
-/**
- * Return the relative path of the given argument to the path of the repo root
- */
-boost::filesystem::path PathFromRepoRoot(const boost::filesystem::path& path);
+///**
+// * Return the relative path of the given argument to the path of the repo root
+// */
+//boost::filesystem::path PathFromRepoRoot(const boost::filesystem::path& path);
+//
+// Seems not useful??
 
 
-/**
- * Return the relative path of the given argument to the path of the `.sit` root
- */
-boost::filesystem::path PathFromSitRoot(const boost::filesystem::path& path);
+///**
+// * Return the relative path of the given argument to the path of the `.sit` root
+// */
+//boost::filesystem::path PathFromSitRoot(const boost::filesystem::path& path);
+//
+// Seems not useful?
 
 
 /**
@@ -81,15 +86,6 @@ void Write(const boost::filesystem::path& path, const std::string& content);
  * Read file `path` to a string.
  */
 std::string Read(const boost::filesystem::path& path);
-
-
-/**
- * Write files from a Tree object recursively
- */
-void writeFilesFromTree(const boost::filesystem::path& prefix, const Tree& tree);
-
-
-
 
 
 }

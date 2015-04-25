@@ -7,7 +7,7 @@ namespace Objects {
 /**
  * Object type
  */
-enum { Blob, Tree, Commit } ObjectType;
+enum ObjectType { BLOB, TREE, COMMIT };
 
 
 /**
