@@ -28,11 +28,15 @@ std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path
 	using namespace boost::filesystem;
 	std::vector<boost::filesystem::path> ls;
 	try {
-		for (recursive_directory_iterator iter(path), end; iter != end; ++iter) {
-			ls.push_back(iter->path().relative_path());
+		if (IsDirectory(path)) {
+			for (recursive_directory_iterator iter(path), end; iter != end; ++iter) {
+				ls.push_back(iter->path().relative_path());
+			}
+		} else {
+			ls.push_back(path);
 		}
 	} catch (const filesystem_error &fe) {
-		throw Sit::Util::SitException(std::string("Cannot list path: ") + path.string(), fe.what());
+		throw Sit::Util::SitException(std::string("Fatal: Cannot list path: ") + path.string(), fe.what());
 	}
 	return ls;
 }
@@ -76,7 +80,7 @@ std::string Read(const boost::filesystem::path &path)
 	char *s = new char[fileSize];
 	boost::filesystem::ifstream file(path, std::ios::in | std::ios::binary);
 	file.read(s, fileSize);
-	std::string str = s;
+	std::string str(s, s + fileSize);
 	delete[] s;
 	return str;
 }

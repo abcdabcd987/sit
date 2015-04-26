@@ -37,6 +37,8 @@ void AssertInRepo();
 
 /**
  * List all files and directories under the path recursively.
+ * If `path` is a directory, ListRecursive will work regularly.
+ * If `path` is a regular file, ListRecursive will return a vector contained only `path`
  * Return a vector of the path list, sorted.
  */
 std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path& path);
