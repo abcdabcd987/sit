@@ -83,6 +83,7 @@
     <ClInclude Include="Core.hpp" />
     <ClInclude Include="Diff.hpp" />
     <ClInclude Include="FileSystem.hpp" />
+    <ClInclude Include="Index.hpp" />
     <ClInclude Include="Objects.hpp" />
     <ClInclude Include="Util.hpp" />
   </ItemGroup>

@@ -6,26 +6,24 @@
 namespace Sit {
 namespace FileSystem {
 
-
 const boost::filesystem::path SIT_ROOT(".sit/");
 const boost::filesystem::path REPO_ROOT("./");
 
+const boost::filesystem::path OBJECTS_DIR(".sit/objects");
 
 bool InRepo()
 {
 	return boost::filesystem::is_directory(SIT_ROOT);
 }
 
-
 void AssertInRepo()
 {
 	if (!InRepo()) {
-		throw Sit::Util::SitException("Not in a sit repo.");
+		throw Sit::Util::SitException("Fatal: Not in a sit repo.");
 	}
 }
 
-
-std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path& path)
+std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path &path)
 {
 	using namespace boost::filesystem;
 	std::vector<boost::filesystem::path> ls;
@@ -39,40 +37,49 @@ std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path
 	return ls;
 }
 
+void SafeCopyFile(const boost::filesystem::path &from, const boost::filesystem::path &to)
+{
+	using namespace boost::filesystem;
+	if (IsDirectory(from)) {
+		return;
+	}
+	create_directories(to.parent_path());
+	copy_file(from, to, copy_option::overwrite_if_exists);
+}
 
-bool IsExist(const boost::filesystem::path& path)
+bool IsExist(const boost::filesystem::path &path)
 {
 	return boost::filesystem::exists(path);
 }
 
-
-bool IsFile(const boost::filesystem::path& path)
+bool IsFile(const boost::filesystem::path &path)
 {
 	return boost::filesystem::is_regular_file(path);
 }
 
-
-bool IsDirectory(const boost::filesystem::path& path)
+bool IsDirectory(const boost::filesystem::path &path)
 {
 	return boost::filesystem::is_directory(path);
 }
 
-
-void Write(const boost::filesystem::path& path, const std::string& content)
+void Write(const boost::filesystem::path &path, const std::string &content)
 {
 	using namespace boost::filesystem;
 	ofstream file(path, std::ios::out | std::ios::binary);
-	file << content;
+	file.write(content.c_str(), content.length());
 }
 
-
-std::string Read(const boost::filesystem::path& path)
+std::string Read(const boost::filesystem::path &path)
 {
 	using namespace boost::iostreams;
-	mapped_file mmap(path, boost::iostreams::mapped_file::readonly);
-	return mmap.const_data();
+	auto fileSize = boost::filesystem::file_size(path);
+	char *s = new char[fileSize];
+	boost::filesystem::ifstream file(path, std::ios::in | std::ios::binary);
+	file.read(s, fileSize);
+	std::string str = s;
+	delete[] s;
+	return str;
 }
-
 
 }
 }

@@ -1,8 +1,8 @@
 #ifndef _SRC_INDEX_HPP_
 #define _SRC_INDEX_HPP_
 
+#include "FileSystem.hpp"
 #include <map>
-#include <string>
 
 namespace Sit {
 
@@ -43,15 +43,14 @@ void Save();
 /**
  * Remove `path` from the index and its object file
  */
-void Remove(const boost::filesystem::path& path);
+unsigned Remove(const boost::filesystem::path &path);
 
 
 /**
- * Insert `path` and the sha1 of `content` to the index,
+ * Insert `file` and the sha1 of `content` to the index,
  * and write `content` to the object file
  */
-void Insert(const boost::filesystem::path& path, const std::string& content);
-
+void Insert(const boost::filesystem::path & file, const std::string & content);
 }
 }
 #endif

@@ -20,6 +20,7 @@ std::string SHA1sum(const std::string& content)
 std::vector<std::string> SplitLine()
 {
 	//HINT: Use boost::algorithm::split
+	return std::vector<std::string>();
 }
 }
 }

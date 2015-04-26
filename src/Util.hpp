@@ -9,7 +9,6 @@
 namespace Sit {
 namespace Util {
 
-
 /**
  * The struct to represent exception
  */
@@ -28,14 +27,10 @@ struct SitException {
 		: message(Message), detail(Detail) {}
 };
 
-
-
 /**
  * Return the SHA1 value of `content`
  */
 std::string SHA1sum(const std::string& content);
-
-
 
 /**
  * Split the `content` into lines

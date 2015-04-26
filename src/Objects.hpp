@@ -1,6 +1,10 @@
 #ifndef _SRC_OBJECTS_HPP
 #define _SRC_OBJECTS_HPP
 
+#include <boost/filesystem.hpp>
+#include <string>
+#include <vector>
+
 namespace Sit {
 namespace Objects {
 
@@ -8,7 +12,6 @@ namespace Objects {
  * Object type
  */
 enum ObjectType { BLOB, TREE, COMMIT };
-
 
 /**
  * A tree item
@@ -20,7 +23,6 @@ struct TreeItem {
 	boost::filesystem::path filename; // The filename
 };
 
-
 /**
  * The `Tree` is actually a list of `TreeItem`
  * Like this:
@@ -29,7 +31,6 @@ struct TreeItem {
  *     040000 tree 99f1a6d12cb4b6f19c8655fca46c3ecf317074e0    lib
  */
 typedef std::vector<TreeItem> Tree;
-
 
 /**
  * The item saving a commit
@@ -49,7 +50,6 @@ struct Commit {
 	std::string message;   // Commit log
 };
 
-
 /**
  * Check whether the object which has sha1 value `id` exists or not
  */
@@ -61,13 +61,11 @@ bool IsExist(const std::string& id);
  */
 std::string GetBlob(const std::string& id);
 
-
 /**
  * Get the tree which has sh1 value `id`.
  * Throw exception if not found or not a tree
  */
 Tree GetTree(const std::string& id);
-
 
 /**
  * Get the commit which has sh1 value `id`.
@@ -82,24 +80,20 @@ Commit GetCommit(const std::string& id);
  */
 void GenHeader(const std::string& content);
 
-
 /**
  * Write the blob object `blob` to file with additional header.
  */
 void WriteBlob(const std::string& blob);
-
 
 /**
  * Write the tree object `tree` to file with additional header.
  */
 void WriteTree(const Tree& tree);
 
-
 /**
  * Write the commit object `commit` to file with additional header.
  */
 void WriteCommit(const Commit& commit);
-
 
 /**
  * Helper function to write the object value with additional header.
