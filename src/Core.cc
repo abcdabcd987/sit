@@ -6,6 +6,10 @@
 #include "Util.hpp"
 #include "Index.hpp"
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
 namespace Sit {
 namespace Core {
 
@@ -14,6 +18,9 @@ void Init()
 	using namespace boost::filesystem;
 	try {
 		create_directories(".sit/");
+#ifdef WIN32
+		SetFileAttributes(L".sit", FILE_ATTRIBUTE_HIDDEN);
+#endif
 		create_directories(".sit/hook");
 		create_directories(".sit/objects");
 		create_directories(".sit/info");
