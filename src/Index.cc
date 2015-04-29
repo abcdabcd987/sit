@@ -79,19 +79,12 @@ unsigned Remove(const boost::filesystem::path &path)
 
 bool InIndex(const boost::filesystem::path& path)
 {
-	unsigned rmCount = 0;
 	try {
-		auto newPath = path.relative_path();
-		for (auto &element : _index) {
-			if (element.first.string().find(newPath.string()) == 0) {
-				_index.erase(element.first);
-				++rmCount;
-			}
-		}
+		return _index.count(path) > 0;
 	} catch (const std::exception &ec) {
 		std::cerr << ec.what() << std::endl;
 	}
-	return rmCount > 0;
+	return false;
 }
 
 }

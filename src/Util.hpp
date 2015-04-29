@@ -30,7 +30,7 @@ struct SitException {
 /**
  * Return the SHA1 value of `content`
  */
-std::string SHA1sum(const std::string& content);
+std::string SHA1sum(const std::string &content);
 
 /**
  * Split the `content` into lines
