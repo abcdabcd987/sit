@@ -69,8 +69,12 @@ bool IsDirectory(const boost::filesystem::path &path)
 void Write(const boost::filesystem::path &path, const std::string &content)
 {
 	using namespace boost::filesystem;
+	create_directories(path.parent_path());
 	ofstream file(path, std::ios::out | std::ios::binary);
 	file.write(content.c_str(), content.length());
+	if (!file) {
+		throw Util::SitException(std::string("Cannot write to path: ") + path.string());
+	}
 }
 
 std::string Read(const boost::filesystem::path &path)

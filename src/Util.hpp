@@ -37,6 +37,20 @@ std::string SHA1sum(const std::string& content);
  */
 std::vector<std::string> SplitLine();
 
+/**
+ * Return the first line of the string
+ */
+std::string FirstLine(const std::string& str);
+
+/**
+ * Convert file mode string to int
+ */
+int FileModeToInt(const std::string& mode);
+
+/**
+ * Convert file mode to string
+ */
+std::string FileModeToString(const int mode);
 
 }
 }

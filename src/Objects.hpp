@@ -73,32 +73,33 @@ Tree GetTree(const std::string& id);
  */
 Commit GetCommit(const std::string& id);
 
-/**
- * Generate the additional header of the content
- * Additional header: OBJECT_TYPE CONTENT_LENGTH \n
- * Ref: http://git-scm.com/book/zh/v1/Git-%E5%86%85%E9%83%A8%E5%8E%9F%E7%90%86-Git-%E5%AF%B9%E8%B1%A1
- */
-void GenHeader(const std::string& content);
+///**
+// * Generate the additional header of the content
+// * Additional header: OBJECT_TYPE CONTENT_LENGTH \n
+// * Ref: http://git-scm.com/book/zh/v1/Git-%E5%86%85%E9%83%A8%E5%8E%9F%E7%90%86-Git-%E5%AF%B9%E8%B1%A1
+// */
+//void GenHeader(const std::string& content);
+// Seems not useful??
+// I asked a question:
+// http://stackoverflow.com/questions/29914417/why-git-prepends-a-type-length-0-header-in-object-files/29914642
 
 /**
  * Write the blob object `blob` to file with additional header.
+ * Return object SHA1.
  */
-void WriteBlob(const std::string& blob);
+std::string WriteBlob(const std::string& blob);
 
 /**
  * Write the tree object `tree` to file with additional header.
+ * Return object SHA1.
  */
-void WriteTree(const Tree& tree);
+std::string WriteTree(const Tree& tree);
 
 /**
  * Write the commit object `commit` to file with additional header.
+ * Return object SHA1.
  */
-void WriteCommit(const Commit& commit);
-
-/**
- * Helper function to write the object value with additional header.
- */
-void _write(const std::string& content);
+std::string WriteCommit(const Commit& commit);
 
 
 }
