@@ -33,6 +33,9 @@
     <ClInclude Include="Index.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cc">
@@ -54,6 +57,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Util.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

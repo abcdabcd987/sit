@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Config.hpp" />
     <ClInclude Include="Core.hpp" />
     <ClInclude Include="Diff.hpp" />
     <ClInclude Include="FileSystem.hpp" />
@@ -88,6 +89,7 @@
     <ClInclude Include="Util.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Config.cc" />
     <ClCompile Include="Core.cc" />
     <ClCompile Include="Diff.cc" />
     <ClCompile Include="FileSystem.cc" />

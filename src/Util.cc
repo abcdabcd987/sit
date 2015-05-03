@@ -11,7 +11,7 @@ std::string SHA1sum(const std::string& content)
 	shaEngine.get_digest(shaValue);
 	std::ostringstream result;
 	for (auto &x : shaValue) {
-		result << std::hex << x;
+		result << std::setw(8) << std::setfill('0') << std::hex << x;
 	}
 	return result.str();
 }
