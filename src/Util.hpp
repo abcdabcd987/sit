@@ -52,6 +52,11 @@ int FileModeToInt(const std::string& mode);
  */
 std::string FileModeToString(const int mode);
 
+/**
+ * Generate author string for committing
+ */
+std::string AuthorString(const std::string& name, const std::string& email, const std::string& datetime);
+
 }
 }
 #endif

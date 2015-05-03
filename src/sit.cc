@@ -1,18 +1,26 @@
 #include "Core.hpp"
+#include "Util.hpp"
 #include <iostream>
 
 int main(int argc, char** argv)
 {
-	if (argv[1] == std::string("init")) {
-		Sit::Core::Init();
+	try {
+		if (strcmp("init", argv[1]) == 0) {
+			Sit::Core::Init();
+		} else if (strcmp("add", argv[1]) == 0) {
+			std::cout << argv[2] << std::endl;
+			Sit::Core::Add(argv[2]);
+		} else if (strcmp("rm", argv[1]) == 0) {
+			std::cout << argv[2] << std::endl;
+			Sit::Core::Rm(argv[2]);
+		} else if (strcmp("commit", argv[1]) == 0) {
+			Sit::Core::Commit();
+		}
+	} catch (const Sit::Util::SitException& e) {
+		std::cerr << "!!! Sit Exception:" << std::endl;
+		std::cerr << e.message << std::endl;
+		if (!e.detail.empty()) {
+			std::cerr << e.detail << std::endl;
+		}
 	}
-	if (argv[1] == std::string("add")) {
-		std::cout << argv[2] << std::endl;
-		Sit::Core::Add(argv[2]);
-	}
-	if (argv[1] == std::string("remove")) {
-		std::cout << argv[2] << std::endl;
-		Sit::Core::Rm(argv[2]);
-	}
-	return 0;
 }

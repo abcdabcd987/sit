@@ -51,6 +51,16 @@ unsigned Remove(const boost::filesystem::path &path);
  * and write `content` to the object file
  */
 void Insert(const boost::filesystem::path & file, const std::string & content);
+
+/**
+ * Index type
+ */
+typedef std::map<boost::filesystem::path, std::string> Index;
+
+/**
+ * Return the whole index
+ */
+Index GetIndex();
 }
 }
 #endif
