@@ -4,6 +4,7 @@
 #include <boost/filesystem.hpp>
 #include <string>
 #include <vector>
+#include "Index.hpp"
 
 namespace Sit {
 namespace Objects {
@@ -100,6 +101,12 @@ std::string WriteTree(const Tree& tree);
  * Return object SHA1.
  */
 std::string WriteCommit(const Commit& commit);
+
+/**
+ * Write the tree object constructed from index
+ * Return tree object SHA1.
+ */
+std::string WriteIndex();
 
 
 }

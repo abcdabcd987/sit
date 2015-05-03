@@ -55,5 +55,10 @@ std::string FileModeToString(int mode)
 	return res;
 }
 
+std::string AuthorString(const std::string& name, const std::string& email, const std::string& datetime)
+{
+	return name + " <" + email + "> " + datetime;
+}
+
 }
 }

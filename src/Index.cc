@@ -4,7 +4,7 @@
 namespace Sit {
 namespace Index {
 
-std::map<boost::filesystem::path, std::string> _index;
+Index _index;
 
 void Load()
 {
@@ -85,6 +85,12 @@ bool InIndex(const boost::filesystem::path& path)
 		std::cerr << ec.what() << std::endl;
 	}
 	return false;
+}
+
+Index GetIndex()
+{
+	Load();
+	return _index;
 }
 
 }

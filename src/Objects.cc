@@ -1,6 +1,8 @@
 #include <sstream>
 #include <iostream>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+
 
 #include "Objects.hpp"
 #include "FileSystem.hpp"
@@ -115,6 +117,78 @@ std::string WriteCommit(const Commit& commit)
 	return sha1;
 }
 
+struct IndexTreeItem;
+typedef std::map<std::string, IndexTreeItem> IndexTree;
+struct IndexTreeItem
+{
+	std::string filename;
+	std::string blobid;
+	IndexTree *tree;
+};
+
+std::string writeIndexTree(const IndexTree& idt)
+{
+	Tree tree;
+	for (const auto &i : idt) {
+		TreeItem item;
+		if (i.second.tree) {
+			item.mode = 040000;
+			item.type = Objects::TREE;
+			item.id = writeIndexTree(*i.second.tree);
+			item.filename = i.second.filename;
+		} else {
+			item.mode = 0100644;
+			item.type = Objects::BLOB;
+			item.id = i.second.blobid;
+			item.filename = i.second.filename;
+		}
+		tree.push_back(item);
+	}
+	return WriteTree(tree);
+}
+
+IndexTree* makeIndexTree(const Index::Index& index)
+{
+	IndexTree *tree = new IndexTree();
+	for (const auto &i : index) {
+		std::vector<std::string> dirs;
+		boost::split(dirs, i.first.generic_string(), boost::is_any_of("/"));
+		dirs.erase(dirs.end()-1);
+		IndexTree *parent = tree;
+		for (const auto &dir : dirs) {
+			auto iter = parent->find(dir);
+			if (iter != parent->end()) {
+				parent = iter->second.tree;
+			} else {
+				IndexTree *t = new IndexTree;
+				parent->insert(std::make_pair(dir, IndexTreeItem({dir, "", t})));
+				parent = t;
+			}
+		}
+		const std::string filename(i.first.filename().string());
+		const IndexTreeItem item({filename, i.second, 0});
+		parent->insert(std::make_pair(filename, item));
+	}
+	return tree;
+}
+
+void deleteIndexTree(IndexTree *tree)
+{
+	for (const auto &i : *tree) {
+		if (i.second.tree) {
+			deleteIndexTree(i.second.tree);
+		}
+	}
+	delete tree;
+}
+
+std::string WriteIndex()
+{
+	IndexTree *tree = makeIndexTree(Index::GetIndex());
+	std::string id(writeIndexTree(*tree));
+	deleteIndexTree(tree);
+	return id;
+}
 
 }
 }
