@@ -7,9 +7,14 @@ namespace Sit {
 namespace Core {
 
 /**
- * Initializes current working directory
+ * Initialize a repository in current working directory
  */
 void Init();
+
+/**
+ * Try to find a repository directory in the parent directory of current working directory
+ */
+void LoadRepo();
 
 /**
  * Add files to the index recursively

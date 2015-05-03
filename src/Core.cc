@@ -34,6 +34,20 @@ void Init()
 	}
 }
 
+void LoadRepo()
+{
+	using namespace boost::filesystem;
+	path curPath = system_complete("./");
+	while (curPath != "") {
+		if (is_directory(curPath / ".sit")) {
+			FileSystem::REPO_ROOT = curPath;
+			return ;
+		}
+		curPath = curPath.parent_path();
+	}
+	throw Sit::Util::SitException("Cannot find a sit repository.");
+}
+
 std::string AddFile(const boost::filesystem::path &file)
 {
 	if (FileSystem::IsDirectory(file)) {
@@ -48,7 +62,7 @@ std::string AddFile(const boost::filesystem::path &file)
 			throw Sit::Util::SitException("Fatal: Try to add a file larger than 200MB", file.string());
 		}
 		std::string sha1Value = Sit::Util::SHA1sum(FileSystem::Read(file));
-		boost::filesystem::path dstFile(FileSystem::OBJECTS_DIR / sha1Value.substr(0, 2) / sha1Value.substr(2));
+		boost::filesystem::path dstFile(FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR / sha1Value.substr(0, 2) / sha1Value.substr(2));
 		FileSystem::SafeCopyFile(file, dstFile);
 		std::cout << file << " added." << std::endl;
 		return sha1Value;
@@ -84,7 +98,7 @@ void Rm(const boost::filesystem::path &path)
 
 std::string getCommitMessage()
 {
-	std::stringstream in(FileSystem::Read(FileSystem::SIT_ROOT / "COMMIT_MSG"));
+	std::stringstream in(FileSystem::Read(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "COMMIT_MSG"));
 	std::stringstream out;
 	std::string line;
 	bool empty = true;
@@ -102,7 +116,7 @@ std::string getCommitMessage()
 
 std::string getHEAD()
 {
-	auto path(FileSystem::SIT_ROOT / "HEAD");
+	auto path(FileSystem::REPO_ROOT/ FileSystem::SIT_ROOT / "HEAD");
 	if (!FileSystem::IsFile(path)) {
 		throw Util::SitException("HEAD not found.");
 	}
@@ -120,7 +134,7 @@ void Commit()
 
 	Objects::Commit commit;
 
-	if (!FileSystem::IsFile(FileSystem::SIT_ROOT / "COMMIT_MSG")) {
+	if (!FileSystem::IsFile(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "COMMIT_MSG")) {
 		throw SitException("Commit message not found.");
 	}
 	commit.message = getCommitMessage();
@@ -146,7 +160,7 @@ void Commit()
 
 	const std::string id(Objects::WriteCommit(commit));
 
-	FileSystem::Write(FileSystem::SIT_ROOT / "HEAD", id);
+	FileSystem::Write(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "HEAD", id);
 }
 
 }

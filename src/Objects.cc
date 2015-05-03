@@ -11,25 +11,25 @@
 namespace Sit {
 namespace Objects {
 
-boost::filesystem::path getpath(const std::string& id)
+boost::filesystem::path getPath(const std::string& id)
 {
-	return FileSystem::OBJECTS_DIR / id.substr(0, 2) / id.substr(2);
+	return FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR / id.substr(0, 2) / id.substr(2);
 }
 
 bool IsExist(const std::string& id)
 {
-	return FileSystem::IsExist(getpath(id));
+	return FileSystem::IsExist(getPath(id));
 }
 
 std::string GetBlob(const std::string& id)
 {
-	return FileSystem::Read(getpath(id));
+	return FileSystem::Read(getPath(id));
 }
 
 Tree GetTree(const std::string& id)
 {
 	using std::getline;
-	std::istringstream ss(FileSystem::Read(getpath(id)));
+	std::istringstream ss(FileSystem::Read(getPath(id)));
 	std::string line;
 	Tree tree;
 	while (getline(ss, line)) {
@@ -47,7 +47,7 @@ Tree GetTree(const std::string& id)
 Commit GetCommit(const std::string& id)
 {
 	using std::getline;
-	std::istringstream ss(FileSystem::Read(getpath(id)));
+	std::istringstream ss(FileSystem::Read(getPath(id)));
 	std::string line;
 	Commit commit;
 
@@ -82,7 +82,7 @@ Commit GetCommit(const std::string& id)
 std::string WriteBlob(const std::string& blob)
 {
 	const std::string sha1(Util::SHA1sum(blob));
-	FileSystem::Write(getpath(sha1), blob);
+	FileSystem::Write(getPath(sha1), blob);
 	return sha1;
 }
 
@@ -98,7 +98,7 @@ std::string WriteTree(const Tree& tree)
 	}
 	const std::string str(ss.str());
 	const std::string sha1(Util::SHA1sum(str));
-	FileSystem::Write(getpath(sha1), str);
+	FileSystem::Write(getPath(sha1), str);
 	return sha1;
 }
 
@@ -113,7 +113,7 @@ std::string WriteCommit(const Commit& commit)
 	   << commit.message;
 	const std::string str(ss.str());
 	const std::string sha1(Util::SHA1sum(str));
-	FileSystem::Write(getpath(sha1), str);
+	FileSystem::Write(getPath(sha1), str);
 	return sha1;
 }
 
@@ -153,7 +153,7 @@ IndexTree* makeIndexTree(const Index::Index& index)
 	for (const auto &i : index) {
 		std::vector<std::string> dirs;
 		boost::split(dirs, i.first.generic_string(), boost::is_any_of("/"));
-		dirs.erase(dirs.end()-1);
+		dirs.erase(dirs.end() - 1);
 		IndexTree *parent = tree;
 		for (const auto &dir : dirs) {
 			auto iter = parent->find(dir);

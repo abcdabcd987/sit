@@ -7,9 +7,9 @@ namespace Sit {
 namespace FileSystem {
 
 const boost::filesystem::path SIT_ROOT(".sit/");
-const boost::filesystem::path REPO_ROOT("./");
-
 const boost::filesystem::path OBJECTS_DIR(".sit/objects");
+
+boost::filesystem::path REPO_ROOT("./");
 
 bool InRepo()
 {

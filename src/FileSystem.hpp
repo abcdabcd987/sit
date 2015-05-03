@@ -18,7 +18,7 @@ extern const boost::filesystem::path SIT_ROOT;
 /**
  * Relative path to the repo root, i.e., `./`
  */
-extern const boost::filesystem::path REPO_ROOT;
+extern boost::filesystem::path REPO_ROOT;
 
 /**
 * Relative path to the `.sit/objects` directory
