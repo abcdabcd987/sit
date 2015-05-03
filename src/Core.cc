@@ -38,7 +38,7 @@ void LoadRepo()
 {
 	using namespace boost::filesystem;
 	path curPath = system_complete("./");
-	while (curPath != "") {
+	while (!curPath.empty()) {
 		if (is_directory(curPath / ".sit")) {
 			FileSystem::REPO_ROOT = curPath;
 			return ;
