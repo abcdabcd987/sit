@@ -1,6 +1,7 @@
 #include <ios>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
+#include <boost/algorithm/string.hpp>
 #include "FileSystem.hpp"
 
 namespace Sit {
@@ -13,7 +14,7 @@ boost::filesystem::path REPO_ROOT("./");
 
 bool InRepo()
 {
-	return boost::filesystem::is_directory(SIT_ROOT);
+	return boost::filesystem::is_directory(REPO_ROOT / SIT_ROOT);
 }
 
 void AssertInRepo()
@@ -87,6 +88,77 @@ std::string Read(const boost::filesystem::path &path)
 	std::string str(s, s + fileSize);
 	delete[] s;
 	return str;
+}
+
+boost::filesystem::path GetRelativePath(
+	const boost::filesystem::path &file,
+	const boost::filesystem::path &base)
+{
+	using namespace boost::filesystem;
+
+	std::string strFullPath = absolute(file).generic_string();
+	std::vector<std::string> tmpDirsFile, finalDirsFile;
+	boost::split(tmpDirsFile, strFullPath, boost::is_any_of("/"));
+	for (const auto &element : tmpDirsFile) {
+		if (element == "" || element == ".") {
+			continue;
+		}
+		if (element == "..") {
+			if (finalDirsFile.empty()) {
+				throw Sit::Util::SitException("Fatal: This is a illegal relative path.");
+			} else {
+				finalDirsFile.pop_back();
+			}
+			continue;
+		}
+		finalDirsFile.push_back(element);
+	}
+
+	std::string strFullPathBase = absolute(base).generic_string();
+	std::vector<std::string> tmpDirsBase, finalDirsBase;
+	boost::split(tmpDirsBase, strFullPathBase, boost::is_any_of("/"));
+	for (const auto &element : tmpDirsBase) {
+		if (element == "" || element == ".") {
+			continue;
+		}
+		if (element == "..") {
+			if (finalDirsBase.empty()) {
+				throw Sit::Util::SitException("Fatal: This is a illegal relative path.");
+			} else {
+				finalDirsBase.pop_back();
+			}
+			continue;
+		}
+		finalDirsBase.push_back(element);
+	}
+
+	unsigned sameItemCount = 0;
+
+	for (unsigned i = 0; i < std::min(finalDirsBase.size(), finalDirsFile.size()); ++i) {
+		if (finalDirsBase[i] == finalDirsFile[i]) {
+			++sameItemCount;
+		} else {
+			break;
+		}
+	}
+
+	path resultPath("");
+	for (unsigned i = sameItemCount; i < finalDirsBase.size(); ++i) {
+		if (resultPath.empty()) {
+			resultPath = "..";
+		} else {
+			resultPath = resultPath / "..";
+		}
+	}
+	for (unsigned i = sameItemCount; i < finalDirsFile.size(); ++i) {
+		if (resultPath.empty()) {
+			resultPath = finalDirsFile[i];
+		} else {
+			resultPath = resultPath / finalDirsFile[i];
+		}
+	}
+
+	return resultPath;
 }
 
 }

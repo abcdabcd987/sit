@@ -37,7 +37,7 @@ void Init()
 void LoadRepo()
 {
 	using namespace boost::filesystem;
-	path curPath = system_complete("./");
+	path curPath = current_path();
 	while (!curPath.empty()) {
 		if (is_directory(curPath / ".sit")) {
 			FileSystem::REPO_ROOT = curPath;
@@ -83,7 +83,8 @@ void Add(const boost::filesystem::path &path)
 		if (FileSystem::IsDirectory(file)) {
 			continue;
 		}
-		Index::Insert(file, AddFile(file));
+		boost::filesystem::path relativePath = FileSystem::GetRelativePath(file);
+		Index::Insert(relativePath, AddFile(file));
 	}
 
 	Index::Save();

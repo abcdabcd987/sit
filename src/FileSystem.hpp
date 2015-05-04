@@ -89,7 +89,12 @@ void Write(const boost::filesystem::path& path, const std::string& content);
  */
 std::string Read(const boost::filesystem::path& path);
 
-
+/**
+ * Get a relative path from base to file.
+ */
+boost::filesystem::path GetRelativePath(
+	const boost::filesystem::path &file,
+	const boost::filesystem::path &base = REPO_ROOT);
 }
 }
 #endif

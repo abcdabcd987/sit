@@ -37,7 +37,7 @@ void Save()
 		boost::filesystem::ofstream indexFile(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "index");
 		indexFile << _index.size() << std::endl;
 		for (auto &element : _index) {
-			indexFile << element.second << " " << element.first.string() << std::endl;
+			indexFile << element.second << " " << element.first.generic_string() << std::endl;
 		}
 		indexFile.close();
 	} catch (const boost::filesystem::filesystem_error &fe) {
@@ -63,7 +63,7 @@ unsigned Remove(const boost::filesystem::path &path)
 		auto newPath = path.relative_path();
 		std::vector<boost::filesystem::path> wouldRm;
 		for (auto &element : _index) {
-			if (element.first.string().find(newPath.string()) == 0) {
+			if (element.first.string().find(newPath.generic_string()) == 0) {
 				wouldRm.push_back(element.first);
 				++rmCount;
 			}
