@@ -4,6 +4,7 @@
 #include <boost/algorithm/string.hpp>
 
 
+#include "Index.hpp"
 #include "Objects.hpp"
 #include "FileSystem.hpp"
 

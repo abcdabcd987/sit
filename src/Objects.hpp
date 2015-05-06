@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "Index.hpp"
-
 namespace Sit {
 namespace Objects {
 

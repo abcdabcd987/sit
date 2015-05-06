@@ -1,4 +1,5 @@
 #include "Index.hpp"
+#include "Objects.hpp"
 #include <iostream>
 
 namespace Sit {
@@ -90,6 +91,25 @@ bool IndexBase::InIndex(const boost::filesystem::path& path) const
 const std::map<boost::filesystem::path, std::string>& IndexBase::GetIndex() const
 {
 	return _index;
+}
+
+void CommitIndex::flattenTree(const Objects::Tree &tree, const boost::filesystem::path& prefix)
+{
+	for (auto &item : tree) {
+		if (item.type == Objects::BLOB) {
+			_index[prefix / item.filename] = item.id;
+		} else {
+			const Objects::Tree subtree(Objects::GetTree(item.id));
+			flattenTree(subtree, prefix / item.filename);
+		}
+	}
+}
+
+void CommitIndex::load(const std::string& id)
+{
+	const Objects::Commit commit(Objects::GetCommit(id));
+	const Objects::Tree tree(Objects::GetTree(commit.tree));
+	flattenTree(tree, "");
 }
 
 }

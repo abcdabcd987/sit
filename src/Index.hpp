@@ -54,8 +54,9 @@ class CommitIndex : public IndexBase {
 	 */
 	void load(const std::string& id);
 
+	void flattenTree(const Objects::Tree &tree, const boost::filesystem::path& prefix);
 public:
-	CommitIndex(const std::string& id): IndexBase() {}
+	CommitIndex(const std::string& id): IndexBase() { load(id); }
 };
 
 extern Index index;
