@@ -41,6 +41,7 @@ void LoadRepo()
 	while (!curPath.empty()) {
 		if (is_directory(curPath / ".sit")) {
 			FileSystem::REPO_ROOT = curPath;
+			Index::index.Load();
 			return ;
 		}
 		curPath = curPath.parent_path();
@@ -76,25 +77,22 @@ std::string AddFile(const boost::filesystem::path &file)
 
 void Add(const boost::filesystem::path &path)
 {
-	Index::Load();
-
 	auto fileList = FileSystem::ListRecursive(path);
 	for (auto &file : fileList) {
-		if (FileSystem::IsDirectory(file)) {
+		if (FileSystem::IsDirectory(file) || FileSystem::GetRelativePath(file, FileSystem::REPO_ROOT).generic_string().substr(0, 4) == ".sit") {
 			continue;
 		}
 		boost::filesystem::path relativePath = FileSystem::GetRelativePath(file);
-		Index::Insert(relativePath, AddFile(file));
+		Index::index.Insert(relativePath, AddFile(file));
 	}
 
-	Index::Save();
+	Index::index.Save();
 }
 
 void Rm(const boost::filesystem::path &path)
 {
-	Index::Load();
-	std::cout << "Removed " << Index::Remove(path) << " files" << std::endl;
-	Index::Save();
+	std::cout << "Removed " << Index::index.Remove(path) << " files" << std::endl;
+	Index::index.Save();
 }
 
 std::string getCommitMessage()

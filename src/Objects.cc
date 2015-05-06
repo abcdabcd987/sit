@@ -147,8 +147,9 @@ std::string writeIndexTree(const IndexTree& idt)
 	return WriteTree(tree);
 }
 
-IndexTree* makeIndexTree(const Index::Index& index)
+IndexTree* makeIndexTree(const Index::Index& indexobj)
 {
+	const auto &index = indexobj.GetIndex();
 	IndexTree *tree = new IndexTree();
 	for (const auto &i : index) {
 		std::vector<std::string> dirs;
@@ -184,7 +185,7 @@ void deleteIndexTree(IndexTree *tree)
 
 std::string WriteIndex()
 {
-	IndexTree *tree = makeIndexTree(Index::GetIndex());
+	IndexTree *tree = makeIndexTree(Index::index);
 	std::string id(writeIndexTree(*tree));
 	deleteIndexTree(tree);
 	return id;

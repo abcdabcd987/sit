@@ -4,11 +4,10 @@
 namespace Sit {
 namespace Index {
 
-Index _index;
+Index index;
 
-void Load()
+void Index::Load()
 {
-	_index.erase(_index.begin(), _index.end());
 	try {
 		if (FileSystem::IsExist(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "index")) {
 			boost::filesystem::ifstream indexFile(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "index");
@@ -19,6 +18,7 @@ void Load()
 				std::string fileName;
 				std::string sha1Value;
 				indexFile >> sha1Value;
+				indexFile.get();
 				std::getline(indexFile, fileName);
 				_index.insert(std::make_pair(boost::filesystem::path(fileName), sha1Value));
 			}
@@ -31,7 +31,7 @@ void Load()
 	}
 }
 
-void Save()
+void Index::Save() const
 {
 	try {
 		boost::filesystem::ofstream indexFile(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "index");
@@ -47,7 +47,7 @@ void Save()
 	}
 }
 
-void Insert(const boost::filesystem::path &file, const std::string &content)
+void IndexBase::Insert(const boost::filesystem::path &file, const std::string &content)
 {
 	try {
 		_index[file] = content;
@@ -56,7 +56,7 @@ void Insert(const boost::filesystem::path &file, const std::string &content)
 	}
 }
 
-unsigned Remove(const boost::filesystem::path &path)
+unsigned IndexBase::Remove(const boost::filesystem::path &path)
 {
 	unsigned rmCount = 0;
 	try {
@@ -77,7 +77,7 @@ unsigned Remove(const boost::filesystem::path &path)
 	return rmCount;
 }
 
-bool InIndex(const boost::filesystem::path& path)
+bool IndexBase::InIndex(const boost::filesystem::path& path) const
 {
 	try {
 		return _index.count(path) > 0;
@@ -87,9 +87,8 @@ bool InIndex(const boost::filesystem::path& path)
 	return false;
 }
 
-Index GetIndex()
+const std::map<boost::filesystem::path, std::string>& IndexBase::GetIndex() const
 {
-	Load();
 	return _index;
 }
 

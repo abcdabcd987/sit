@@ -4,6 +4,7 @@
 #include <boost/filesystem.hpp>
 #include <string>
 #include <vector>
+
 #include "Index.hpp"
 
 namespace Sit {
