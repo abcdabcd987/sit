@@ -12,7 +12,7 @@ namespace Core {
 void Init();
 
 /**
- * Try to find a repository directory in the parent directory of current working directory
+ * Try to find a repository directory in the parent directories of current working directory
  */
 void LoadRepo();
 

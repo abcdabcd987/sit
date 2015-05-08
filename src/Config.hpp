@@ -1,5 +1,7 @@
 #ifndef _SRC_CONFIG_HPP_
 #define _SRC_CONFIG_HPP_
+#include <map>
+#include <string>
 
 namespace Sit {
 namespace Config {

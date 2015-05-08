@@ -9,7 +9,7 @@ const std::string NOT_FOUND("\0<CONFIG_NOT_FOUND>\0");
 
 Config readConfig()
 {
-	const auto config_path = FileSystem::SIT_ROOT / "config";
+	const auto config_path = FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "config";
 	if (!FileSystem::IsFile(config_path)) {
 		throw Util::SitException(std::string("Cannot read configuration file."));
 	}
@@ -34,11 +34,11 @@ Config readConfig()
 
 void writeConfig(const Config& config)
 {
-	std::stringstream ss;
+	std::ostringstream ss;
 	for (auto &entry : config) {
 		ss << entry.first << ": " << entry.second << "\n";
 	}
-	const auto config_path = FileSystem::SIT_ROOT / "config";
+	const auto config_path = FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "config";
 	FileSystem::Write(config_path, ss.str());
 }
 

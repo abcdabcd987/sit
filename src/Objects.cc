@@ -89,7 +89,7 @@ std::string WriteBlob(const std::string& blob)
 
 std::string WriteTree(const Tree& tree)
 {
-	std::stringstream ss;
+	std::ostringstream ss;
 	for (auto& item : tree) {
 		ss << Util::FileModeToString(item.mode) << ' '
 		   << (item.type == TREE ? "tree " : "blob ")
@@ -105,7 +105,7 @@ std::string WriteTree(const Tree& tree)
 
 std::string WriteCommit(const Commit& commit)
 {
-	std::stringstream ss;
+	std::ostringstream ss;
 	ss << "tree " << commit.tree << '\n'
 	   << "parent " << commit.parent << '\n'
 	   << "author " << commit.author << '\n'

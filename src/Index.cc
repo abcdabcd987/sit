@@ -97,7 +97,7 @@ void CommitIndex::flattenTree(const Objects::Tree &tree, const boost::filesystem
 {
 	for (auto &item : tree) {
 		if (item.type == Objects::BLOB) {
-			_index[prefix / item.filename] = item.id;
+			_index.insert(std::make_pair(prefix / item.filename, item.id));
 		} else {
 			const Objects::Tree subtree(Objects::GetTree(item.id));
 			flattenTree(subtree, prefix / item.filename);
