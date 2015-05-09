@@ -88,6 +88,14 @@ bool IndexBase::InIndex(const boost::filesystem::path& path) const
 	return false;
 }
 
+const std::string& IndexBase::GetID(const boost::filesystem::path &path) const
+{
+	const auto iter = _index.find(path);
+	if (iter != _index.end())
+		return iter->second;
+	throw Util::SitException(std::string("Path ") + path.string() + " not in the index.");
+}
+
 const std::map<boost::filesystem::path, std::string>& IndexBase::GetIndex() const
 {
 	return _index;
@@ -110,6 +118,17 @@ void CommitIndex::load(const std::string& id)
 	const Objects::Commit commit(Objects::GetCommit(id));
 	const Objects::Tree tree(Objects::GetTree(commit.tree));
 	flattenTree(tree, "");
+}
+
+void WorkingIndex::load()
+{
+	const auto ls(FileSystem::ListRecursive(FileSystem::REPO_ROOT));
+	for (const auto &path : ls) {
+		if (FileSystem::IsDirectory(path)) continue;
+		const std::string content(FileSystem::Read(path));
+		const std::string sha1(Util::SHA1sum(content));
+		_index.insert(std::make_pair(path, sha1));
+	}
 }
 
 }

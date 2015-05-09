@@ -31,10 +31,13 @@ std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path
 	try {
 		if (IsDirectory(path)) {
 			for (recursive_directory_iterator iter(path), end; iter != end; ++iter) {
-				ls.push_back(iter->path().relative_path());
+				const boost::filesystem::path p(GetRelativePath(iter->path()));
+				const std::string s(p.generic_string());
+				if (s.substr(0, 4) == ".sit") continue;
+				ls.push_back(p);
 			}
 		} else {
-			ls.push_back(path);
+			ls.push_back(GetRelativePath(path));
 		}
 	} catch (const filesystem_error &fe) {
 		throw Sit::Util::SitException(std::string("Fatal: Cannot list path: ") + path.string(), fe.what());

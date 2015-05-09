@@ -9,6 +9,8 @@
 #include "Util.hpp"
 #include "Index.hpp"
 #include "Config.hpp"
+#include "Refs.hpp"
+#include "Status.hpp"
 
 #ifdef WIN32
 #include <Windows.h>
@@ -25,8 +27,11 @@ void Init()
 #ifdef WIN32
 		SetFileAttributes(L".sit", FILE_ATTRIBUTE_HIDDEN);
 #endif
+		create_directories(".sit/refs");
+		create_directories(".sit/refs/heads");
 		create_directories(".sit/objects");
-		FileSystem::Write(".sit/HEAD", "0000000000000000000000000000000000000000");
+		FileSystem::Write(".sit/HEAD", Refs::EMPTY_REF);
+		FileSystem::Write(".sit/refs/heads/master", Refs::EMPTY_REF);
 	} catch (const boost::filesystem::filesystem_error &fe) {
 		std::cerr << fe.what() << std::endl;
 	} catch (const std::exception &stdEc) {
@@ -79,7 +84,7 @@ void Add(const boost::filesystem::path &path)
 {
 	auto fileList = FileSystem::ListRecursive(path);
 	for (auto &file : fileList) {
-		if (FileSystem::IsDirectory(file) || FileSystem::GetRelativePath(file, FileSystem::REPO_ROOT).generic_string().substr(0, 4) == ".sit") {
+		if (FileSystem::IsDirectory(file)) {
 			continue;
 		}
 		boost::filesystem::path relativePath = FileSystem::GetRelativePath(file);
@@ -113,18 +118,6 @@ std::string getCommitMessage()
 	return out.str();
 }
 
-std::string getHEAD()
-{
-	auto path(FileSystem::REPO_ROOT/ FileSystem::SIT_ROOT / "HEAD");
-	if (!FileSystem::IsFile(path)) {
-		throw Util::SitException("HEAD not found.");
-	}
-	boost::filesystem::ifstream in(path);
-	std::string str;
-	in >> str;
-	return str;
-}
-
 void Commit()
 {
 	using Util::SitException;
@@ -154,12 +147,18 @@ void Commit()
 	commit.committer = Util::AuthorString(user_name, user_email, datetime);
 
 	
-	commit.parent = getHEAD();
+	commit.parent = Refs::Get(Refs::Local("master"));
 	commit.tree = Objects::WriteIndex();
 
 	const std::string id(Objects::WriteCommit(commit));
 
-	FileSystem::Write(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "HEAD", id);
+	Refs::Set(Refs::Local("master"), id);
+	Refs::Set("HEAD", id);
+}
+
+void Status()
+{
+	std::cout << Status::StatusString();
 }
 
 }

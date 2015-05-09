@@ -23,9 +23,13 @@ public:
 
 	/**
 	 * Insert `file` and the sha1 of `content` to the index,
-	 * and write `content` to the object file
 	 */
 	void Insert(const boost::filesystem::path & file, const std::string & content);
+
+	/**
+	 * Return the hash value of the `path`. Throw if not exist.
+	 */
+	const std::string& GetID(const boost::filesystem::path &path) const;
 
 	/**
 	 * Return the _index;
@@ -57,6 +61,15 @@ class CommitIndex : public IndexBase {
 	void flattenTree(const Objects::Tree &tree, const boost::filesystem::path& prefix);
 public:
 	CommitIndex(const std::string& id): IndexBase() { load(id); }
+};
+
+class WorkingIndex : public IndexBase {
+	/**
+	 * Load the file list from the repo root.
+	 */
+	void load();
+public:
+	WorkingIndex(): IndexBase() { load(); }
 };
 
 extern Index index;

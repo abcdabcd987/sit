@@ -4,6 +4,7 @@
 
 #include <string>
 #include <map>
+#include "Index.hpp"
 
 namespace Sit {
 namespace Diff {
@@ -11,30 +12,24 @@ namespace Diff {
 /**
  * File Status
  */
-enum FileStatus { Added, Modified, Deleted, Same };
+enum FileStatus { Added, Modified, Deleted, Same, Untracked };
 
 /**
  * An item of a `Diff` object
  */
 struct DiffItem {
 	FileStatus status;            // File status
-	std::string diff;             // Diff string
 };
 
 /**
- * A `Diff` object is a map of the file status of each file
+ * A `DiffList` object is a map of the file status of each file
  */
-typedef std::map<boost::filesystem::path, DiffItem> Diff;
+typedef std::map<boost::filesystem::path, DiffItem> DiffList;
 
 /**
- * Compare `base` to `target` in detail, that is, offer the diff string
+ * Compare `base` to `target` in brief
  */
-Diff DetailDiff(const std::string& base, const std::string& target);
-
-/**
- * Compare `base` to `target` according to SHA1 without diff string
- */
-Diff FastDiff(const std::string& base, const std::string& target);
+DiffList Diff(const Index::IndexBase& base, const Index::IndexBase& target);
 
 }
 }

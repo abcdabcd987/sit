@@ -19,6 +19,8 @@ int main(int argc, char** argv)
 			Sit::Core::Rm(argv[2]);
 		} else if (strcmp("commit", argv[1]) == 0) {
 			Sit::Core::Commit();
+		} else if (strcmp("status", argv[1]) == 0) {
+			Sit::Core::Status();
 		}
 	} catch (const Sit::Util::SitException& e) {
 		std::cerr << "!!! Sit Exception:" << std::endl;
@@ -26,5 +28,9 @@ int main(int argc, char** argv)
 		if (!e.detail.empty()) {
 			std::cerr << e.detail << std::endl;
 		}
+	} catch (const boost::filesystem::filesystem_error &fe) {
+		std::cerr << fe.what() << std::endl;
+	} catch (const std::exception &ec) {
+		std::cerr << ec.what() << std::endl;
 	}
 }

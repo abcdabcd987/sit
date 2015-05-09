@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -Wall -O2 -std=c++11
 LIBS = -lpthread -lboost_system -lboost_filesystem -lboost_date_time
 
-SOURCES = sit.cc Config.cc Core.cc Diff.cc FileSystem.cc Index.cc Objects.cc Util.cc
+SOURCES = sit.cc Config.cc Core.cc Diff.cc FileSystem.cc Index.cc Objects.cc Refs.cc Status.cc Util.cc
 OBJECTS = $(SOURCES:.cc=.o)
 EXECUTABLE = sit
 
