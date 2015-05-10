@@ -45,6 +45,18 @@ int main(int argc, char** argv)
 				printCheckoutArg();
 				return 1;
 			}
+		} else if (strcmp("log", argv[1]) == 0) {
+			if (argc == 2) {
+				Sit::Core::Log("master");
+			} else if (argc == 3) {
+				Sit::Core::Log(argv[2]);
+			} else {
+				std::cerr << "Wrong arguments" << std::endl
+				          << "    sit log" << std::endl
+				          << "    sit log master" << std::endl
+				          << "    sit log <Commit ID>" << std::endl
+				          << std::endl;
+			}
 		}
 	} catch (const Sit::Util::SitException& e) {
 		std::cerr << "!!! Sit Exception:" << std::endl;

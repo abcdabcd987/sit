@@ -208,5 +208,29 @@ void Checkout(const std::string &commitid, const std::string &filename)
 	}
 }
 
+void printLog(const Objects::Commit &commit, const std::string &id)
+{
+	std::cout << "Commit " << id << std::endl
+	          << "Author: " << commit.author << std::endl
+	          << std::endl
+	          << commit.message
+	          << std::endl;
+}
+
+void Log(std::string id)
+{
+	if (id == "master") {
+		id = Refs::Get(Refs::Local("master"));
+		while (id != Refs::EMPTY_REF) {
+			Objects::Commit commit(Objects::GetCommit(id));
+			printLog(commit, id);
+			id = commit.parent;
+		}
+	} else {
+		Objects::Commit commit(Objects::GetCommit(id));
+		printLog(commit, id);
+	}
+}
+
 }
 }

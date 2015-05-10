@@ -48,6 +48,11 @@ void Diff(const std::string& base, const std::string& target);
  */
 void Status();
 
+/**
+ * Print commit log
+ */
+void Log(std::string id);
+
 }
 }
 #endif
