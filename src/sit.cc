@@ -7,10 +7,25 @@
 void printCheckoutArg()
 {
 	std::cout << "Wrong arguments" << std::endl
-			  << std::endl
 			  << "    sit checkout <commit>" << std::endl
 			  << "    sit checkout -- <file>" << std::endl
 			  << "    sit checkout <commit> -- <file>" << std::endl
+			  << std::endl;
+}
+void printLogArg()
+{
+	std::cerr << "Wrong arguments" << std::endl
+	          << "    sit log" << std::endl
+	          << "    sit log master" << std::endl
+	          << "    sit log <Commit ID>" << std::endl
+	          << std::endl;
+}
+void printResetArg()
+{
+	std::cout << "Wrong arguments" << std::endl
+			  << "    sit reset [--hard] <commit>" << std::endl
+			  << "    sit reset [--hard] -- <file>" << std::endl
+			  << "    sit reset [--hard] <commit> -- <file>" << std::endl
 			  << std::endl;
 }
 int main(int argc, char** argv)
@@ -51,11 +66,23 @@ int main(int argc, char** argv)
 			} else if (argc == 3) {
 				Sit::Core::Log(argv[2]);
 			} else {
-				std::cerr << "Wrong arguments" << std::endl
-				          << "    sit log" << std::endl
-				          << "    sit log master" << std::endl
-				          << "    sit log <Commit ID>" << std::endl
-				          << std::endl;
+				printLogArg();
+				return 1;
+			}
+		} else if (strcmp("reset", argv[1]) == 0) {
+			int offset = argc >= 3 && strcmp("--hard", argv[2]) == 0 ? 1 : 0;
+			if (argc == offset+3) {
+				// reset [--hard] <commit>
+				Sit::Core::Reset(argv[offset+2], "", offset);
+			} else if (argc == offset+4 && strcmp("--", argv[offset+2]) == 0) {
+				// reset [--hard] -- <file>
+				Sit::Core::Reset("", argv[offset+3], offset);
+			} else if (argc == offset+5 && strcmp("--", argv[offset+3]) == 0) {
+				// reset [--hard] <commit> -- <file>
+				Sit::Core::Reset(argv[offset+2], argv[offset+4], offset);
+			} else {
+				printResetArg();
+				return 1;
 			}
 		}
 	} catch (const Sit::Util::SitException& e) {

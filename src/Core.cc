@@ -232,5 +232,40 @@ void Log(std::string id)
 	}
 }
 
+void Reset(std::string id, const std::string &filename, const bool isHard)
+{
+	if (id == "master") {
+		id = Refs::Get(Refs::Local("master"));
+	} else if (id == "HEAD" || id.empty()) {
+		id = Refs::Get("HEAD");
+	}
+
+	const Index::CommitIndex &commitIndex(id);
+	const bool inCommit = commitIndex.InIndex(filename);
+	const bool inIndex = Index::index.InIndex(filename);
+
+	if (inCommit && !inIndex) {
+		Index::index.Insert(filename, commitIndex.GetID(filename));
+		if (isHard) {
+			Checkout(id, filename);
+		}
+	} else if (!inCommit && inIndex) {
+		Index::index.Remove(filename);
+		if (isHard) {
+			FileSystem::Remove(filename);
+		}
+	} else if (inCommit && inIndex) {
+		Index::index.Remove(filename);
+		Index::index.Insert(filename, commitIndex.GetID(filename));
+		if (isHard) {
+			Checkout(id, filename);
+		}
+	} else {
+		std::cerr << "Error: " << filename << " is not tracked" << std::endl;
+		return;
+	}
+	Index::index.Save();
+}
+
 }
 }

@@ -88,6 +88,9 @@ std::string StatusString()
 	List notStaged(getNotStaged(index, work));
 
 	ss << "On branch: master" << std::endl;
+	if (headref != Refs::Get(Refs::Local("master"))) {
+		ss << "HEAD detached at " << headref << std::endl;
+	}
 
 	if (untracked.empty() && toBeCommitted.empty() && notStaged.empty()) {
 		ss << "Nothing to commit, working directory clean" << std::endl;
@@ -96,7 +99,7 @@ std::string StatusString()
 
 	if (!toBeCommitted.empty()) {
 		ss << "Changes to be committed:" << std::endl
-		   << "  (Use \"sit reset HEAD <file>...\" to unstage)" << std::endl
+		   << "  (Use \"sit reset HEAD -- <file>\" to unstage)" << std::endl
 		   << std::endl;
 		print(ss, toBeCommitted);
 		ss << std::endl;

@@ -93,6 +93,11 @@ std::string Read(const boost::filesystem::path &path)
 	return str;
 }
 
+void Remove(const boost::filesystem::path& path)
+{
+	boost::filesystem::remove(path);
+}
+
 boost::filesystem::path GetRelativePath(
 	const boost::filesystem::path &file,
 	const boost::filesystem::path &base)

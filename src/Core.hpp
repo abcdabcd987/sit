@@ -53,6 +53,12 @@ void Status();
  */
 void Log(std::string id);
 
+/**
+ * Reset `filename` status in the index to that in the commit `id`
+ * If `isHard`, modify the working directory, too.
+ */
+void Reset(std::string id, const std::string &filename, const bool isHard);
+
 }
 }
 #endif
