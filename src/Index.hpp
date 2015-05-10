@@ -50,6 +50,11 @@ public:
 	 * Save the index to `.sit/index`
 	 */
 	void Save() const;
+
+	/**
+	 * Clear the index;
+	 */
+	void Clear();
 };
 
 class CommitIndex : public IndexBase {

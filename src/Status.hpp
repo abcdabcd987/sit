@@ -9,6 +9,11 @@ namespace Status {
 
 std::string StatusString();
 
+/**
+ * Whether the repo is clean
+ */
+bool IsClean();
+
 }
 }
 #endif

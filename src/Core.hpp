@@ -36,7 +36,7 @@ void Commit();
  * Change the index, working directory and `HEAD` to the commit `id`.
  * Make sure the working directory is clean before action.
  */
-void Checkout(const std::string& id);
+void Checkout(const std::string &commitid, const std::string &filename);
 
 /**
  * Print the diff of two commits or one commit and current working directory

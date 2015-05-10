@@ -48,6 +48,11 @@ void Index::Save() const
 	}
 }
 
+void Index::Clear()
+{
+	_index.clear();
+}
+
 void IndexBase::Insert(const boost::filesystem::path &file, const std::string &content)
 {
 	try {

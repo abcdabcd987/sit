@@ -161,5 +161,52 @@ void Status()
 	std::cout << Status::StatusString();
 }
 
+void Checkout(const std::string &commitid, const std::string &filename)
+{
+	if (!commitid.empty() && !Objects::IsExist(commitid)) {
+		std::cerr << "Error: Commit " << commitid << " doesn't exist." << std::endl;
+		return;
+	}
+
+	Index::IndexBase index;
+	if (commitid.empty()) {
+		index = Index::index;
+	} else {
+		index = Index::CommitIndex(commitid);
+	}
+	const std::map<boost::filesystem::path, std::string> &idx(index.GetIndex());
+
+	if (filename.empty()) {
+		// Commit Checkout
+
+		if (!Status::IsClean()) {
+			std::cerr << "Error: You have something staged. Commit or reset before checkout." << std::endl;
+			return;
+		}
+
+		Index::index.Clear();
+		for (const auto &item : idx) {
+			const auto &src(Objects::GetPath(item.second));
+			const auto &dst(FileSystem::REPO_ROOT / item.first);
+			FileSystem::SafeCopyFile(src, dst);
+			Index::index.Insert(item.first, item.second);
+		}
+		Index::index.Save();		
+		Refs::Set("HEAD", commitid);		
+	} else {
+		// File Checkout
+
+		if (!index.InIndex(filename)) {
+			std::cerr << "Error: " << filename << " doesn't exist in file list";
+			return;
+		}
+		const boost::filesystem::path path(filename);
+		const std::string objpath(idx.find(path)->second);
+		const auto &src(Objects::GetPath(objpath));
+		const auto &dst(FileSystem::REPO_ROOT / filename);
+		FileSystem::SafeCopyFile(src, dst);
+	}
+}
+
 }
 }

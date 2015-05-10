@@ -51,6 +51,11 @@ struct Commit {
 };
 
 /**
+ * Get object filesystem path
+ */
+boost::filesystem::path GetPath(const std::string& id);
+
+/**
  * Check whether the object which has sha1 value `id` exists or not
  */
 bool IsExist(const std::string& id);

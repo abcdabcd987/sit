@@ -121,5 +121,18 @@ std::string StatusString()
 	return ss.str();
 }
 
+bool IsClean()
+{
+	const std::string headref(Refs::Get("HEAD"));
+	if (headref == Refs::EMPTY_REF) {
+		throw Util::SitException("The current repo is empty.");
+	}
+	const Index::CommitIndex head(headref);
+	const Index::Index &index(Index::index);
+
+	List toBeCommitted(getToBeCommitted(head, index));
+	return toBeCommitted.empty();
+}
+
 }
 }
