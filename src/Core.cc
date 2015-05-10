@@ -161,13 +161,13 @@ void Status()
 	std::cout << Status::StatusString();
 }
 
-void Checkout(const std::string &commitid, const std::string &filename)
+void Checkout(std::string commitid, const std::string &filename)
 {
+	commitid = Util::SHA1Complete(commitid);
 	if (!commitid.empty() && !Objects::IsExist(commitid)) {
 		std::cerr << "Error: Commit " << commitid << " doesn't exist." << std::endl;
 		return;
 	}
-
 	Index::IndexBase index;
 	if (commitid.empty()) {
 		index = Index::index;
@@ -239,7 +239,7 @@ void Reset(std::string id, const std::string &filename, const bool isHard)
 	} else if (id == "HEAD" || id.empty()) {
 		id = Refs::Get("HEAD");
 	}
-
+	id = Sit::Util::SHA1Complete(id);
 	const Index::CommitIndex &commitIndex(id);
 	const bool inCommit = commitIndex.InIndex(filename);
 	const bool inIndex = Index::index.InIndex(filename);

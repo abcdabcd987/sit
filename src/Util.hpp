@@ -2,6 +2,7 @@
 #define _SRC_UTIL_HPP
 #include <sstream>
 #include <iomanip>
+#include "FileSystem.hpp"
 
 #include <string>
 #include <vector>
@@ -58,6 +59,10 @@ std::string FileModeToString(const int mode);
  */
 std::string AuthorString(const std::string& name, const std::string& email, const std::string& datetime);
 
+/*
+ *Complete SHA1 value with exists objects.
+ */
+std::string SHA1Complete(std::string _id);
 }
 }
 #endif

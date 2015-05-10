@@ -85,6 +85,9 @@ std::string Read(const boost::filesystem::path &path)
 {
 	using namespace boost::iostreams;
 	auto fileSize = boost::filesystem::file_size(path);
+	if (fileSize > 512 << 20) {
+		throw Sit::Util::SitException("Fatal: try to read a file larger than 512MB.");
+	}
 	char *s = new char[fileSize];
 	boost::filesystem::ifstream file(path, std::ios::in | std::ios::binary);
 	file.read(s, fileSize);

@@ -2,14 +2,19 @@
 #include "Util.hpp"
 #include "FileSystem.hpp"
 #include <iostream>
+
+#include <boost/program_options.hpp>
 #include <string>
+#include <vector>
+
+namespace opt = boost::program_options;
 
 void printCheckoutArg()
 {
 	std::cout << "Wrong arguments" << std::endl
 			  << "    sit checkout <commit>" << std::endl
-			  << "    sit checkout -- <file>" << std::endl
-			  << "    sit checkout <commit> -- <file>" << std::endl
+			  << "    sit checkout -- <file> [<file> ...]" << std::endl
+			  << "    sit checkout <commit> -- <file> [<file> ...]" << std::endl
 			  << std::endl;
 }
 void printLogArg()
@@ -24,43 +29,57 @@ void printResetArg()
 {
 	std::cout << "Wrong arguments" << std::endl
 			  << "    sit reset [--hard] <commit>" << std::endl
-			  << "    sit reset [--hard] -- <file>" << std::endl
-			  << "    sit reset [--hard] <commit> -- <file>" << std::endl
+			  << "    sit reset [--hard] -- <file> [<file> ...]" << std::endl
+			  << "    sit reset [--hard] <commit> -- <file> [<file> ...]" << std::endl
 			  << std::endl;
 }
-int main(int argc, char** argv)
+
+std::vector<std::string> argv;
+
+int main(int argc, char** av)
 {
+	argv = std::vector<std::string>(av, av + argc);
 	try {
-		if (strcmp("init", argv[1]) == 0) {
+		if (argv[1] == "init") {
 			Sit::Core::Init();
 		}
 		Sit::Core::LoadRepo();
-		std::cout << Sit::FileSystem::REPO_ROOT << std::endl;
-		if (strcmp("add", argv[1]) == 0) {
-			std::cout << argv[2] << std::endl;
-			Sit::Core::Add(argv[2]);
-		} else if (strcmp("rm", argv[1]) == 0) {
-			std::cout << argv[2] << std::endl;
-			Sit::Core::Rm(argv[2]);
-		} else if (strcmp("commit", argv[1]) == 0) {
+		if (argv[1] == "add") {
+			for (auto iter = argv.begin() + 2; iter != argv.end(); ++iter) {
+				Sit::Core::Add(*iter);
+			}
+		} else if (argv[1] == "rm") {
+			for (auto iter = argv.begin() + 2; iter != argv.end(); ++iter) {
+				Sit::Core::Rm(*iter);
+			}
+		} else if (argv[1] == "commit") {
+			boost::filesystem::ofstream COMMIT_MSG(Sit::FileSystem::REPO_ROOT / ".sit/COMMIT_MSG");
+			for (auto iter = argv.begin() + 2; iter != argv.end(); ++iter) {
+				COMMIT_MSG << *iter;
+			}
+			COMMIT_MSG.close();
 			Sit::Core::Commit();
-		} else if (strcmp("status", argv[1]) == 0) {
+		} else if (argv[1] == "status") {
 			Sit::Core::Status();
-		} else if (strcmp("checkout", argv[1]) == 0) {
+		} else if (argv[1] == "checkout") {
 			if (argc == 3) {
 				// checkout <commit>
 				Sit::Core::Checkout(argv[2], "");
-			} else if (argc == 4 && strcmp("--", argv[2]) == 0) {
+			} else if (argc >= 4 && argv[2] == "--") {
 				// checkout -- <file>
-				Sit::Core::Checkout("", argv[3]);
-			} else if (argc == 5 && strcmp("--", argv[3]) == 0) {
+				for (auto iter = argv.begin() + 3; iter != argv.end(); ++iter) {
+					Sit::Core::Checkout("", *iter);
+				}
+			} else if (argc >= 5 && argv[3] == "--") {
 				// checkout <commit> -- <file>
-				Sit::Core::Checkout(argv[2], argv[4]);
+				for (auto iter = argv.begin() + 4; iter != argv.end(); ++iter) {
+					Sit::Core::Checkout(argv[2], *iter);
+				}
 			} else {
 				printCheckoutArg();
 				return 1;
 			}
-		} else if (strcmp("log", argv[1]) == 0) {
+		} else if (argv[1] == "log") {
 			if (argc == 2) {
 				Sit::Core::Log("master");
 			} else if (argc == 3) {
@@ -69,17 +88,21 @@ int main(int argc, char** argv)
 				printLogArg();
 				return 1;
 			}
-		} else if (strcmp("reset", argv[1]) == 0) {
-			int offset = argc >= 3 && strcmp("--hard", argv[2]) == 0 ? 1 : 0;
-			if (argc == offset+3) {
+		} else if (argv[1] == "reset") {
+			int offset = argc >= 3 && argv[2] == "--hard" ? 1 : 0;
+			if (argc == offset + 3) {
 				// reset [--hard] <commit>
-				Sit::Core::Reset(argv[offset+2], "", offset);
-			} else if (argc == offset+4 && strcmp("--", argv[offset+2]) == 0) {
+				Sit::Core::Reset(argv[offset + 2], "", offset);
+			} else if (argc >= offset + 4 && argv[offset + 2] == "--") {
 				// reset [--hard] -- <file>
-				Sit::Core::Reset("", argv[offset+3], offset);
-			} else if (argc == offset+5 && strcmp("--", argv[offset+3]) == 0) {
+				for (auto i = 3; i < argc; ++i) {
+					Sit::Core::Reset("", argv[offset + i], offset);
+				}
+			} else if (argc >= offset + 5 && argv[offset + 3] == "--") {
 				// reset [--hard] <commit> -- <file>
-				Sit::Core::Reset(argv[offset+2], argv[offset+4], offset);
+				for (auto i = 4; i < argc; ++i) {
+					Sit::Core::Reset(argv[offset + 2], argv[offset + i], offset);
+				}
 			} else {
 				printResetArg();
 				return 1;

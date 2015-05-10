@@ -60,5 +60,20 @@ std::string AuthorString(const std::string& name, const std::string& email, cons
 	return name + " <" + email + "> " + datetime;
 }
 
+std::string SHA1Complete(std::string _id)
+{
+	boost::filesystem::path path = _id.substr(0, 2);
+	boost::filesystem::path filename = _id.substr(2);
+	auto fileList = FileSystem::ListRecursive(FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR / path);
+	for (const auto &file : fileList) {
+		if (!FileSystem::IsDirectory(file)) {
+			if (file.filename().generic_string().find(filename.generic_string()) != std::string::npos) {
+				return file.filename().generic_string();
+			}
+		}
+	}
+	throw SitException("Fatal: No match objects.");
+}
+
 }
 }
