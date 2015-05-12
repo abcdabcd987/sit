@@ -64,15 +64,24 @@ std::string SHA1Complete(std::string _id)
 {
 	boost::filesystem::path path = _id.substr(0, 2);
 	boost::filesystem::path filename = _id.substr(2);
+	boost::filesystem::path result;
 	auto fileList = FileSystem::ListRecursive(FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR / path);
 	for (const auto &file : fileList) {
 		if (!FileSystem::IsDirectory(file)) {
 			if (file.filename().generic_string().find(filename.generic_string()) != std::string::npos) {
-				return file.filename().generic_string();
+				if (result.empty()) {
+					result = file.filename();
+				} else {
+					throw SitException("Fatal: There are several matches.");
+				}
 			}
 		}
 	}
-	throw SitException("Fatal: No match objects.");
+	if (result.empty()) {
+		throw SitException("Fatal: No such a object.");
+	} else {
+		return path.generic_string() + result.generic_string();
+	}
 }
 
 }
