@@ -18,6 +18,9 @@ enum FileStatus { Added, Modified, Deleted, Same, Untracked };
  * An item of a `Diff` object
  */
 struct DiffItem {
+	std::string baseid;           // Source object ID
+	std::string targetid;         // Target object ID
+	boost::filesystem::path path; // Item path
 	FileStatus status;            // File status
 };
 
