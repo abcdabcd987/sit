@@ -122,7 +122,6 @@ void amend(const std::string &oldid, const std::string &newid)
 {
 	std::vector<std::pair<std::string, Objects::Commit>> olds;
 	for (std::string id(Refs::Get(Refs::Local("master"))); id != oldid; ) {
-		std::cerr << "id: " << id << std::endl;
 		const Objects::Commit commit(Objects::GetCommit(id));
 		olds.push_back(std::make_pair(id, commit));
 		id = commit.parent;
