@@ -11,41 +11,41 @@ namespace opt = boost::program_options;
 
 void printCheckoutArg()
 {
-	std::cout << "Wrong arguments" << std::endl
-			  << "    sit checkout <commit>" << std::endl
-			  << "    sit checkout -- <file> [<file> ...]" << std::endl
-			  << "    sit checkout <commit> -- <file> [<file> ...]" << std::endl
-			  << std::endl;
+	std::cout << 
+		"Wrong arguments\n"
+		"    sit checkout <commit>\n"
+		"    sit checkout -- <file> [<file> ...]\n"
+		"    sit checkout <commit> -- <file> [<file> ...]\n";
 }
 void printLogArg()
 {
-	std::cerr << "Wrong arguments" << std::endl
-	          << "    sit log" << std::endl
-	          << "    sit log master" << std::endl
-	          << "    sit log <Commit ID>" << std::endl
-	          << std::endl;
+	std::cerr << 
+		"Wrong arguments\n"
+		"    sit log\n"
+		"    sit log master\n"
+		"    sit log <Commit ID>\n";
 }
 void printResetArg()
 {
-	std::cout << "Wrong arguments" << std::endl
-			  << "    sit reset [--hard] <commit>" << std::endl
-			  << "    sit reset [--hard] -- <file> [<file> ...]" << std::endl
-			  << "    sit reset [--hard] <commit> -- <file> [<file> ...]" << std::endl
-			  << std::endl;
+	std::cout << 
+		"Wrong arguments\n"
+		"    sit reset [--hard] <commit>\n"
+		"    sit reset [--hard] -- <file> [<file> ...]\n"
+		"    sit reset [--hard] <commit> -- <file> [<file> ...]\n";
 }
 void printDiffArg()
 {
-	std::cout << "Wrong arguments" << std::endl
-	          << "    sit diff [<base>] [<target>]" << std::endl
-	          << "    <base> and <target> could be:" << std::endl
-	          << "        index" << std::endl
-	          << "        work" << std::endl
-	          << "        master" << std::endl
-	          << "        HEAD" << std::endl
-	          << "        <CommitID>" << std::endl
-	          << "    Default <base>   = index" << std::endl
-	          << "    Default <target> = work" << std::endl
-	          << std::endl;
+	std::cout <<
+		"Wrong arguments\n"
+		"    sit diff [<base>] [<target>]\n"
+		"    <base> and <target> could be:\n"
+		"        index\n"
+		"        work\n"
+		"        master\n"
+		"        HEAD\n"
+		"        <CommitID>\n"
+		"    Default <base>   = index\n"
+		"    Default <target> = work\n";
 }
 
 std::vector<std::string> argv;
