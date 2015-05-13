@@ -99,7 +99,7 @@ std::string StatusString()
 
 	if (!toBeCommitted.empty()) {
 		ss << "Changes to be committed:" << std::endl
-		   << "  (Use \"sit reset HEAD -- <file>\" to unstage)" << std::endl
+		   << "  (Use \"sit reset -- <file>\" to unstage)" << std::endl
 		   << std::endl;
 		print(ss, toBeCommitted);
 		ss << std::endl;

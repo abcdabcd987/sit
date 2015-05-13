@@ -33,6 +33,20 @@ void printResetArg()
 			  << "    sit reset [--hard] <commit> -- <file> [<file> ...]" << std::endl
 			  << std::endl;
 }
+void printDiffArg()
+{
+	std::cout << "Wrong arguments" << std::endl
+	          << "    sit diff [<base>] [<target>]" << std::endl
+	          << "    <base> and <target> could be:" << std::endl
+	          << "        index" << std::endl
+	          << "        work" << std::endl
+	          << "        master" << std::endl
+	          << "        HEAD" << std::endl
+	          << "        <CommitID>" << std::endl
+	          << "    Default <base>   = index" << std::endl
+	          << "    Default <target> = work" << std::endl
+	          << std::endl;
+}
 
 std::vector<std::string> argv;
 
@@ -106,6 +120,16 @@ int main(int argc, char** av)
 			} else {
 				printResetArg();
 				return 1;
+			}
+		} else if (argv[1] == "diff") {
+			if (argc == 2) {
+				Sit::Core::Diff("index", "work");
+			} else if (argc == 3) {
+				Sit::Core::Diff(argv[2], "work");
+			} else if (argc == 4) {
+				Sit::Core::Diff(argv[2], argv[3]);
+			} else {
+				printDiffArg();
 			}
 		}
 	} catch (const Sit::Util::SitException& e) {

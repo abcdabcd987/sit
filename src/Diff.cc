@@ -38,11 +38,13 @@ DiffList Diff(const Index::IndexBase& base, const Index::IndexBase& target)
 	return diff;
 }
 
-std::vector<std::string> lines(const std::string &objectID)
+std::vector<std::string> lines(const std::string &objectID, const std::string &indexID, const boost::filesystem::path &path)
 {
-	std::istringstream ss(Objects::GetBlob(objectID));
-	std::string line;
 	std::vector<std::string> v;
+	if (objectID == Refs::EMPTY_REF)
+		return v;
+	std::istringstream ss(indexID != "work" ? Objects::GetBlob(objectID) : FileSystem::Read(path));
+	std::string line;
 	while (std::getline(ss, line))
 		v.push_back(line);
 	return v;
@@ -72,8 +74,8 @@ std::string DiffString(const DiffItem &item,
 	const std::string &targetID)
 {
 	// Convert objectIDs to two vector<int>, as input
-	std::vector<std::string> base(lines(item.baseid));
-	std::vector<std::string> target(lines(item.targetid));
+	std::vector<std::string> base(lines(item.baseid, baseID, item.path));
+	std::vector<std::string> target(lines(item.targetid, targetID, item.path));
 	std::vector<std::string> dict(base);
 	for (const std::string &line : target)
 		dict.push_back(line);
@@ -114,7 +116,7 @@ std::string DiffString(const DiffItem &item,
 	// Generate a diff string
 	std::ostringstream out;
 	out << "diff --git a/" << item.path.generic_string() << " b/" << item.path.generic_string() << std::endl
-	    << baseID << " " << targetID << "100644" << std::endl
+	    << baseID << " " << targetID << " 100644" << std::endl
 	    << "--- a/" << item.path.generic_string() << std::endl
 	    << "+++ b/" << item.path.generic_string() << std::endl;
 
@@ -143,6 +145,20 @@ std::string DiffString(const DiffItem &item,
 	delete [] f;
 	delete [] pre;
 
+	return out.str();
+}
+
+std::string DiffIndex(const std::string &baseID, const std::string &targetID)
+{
+	const Index::IndexBase base(Index::GetIndex(baseID));
+	const Index::IndexBase target(Index::GetIndex(targetID));
+	const DiffList diff(Diff(base, target));
+	std::ostringstream out;
+	for (const auto &item : diff) {
+		if (item.second.status != Same) {
+			out << DiffString(item.second, baseID, targetID);
+		};
+	}
 	return out.str();
 }
 

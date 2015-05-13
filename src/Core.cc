@@ -267,5 +267,10 @@ void Reset(std::string id, const std::string &filename, const bool isHard)
 	Index::index.Save();
 }
 
+void Diff(const std::string &baseID, const std::string &targetID)
+{
+	std::cout << Diff::DiffIndex(Util::SHA1Complete(baseID), Util::SHA1Complete(targetID));
+}
+
 }
 }

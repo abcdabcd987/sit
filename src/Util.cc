@@ -62,10 +62,12 @@ std::string AuthorString(const std::string& name, const std::string& email, cons
 
 std::string SHA1Complete(std::string _id)
 {
+	if (_id == "index" || _id == "master" || _id == "HEAD" || _id == "work")
+		return _id;
 	boost::filesystem::path path = _id.substr(0, 2);
 	boost::filesystem::path filename = _id.substr(2);
 	boost::filesystem::path result;
-	auto fileList = FileSystem::ListRecursive(FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR / path);
+	auto fileList = FileSystem::ListRecursive(FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR / path, false);
 	for (const auto &file : fileList) {
 		if (!FileSystem::IsDirectory(file)) {
 			if (file.filename().generic_string().find(filename.generic_string()) != std::string::npos) {

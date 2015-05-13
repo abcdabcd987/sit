@@ -79,6 +79,8 @@ public:
 
 extern Index index;
 
+IndexBase GetIndex(const std::string &id);
+
 }
 }
 #endif

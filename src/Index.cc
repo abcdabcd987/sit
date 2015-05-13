@@ -1,3 +1,4 @@
+#include "Refs.hpp"
 #include "Index.hpp"
 #include "Objects.hpp"
 #include <iostream>
@@ -134,6 +135,19 @@ void WorkingIndex::load()
 		const std::string sha1(Util::SHA1sum(content));
 		_index.insert(std::make_pair(path, sha1));
 	}
+}
+
+IndexBase GetIndex(const std::string &id)
+{
+	if (id == "index")
+		return index;
+	if (id == "master")
+		return CommitIndex(Refs::Get(Refs::Local("master")));
+	if (id == "HEAD")
+		return CommitIndex(Refs::Get("HEAD"));
+	if (id == "work")
+		return WorkingIndex();
+	return CommitIndex(id);
 }
 
 }

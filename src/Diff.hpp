@@ -34,6 +34,11 @@ typedef std::map<boost::filesystem::path, DiffItem> DiffList;
  */
 DiffList Diff(const Index::IndexBase& base, const Index::IndexBase& target);
 
+/**
+ * Return the diff string between two index
+ */
+std::string DiffIndex(const std::string &baseID, const std::string &targetID);
+
 }
 }
 #endif
