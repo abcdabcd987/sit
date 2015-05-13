@@ -67,12 +67,8 @@ int main(int argc, char** av)
 				Sit::Core::Rm(*iter);
 			}
 		} else if (argv[1] == "commit") {
-			boost::filesystem::ofstream COMMIT_MSG(Sit::FileSystem::REPO_ROOT / ".sit/COMMIT_MSG");
-			for (auto iter = argv.begin() + 2; iter != argv.end(); ++iter) {
-				COMMIT_MSG << *iter;
-			}
-			COMMIT_MSG.close();
-			Sit::Core::Commit();
+			const int offset = argc > 2 && argv[2] == "--amend" ? 1 : 0;
+			Sit::Core::Commit(offset);
 		} else if (argv[1] == "status") {
 			Sit::Core::Status();
 		} else if (argv[1] == "checkout") {

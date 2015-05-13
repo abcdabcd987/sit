@@ -30,7 +30,7 @@ void Rm(const boost::filesystem::path& path);
  * Create an commit object and point `HEAD` at that commit.
  * Read commit log from `.sit/COMMIT_MSG`
  */
-void Commit();
+void Commit(const bool isAmend = false);
 
 /**
  * Change the index, working directory and `HEAD` to the commit `id`.

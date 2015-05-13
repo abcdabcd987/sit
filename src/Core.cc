@@ -118,14 +118,39 @@ std::string getCommitMessage()
 	return out.str();
 }
 
-void Commit()
+void amend(const std::string &oldid, const std::string &newid)
+{
+	std::vector<std::pair<std::string, Objects::Commit>> olds;
+	for (std::string id(Refs::Get(Refs::Local("master"))); id != oldid; ) {
+		std::cerr << "id: " << id << std::endl;
+		const Objects::Commit commit(Objects::GetCommit(id));
+		olds.push_back(std::make_pair(id, commit));
+		id = commit.parent;
+	}
+
+	std::string last = newid;
+	for (auto iter = olds.rbegin(); iter != olds.rend(); ++iter) {
+		iter->second.parent = last;
+		last = Objects::WriteCommit(iter->second);
+	}
+
+	Refs::Set(Refs::Local("master"), last);
+}
+
+void Commit(const bool isAmend)
 {
 	using Util::SitException;
 	using boost::posix_time::to_simple_string;
 	using boost::posix_time::second_clock;
 
+	const std::string headref(Refs::Get("HEAD"));
+	const std::string masterref(Refs::Get(Refs::Local("master")));
+
 	Objects::Commit commit;
 
+	if (headref != masterref && !isAmend) {
+		throw SitException("HEAD is not up-to-date with master. Cannot commit.");
+	}
 	if (!FileSystem::IsFile(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "COMMIT_MSG")) {
 		throw SitException("Commit message not found.");
 	}
@@ -146,13 +171,21 @@ void Commit()
 	commit.author = Util::AuthorString(user_name, user_email, datetime);
 	commit.committer = Util::AuthorString(user_name, user_email, datetime);
 
-	
-	commit.parent = Refs::Get(Refs::Local("master"));
+	if (!isAmend) {
+		commit.parent = masterref;
+	} else {
+		const Objects::Commit oldcommit(Objects::GetCommit(headref));
+		commit.parent = oldcommit.parent;
+	}
 	commit.tree = Objects::WriteIndex();
 
 	const std::string id(Objects::WriteCommit(commit));
 
-	Refs::Set(Refs::Local("master"), id);
+	if (!isAmend) {
+		Refs::Set(Refs::Local("master"), id);
+	} else {
+		amend(headref, id);
+	}
 	Refs::Set("HEAD", id);
 }
 
