@@ -61,7 +61,11 @@ AllHelp::AllHelp()
 		"    sit-commit",
 		"    Record changes to the repository\n"
 		"    Stores the current contents of the index in a new commit along with a log message from the user describing the changes.",
-		"    sit commit [-m <COMMIT_MSG>]"
+		"    sit commit [--amend] [-m <COMMIT_MSG>]\n"
+		"    --amend:\n"
+		"         Replace the tip of the current branch by creating a new commit. The recorded tree is prepared as usual, and the message from the original commit is used as the starting point, instead of an empty message. The new commit has the same parents and author as the current one.\n"
+		"    -m:\n"
+		"         the args after it will be all write to COMMIT_MSG."
 		);
 	data["checkout"] = HelpMessage(
 		"    sit-checkout",

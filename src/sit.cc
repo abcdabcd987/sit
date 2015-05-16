@@ -51,6 +51,16 @@ void printDiffArg()
 		"    Default <target> = work\n" << std::endl;
 }
 
+std::ostringstream COMMIT_MSG_STR;
+void WriteCommitMessage()
+{
+	if (COMMIT_MSG_STR.str().empty()) {
+		Sit::FileSystem::Write(Sit::FileSystem::REPO_ROOT / Sit::FileSystem::SIT_ROOT / "COMMIT_MSG", "No Messages");
+	} else {
+		Sit::FileSystem::Write(Sit::FileSystem::REPO_ROOT / Sit::FileSystem::SIT_ROOT / "COMMIT_MSG", COMMIT_MSG_STR.str());
+	}
+}
+
 std::vector<std::string> argv;
 
 int main(int argc, char** av)
@@ -82,6 +92,20 @@ int main(int argc, char** av)
 			}
 		} else if (argv[1] == "commit") {
 			const int offset = argc > 2 && argv[2] == "--amend" ? 1 : 0;
+			if (offset) {
+				if (argc > 4 && argv[3] == "-m") {
+					for (int i = 4; i < argc; ++i) {
+						COMMIT_MSG_STR << argv[i] << " ";
+					}
+				}
+			} else {
+				if (argc > 3 && argv[2] == "-m") {
+					for (int i = 3; i < argc; ++i) {
+						COMMIT_MSG_STR << argv[i] << " ";
+					}
+				}
+			}
+			WriteCommitMessage();
 			Sit::Core::Commit(offset);
 		} else if (argv[1] == "status") {
 			Sit::Core::Status();
