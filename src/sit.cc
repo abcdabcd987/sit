@@ -3,11 +3,25 @@
 #include "FileSystem.hpp"
 #include <iostream>
 
-#include <boost/program_options.hpp>
 #include <string>
 #include <vector>
 
-namespace opt = boost::program_options;
+void printHelpMessage()
+{
+	std::cout <<
+		"usage: sit [--help] <command> [<args>]\n\n\n"
+		"The most commonly used sit commands are:\n"
+	    "   add        Add file contents to the index\n"
+		"   checkout   Checkout a branch or paths to the working tree\n"
+		"   commit     Record changes to the repository\n"
+		"   diff       Show changes between commits, commit and working tree, etc\n"
+		"   init       Create an empty Git repository or reinitialize an existing one\n"
+		"   log        Show commit logs\n"
+		"   reset      Reset current HEAD to the specified state\n"
+		"   rm         Remove files from the working tree and from the index\n"
+		"   status     Show the working tree status\n"
+		"   help       Show this help message\n" << std::endl;
+}
 
 void printCheckoutArg()
 {
@@ -15,24 +29,27 @@ void printCheckoutArg()
 		"Wrong arguments\n"
 		"    sit checkout <commit>\n"
 		"    sit checkout -- <file> [<file> ...]\n"
-		"    sit checkout <commit> -- <file> [<file> ...]\n";
+		"    sit checkout <commit> -- <file> [<file> ...]\n" << std::endl;
 }
+
 void printLogArg()
 {
 	std::cerr << 
 		"Wrong arguments\n"
 		"    sit log\n"
 		"    sit log master\n"
-		"    sit log <Commit ID>\n";
+		"    sit log <Commit ID>\n" << std::endl;
 }
+
 void printResetArg()
 {
 	std::cout << 
 		"Wrong arguments\n"
 		"    sit reset [--hard] <commit>\n"
 		"    sit reset [--hard] -- <file> [<file> ...]\n"
-		"    sit reset [--hard] <commit> -- <file> [<file> ...]\n";
+		"    sit reset [--hard] <commit> -- <file> [<file> ...]\n" << std::endl;
 }
+
 void printDiffArg()
 {
 	std::cout <<
@@ -45,7 +62,7 @@ void printDiffArg()
 		"        HEAD\n"
 		"        <CommitID>\n"
 		"    Default <base>   = index\n"
-		"    Default <target> = work\n";
+		"    Default <target> = work\n" << std::endl;
 }
 
 std::vector<std::string> argv;
@@ -127,6 +144,8 @@ int main(int argc, char** av)
 			} else {
 				printDiffArg();
 			}
+		} else if (argv[1] == "--help" || argv[1] == "help") {
+			printHelpMessage();
 		}
 	} catch (const Sit::Util::SitException& e) {
 		std::cerr << "!!! Sit Exception:" << std::endl;

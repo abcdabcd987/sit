@@ -96,7 +96,7 @@ void Add(const boost::filesystem::path &path)
 
 void Rm(const boost::filesystem::path &path)
 {
-	std::cout << "Removed " << Index::index.Remove(path) << " files" << std::endl;
+	Index::index.Remove(FileSystem::GetRelativePath(path));
 	Index::index.Save();
 }
 
