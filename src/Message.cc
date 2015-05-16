@@ -48,8 +48,14 @@ AllHelp::AllHelp()
 	data["add"] = HelpMessage(
 		"    sit-add",
 		"    Add file contents to the index\n"
-		"    This command updates the index using the current content found in the working tree, to prepare the content staged for the next commit.It typically adds the current content of existing paths as a whole, but with some options it can also be used to add content with only part of the changes made to the working tree files applied, or remove paths that do not exist in the working tree anymore.\n"
-		"    This command can be performed multiple times before a commit.It only adds the content of the specified file(s) at the time the add command is run; if you want subsequent changes included in the next commit, then you must run sit add again to add the new content to the index.",
+		"    This command updates the index using the current content found in the working tree, to prepare\n"
+		"    the content staged for the next commit.It typically adds the current content of existing paths\n"
+		"    as a whole, but with some options it can also be used to add content with only part of the \n"
+		"    changes made to the working tree files applied, or remove paths that do not exist in the working\n"
+		"    tree anymore.\n\n"
+		"    This command can be performed multiple times before a commit.It only adds the content of the \n"
+		"    specified file(s) at the time the add command is run; if you want subsequent changes included in \n"
+		"    the next commit, then you must run sit add again to add the new content to the index.",
 		"    sit add [<files>]"
 		);
 	data["rm"] = HelpMessage(
@@ -63,9 +69,14 @@ AllHelp::AllHelp()
 		"    Stores the current contents of the index in a new commit along with a log message from the user describing the changes.",
 		"    sit commit [--amend] [-m <COMMIT_MSG>]\n"
 		"    --amend:\n"
-		"         Replace the tip of the current branch by creating a new commit. The recorded tree is prepared as usual, and the message from the original commit is used as the starting point, instead of an empty message. The new commit has the same parents and author as the current one.\n"
+		"         Replace the tip of the current branch by creating a new commit.\n"
+		"         The recorded tree is prepared as usual, and the message from the original commit is used as \n"
+		"         the starting point, instead of an empty message. The new commit has the same parents and author \n"
+		"         as the current one.\n"
 		"    -m:\n"
-		"         the args after it will be all write to COMMIT_MSG."
+		"         the args after it will be all write to COMMIT_MSG.\n"
+		"    Attention!!!\n"
+		"        The order of --amend and -m cannot be reversed or sit cannot understand correctly."
 		);
 	data["checkout"] = HelpMessage(
 		"    sit-checkout",
@@ -82,7 +93,8 @@ AllHelp::AllHelp()
 		"    sit reset [--hard] <commit>\n"
 		"    sit reset [--hard] -- <file> [<file> ...]\n"
 		"    sit reset [--hard] <commit> -- <file> [<file> ...]\n"
-		"    The option \"--hard\" resets the index and working tree. Any changes to tracked files in the working tree since <commit> are discarded."
+		"    The option \"--hard\" resets the index and working tree. Any changes to tracked files in the working tree\n"
+		"    since <commit> are discarded."
 		);
 	data["log"] = HelpMessage(
 		"    sit-log",
@@ -93,7 +105,8 @@ AllHelp::AllHelp()
 		);
 	data["diff"] = HelpMessage(
 		"    sit-diff",
-		"    Show changes between the working tree and the index or a tree, changes between the index and a tree, changes between two trees, changes between two blob objects, or changes between two files on disk.\n",
+		"    Show changes between the working tree and the index or a tree, changes between the index and a tree, \n"
+		"    changes between two trees, changes between two blob objects, or changes between two files on disk.\n",
 		"    sit diff [<base>] [<target>]\n"
 		"    <base> and <target> could be:\n"
 		"        index\n"
