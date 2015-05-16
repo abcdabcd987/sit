@@ -1,27 +1,13 @@
 #include "Core.hpp"
 #include "Util.hpp"
 #include "FileSystem.hpp"
+#include "Messages.hpp"
 #include <iostream>
 
 #include <string>
 #include <vector>
 
-void printHelpMessage()
-{
-	std::cout <<
-		"usage: sit [--help] <command> [<args>]\n\n\n"
-		"The most commonly used sit commands are:\n"
-	    "   add        Add file contents to the index\n"
-		"   checkout   Checkout a branch or paths to the working tree\n"
-		"   commit     Record changes to the repository\n"
-		"   diff       Show changes between commits, commit and working tree, etc\n"
-		"   init       Create an empty Git repository or reinitialize an existing one\n"
-		"   log        Show commit logs\n"
-		"   reset      Reset current HEAD to the specified state\n"
-		"   rm         Remove files from the working tree and from the index\n"
-		"   status     Show the working tree status\n"
-		"   help       Show this help message\n" << std::endl;
-}
+Sit::Msg::AllHelp allHelp;
 
 void printCheckoutArg()
 {
@@ -43,7 +29,7 @@ void printLogArg()
 
 void printResetArg()
 {
-	std::cout << 
+	std::cerr << 
 		"Wrong arguments\n"
 		"    sit reset [--hard] <commit>\n"
 		"    sit reset [--hard] -- <file> [<file> ...]\n"
@@ -52,7 +38,7 @@ void printResetArg()
 
 void printDiffArg()
 {
-	std::cout <<
+	std::cerr <<
 		"Wrong arguments\n"
 		"    sit diff [<base>] [<target>]\n"
 		"    <base> and <target> could be:\n"
@@ -71,8 +57,19 @@ int main(int argc, char** av)
 {
 	argv = std::vector<std::string>(av, av + argc);
 	try {
+		if (argv[1] == "--help" || argv[1] == "help") {
+			if (argc == 2) {
+				allHelp.ShowHelp("all");
+			} else {
+				for (int i = 2; i < argc; ++i) {
+					allHelp.ShowHelp(argv[i]);
+				}
+			}
+			return 0;
+		}
 		if (argv[1] == "init") {
 			Sit::Core::Init();
+			return 0;
 		}
 		Sit::Core::LoadRepo();
 		if (argv[1] == "add") {
@@ -144,8 +141,6 @@ int main(int argc, char** av)
 			} else {
 				printDiffArg();
 			}
-		} else if (argv[1] == "--help" || argv[1] == "help") {
-			printHelpMessage();
 		}
 	} catch (const Sit::Util::SitException& e) {
 		std::cerr << "!!! Sit Exception:" << std::endl;

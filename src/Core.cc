@@ -23,7 +23,14 @@ void Init()
 {
 	using namespace boost::filesystem;
 	try {
-		create_directories(".sit/");
+		if (exists(".sit")) {
+			if (is_directory(".sit")) {
+				remove_all(".sit");
+			} else {
+				throw Util::SitException("Fatal: .sit is existed but not a directory please check it.");
+			}
+		}
+		create_directories(".sit");
 #ifdef WIN32
 		SetFileAttributes(L".sit", FILE_ATTRIBUTE_HIDDEN);
 #endif
