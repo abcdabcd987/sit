@@ -143,13 +143,13 @@ int main(int argc, char** av)
 				Sit::Core::Reset(argv[offset + 2], "", offset);
 			} else if (argc >= offset + 4 && argv[offset + 2] == "--") {
 				// reset [--hard] -- <file>
-				for (auto i = 3; i < argc; ++i) {
-					Sit::Core::Reset("", argv[offset + i], offset);
+				for (auto i = offset + 3; i < argc; ++i) {
+					Sit::Core::Reset("", argv[i], offset);
 				}
 			} else if (argc >= offset + 5 && argv[offset + 3] == "--") {
 				// reset [--hard] <commit> -- <file>
-				for (auto i = 4; i < argc; ++i) {
-					Sit::Core::Reset(argv[offset + 2], argv[offset + i], offset);
+				for (auto i = offset + 4; i < argc; ++i) {
+					Sit::Core::Reset(argv[offset + 2], argv[i], offset);
 				}
 			} else {
 				printResetArg();

@@ -66,6 +66,7 @@ std::string AddFile(const boost::filesystem::path &file)
 	if (FileSystem::IsDirectory(file)) {
 		return "";
 	}
+	std::cerr << "Adding file: " << file << std::endl;
 	try {
 		auto fileSize = boost::filesystem::file_size(file);
 		if (fileSize > (100 << 20)) {
@@ -89,8 +90,8 @@ std::string AddFile(const boost::filesystem::path &file)
 
 void Add(const boost::filesystem::path &path)
 {
-	auto fileList = FileSystem::ListRecursive(path);
-	for (auto &file : fileList) {
+	auto fileList = FileSystem::ListRecursive(path, true, false);
+	for (const auto &file : fileList) {
 		if (FileSystem::IsDirectory(file)) {
 			continue;
 		}

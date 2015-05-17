@@ -24,7 +24,7 @@ void AssertInRepo()
 	}
 }
 
-std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path &path, const bool ignoreSit)
+std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path &path, const bool ignoreSit, const bool relativeToRepoRoot)
 {
 	using namespace boost::filesystem;
 	std::vector<boost::filesystem::path> ls;
@@ -34,7 +34,11 @@ std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path
 				const boost::filesystem::path p(GetRelativePath(iter->path()));
 				const std::string s(p.generic_string());
 				if (ignoreSit && s.substr(0, 4) == ".sit") continue;
-				ls.push_back(p);
+				if (relativeToRepoRoot) {
+					ls.push_back(p);
+				} else {
+					ls.push_back(iter->path());
+				}
 			}
 		} else {
 			ls.push_back(GetRelativePath(path));
