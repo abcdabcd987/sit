@@ -48,6 +48,9 @@
     <ClInclude Include="MurmurHash3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Color.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cc">

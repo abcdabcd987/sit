@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Color.hpp" />
     <ClInclude Include="Config.hpp" />
     <ClInclude Include="Core.hpp" />
     <ClInclude Include="Diff.hpp" />

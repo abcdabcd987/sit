@@ -5,6 +5,26 @@
 namespace Sit {
 namespace Color {
 
+#ifdef WIN32
+const std::string RESET = "";
+const std::string CLS = "";              // Clears screen
+const std::string BLACK = "";        // Black
+const std::string RED = "";          // Red
+const std::string GREEN = "";        // Green
+const std::string BROWN = "";        // Brown / dark yellow
+const std::string BLUE = "";         // Blue
+const std::string MAGENTA = "";      // Magenta / purple
+const std::string CYAN = "";         // Cyan
+const std::string GREY = "";         // Grey / dark white
+const std::string DARKGREY = "";     // Dark grey / light black
+const std::string LIGHTRED = "";     // Light red
+const std::string LIGHTGREEN = "";   // Light green
+const std::string YELLOW = "";       // Yellow (bright)
+const std::string LIGHTBLUE = "";    // Light blue
+const std::string LIGHTMAGENTA = ""; // Light magenta / light purple
+const std::string LIGHTCYAN = "";    // Light cyan
+const std::string WHITE = "";        // White (bright)
+#else
 const std::string RESET = "\033[0m";
 const std::string CLS = "\033[2J";              // Clears screen
 const std::string BLACK = "\033[22;30m";        // Black
@@ -23,7 +43,7 @@ const std::string LIGHTBLUE = "\033[01;34m";    // Light blue
 const std::string LIGHTMAGENTA = "\033[01;35m"; // Light magenta / light purple
 const std::string LIGHTCYAN = "\033[01;36m";    // Light cyan
 const std::string WHITE = "\033[01;37m";        // White (bright)
-
+#endif
 }
 }
 
