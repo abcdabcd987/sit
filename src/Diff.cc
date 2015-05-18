@@ -1,6 +1,8 @@
 #include "Diff.hpp"
 #include "Refs.hpp"
 #include "Objects.hpp"
+#include "MurmurHash3.h"
+#include <cassert>
 #include <vector>
 #include <sstream>
 
@@ -38,6 +40,138 @@ DiffList Diff(const Index::IndexBase& base, const Index::IndexBase& target)
 	return diff;
 }
 
+//
+// Diff Algorithm
+// See "An O(ND) Difference Algorithm and its Variations", by Eugene Myers.
+//
+
+template <class T>
+class array {
+	int lo, hi;
+	T * const data;
+	bool allocated;
+	array(int l, int h, T *dt)
+		: lo(l), hi(h), data(dt), allocated(false) {}
+public:
+	array(int l, int h)
+		: lo(l), hi(h), data(new T[hi-lo+1]), allocated(true) {}
+	array(int l, const std::vector<T> &v)
+		: lo(l), hi(l+v.size()-1), data(new T[hi-lo+1]), allocated(true) {
+		T *p = data;
+		for (const T& item : v) {
+			*p++ = item;
+		}
+	}
+	const T& operator[](int i) const {
+		assert(lo <= i && i <= hi);
+		return data[i-lo];
+	}
+	T& operator[](int i) {
+		assert(lo <= i && i <= hi);
+		return data[i-lo];
+	}
+	array splice(int l, int r) const {
+		assert(lo <= l && r <= hi);
+		return array(1, r-l+1, data+l-lo);
+	}
+	int size() const {
+		return hi-lo+1;
+	}
+	~array() {
+		if (allocated) {
+			delete [] data;
+		}
+	}
+};
+
+struct snake {
+	int x, y, u, v, d;
+};
+snake middle_snake(const array<HashValue> &a, const array<HashValue> &b) {
+	const int n = a.size();
+	const int m = b.size();
+	const int limd = (m+n+1)/2; // ceil((m+n)/2)
+	const int delta = n-m;	  // center diag for reverse D-path
+	const bool odd = delta & 1;
+	array<int> vf(-n-m, n+m);   // for furthest reaching forward D-path in diag k
+	array<int> vr(delta+(-n-m), delta+(n+m));   // for furthest reaching reverse D-path in diag k
+	vf[1] = 0;		// at (0, -1)
+	vr[delta-1] = n;  // at (n, m+1)
+	for (int d = 0; d <= limd; ++d) {
+		// forward, diag 0 centered
+		for (int k = -d, x, y; k <= d; k += 2) {
+			// find the end of the furthest reaching forward D-path in diag k
+			if (k == -d || (k != d && vf[k-1] < vf[k+1])) {
+				x = vf[k+1];		// go downward
+			} else {
+				x = vf[k-1] + 1;	// go rightward
+			}
+			y = x-k;
+			while (x < n && y < m && a[x+1] == b[y+1]) ++x, ++y;
+			vf[k] = x;
+
+			// check overlap
+			if (odd && delta-(d-1) <= k && k <= delta+(d-1)) {
+				const int u = vr[k], v = u-k;
+				if (u+v >= d && x+y <= n+m-(d-1) && x >= u) {
+					return snake({u, v, x, y, 2*d-1});
+				}
+			}
+		}
+
+		// reverse, diag delta centered
+		for (int k = -d, u, v; k <= d; k += 2) {
+			// find the end of the furthest reaching reverse D-path in diag delta+k
+			if (k == d || (k != -d && vr[delta+k-1] < vr[delta+k+1])) {
+				u = vr[delta+k-1];	  // go upward
+			} else {
+				u = vr[delta+k+1] - 1;  // go leftward
+			}
+			v = u-(delta+k);
+			while (u > 0 && v > 0 && a[u] == b[v]) --u, --v;
+			vr[delta+k] = u;
+
+			// check overlap
+			if (!odd && -d <= k+delta && k+delta <= d) {
+				const int x = vf[delta+k], y = x-(delta+k);
+				if (u+v >= d && x+y <= n+m-d && x >= u) {
+					return snake({u, v, x, y, 2*d});
+				}
+			}
+		}
+	}
+	// shouldn't be here
+	assert(false);
+	return snake();
+}
+void lcs(std::vector<std::pair<int, int>> &out,
+		const array<HashValue> &a, const int aoff,
+		const array<HashValue> &b, const int boff) {
+	const int n = a.size(), m = b.size();
+	if (n > 0 && m > 0) {
+		snake s(middle_snake(a, b)); // (x,y) to (u,v)
+		if (s.d > 1) {
+			lcs(out, a.splice(1, s.x), aoff, b.splice(1, s.y), boff);
+			for (int i = s.x+1; i <= s.u; ++i) out.push_back(std::make_pair(aoff+i-1, boff-s.x+s.y+i-1));
+			lcs(out, a.splice(s.u+1, n), aoff+s.u, b.splice(s.v+1, m), boff+s.v);
+		} else if (n < m) {
+			for (int i = 1, j = 1; i <= n && j <= m; ++i, ++j) {
+				if (a[i] != b[j]) ++j;
+				out.push_back(std::make_pair(aoff+i-1, boff+j-1));
+			}
+		} else {
+			for (int i = 1, j = 1; i <= n && j <= m; ++i, ++j) {
+				if (a[i] != b[j]) ++i;
+				out.push_back(std::make_pair(aoff+i-1, boff+j-1));
+			}
+		}
+	}
+}
+//
+// Diff Algorithm End
+//
+
+
 std::vector<std::string> lines(const std::string &objectID, const std::string &indexID, const boost::filesystem::path &path)
 {
 	std::vector<std::string> v;
@@ -49,69 +183,25 @@ std::vector<std::string> lines(const std::string &objectID, const std::string &i
 		v.push_back(line);
 	return v;
 }
-std::vector<int> linesToInts(const std::vector<std::string> &lines, const std::vector<std::string> &dict)
+void hashlines(array<HashValue> &out, const std::vector<std::string> &v)
 {
-	std::vector<int> v;
-	v.push_back(-1); // padding
-	for (const std::string &line : lines)
-		v.push_back(std::lower_bound(dict.begin(), dict.end(), line) - dict.begin());
-	return v;
-}
-void getLCS(std::vector<std::pair<int, int>> &sol, char **pre, int i, int j)
-{
-	if (!i || !j) return;
-	if (pre[i][j] == 'y') {
-		getLCS(sol, pre, i-1, j-1);
-		sol.push_back(std::make_pair(i-1, j-1));
-	} else if (pre[i][j] == 'u') {
-		getLCS(sol, pre, i-1, j);
-	} else if (pre[i][j] == 'l') {
-		getLCS(sol, pre, i, j-1);
-	}
+	for (size_t i = 0; i < v.size(); ++i)
+		out[i+1] = MurmurHash3(v[i].c_str(), v[i].size());
 }
 std::string DiffString(const DiffItem &item,
 	const std::string &baseID,
 	const std::string &targetID)
 {
-	// Convert objectIDs to two vector<int>, as input
+	// Convert objectIDs to two array<HashValue>, as input
 	std::vector<std::string> base(lines(item.baseid, baseID, item.path));
 	std::vector<std::string> target(lines(item.targetid, targetID, item.path));
-	std::vector<std::string> dict(base);
-	for (const std::string &line : target)
-		dict.push_back(line);
-	std::sort(dict.begin(), dict.end());
-	dict.resize(std::unique(dict.begin(), dict.end()) - dict.begin());
-	const std::vector<int> b(linesToInts(base, dict));
-	const std::vector<int> t(linesToInts(target, dict));
+	array<HashValue> b(1, base.size()), t(1, target.size());
+	hashlines(b, base);
+	hashlines(t, target);
 
 	// Calculate longest common subsequence
-	int **f = new int*[b.size()];
-	char **pre = new char*[b.size()];
-	for (auto i = 0; i < b.size(); ++i) {
-		f[i] = new int[t.size()];
-		pre[i] = new char[t.size()];
-		memset(f[i], 0, sizeof(*f[i])*t.size());
-	}
-	for (auto i = 1; i < b.size(); ++i) {
-		for (auto j = 1; j < t.size(); ++j) {
-			if (b[i] == t[j]) {
-				f[i][j] = f[i-1][j-1] + 1;
-				pre[i][j] = 'y';     // upper left
-			} else {
-				if (f[i-1][j] < f[i][j-1]) {
-					f[i][j] = f[i][j-1];
-					pre[i][j] = 'l'; // left
-				} else {
-					f[i][j] = f[i-1][j];
-					pre[i][j] = 'u'; // upper
-				}
-			}
-		}
-	}
-
-	// Get a LCS soltuion
 	std::vector<std::pair<int, int>> sol;
-	getLCS(sol, pre, b.size()-1, t.size()-1);
+	lcs(sol, b, 0, t, 0);
 
 	// Generate a diff string
 	std::ostringstream out;
@@ -124,8 +214,6 @@ std::string DiffString(const DiffItem &item,
 	int baseEnd = base.size(), targetEnd = target.size();
 	out << Color::CYAN << "@@ -1," << baseEnd << " +1," << targetEnd << " @@" << Color::RESET << std::endl;
 	sol.push_back(std::make_pair(baseEnd, targetEnd)); // padding
-	base.push_back("");                                // padding
-	target.push_back("");                              // padding
 
 	int baseLast = 0, targetLast = 0;
 	for (const auto &p : sol) {
@@ -133,17 +221,10 @@ std::string DiffString(const DiffItem &item,
 			out << Color::RED << "-" << base[baseLast] << Color::RESET << std::endl;
 		for (; targetLast < p.second; ++targetLast)
 			out << Color::GREEN << "+" << target[targetLast] << Color::RESET << std::endl;
-		out << " " << base[p.first] << std::endl;
+		if (p.first != baseEnd)
+			out << " " << base[p.first] << std::endl;
 		++baseLast, ++targetLast;
 	}
-
-	// Free the memory
-	for (int i = 0; i < baseEnd-1; ++i) {
-		delete [] f[i];
-		delete [] pre[i];
-	}
-	delete [] f;
-	delete [] pre;
 
 	return out.str();
 }
