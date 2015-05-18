@@ -112,7 +112,7 @@ std::string WriteCommit(const Commit& commit);
  */
 std::string WriteIndex();
 
-
+std::vector<std::string> ListExistedObjects();
 }
 }
 #endif

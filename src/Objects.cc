@@ -192,5 +192,22 @@ std::string WriteIndex()
 	return id;
 }
 
+std::vector<std::string> ListExistedObjects()
+{
+	std::vector<std::string> objectsList;
+	auto objectsFileList = FileSystem::ListRecursive(FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR, false, true);
+	//list objects as ".sit/objects/00/00000000000000000000000000000000000000"
+	for (const auto &object : objectsFileList) {
+		if (!FileSystem::IsDirectory(object)) {
+			std::string tmp = object.generic_string();
+			//erase ".sit/objects/" and remain "00/00000000000000000000000000000000000000"
+			tmp.erase(0, 13);
+			tmp.erase(2, 1);
+			objectsList.push_back(tmp);
+		}
+	}
+	return objectsList;
+}
+
 }
 }
