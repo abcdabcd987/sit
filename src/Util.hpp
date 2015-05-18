@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iomanip>
 #include "FileSystem.hpp"
+#include "Color.hpp"
 
 #include <string>
 #include <vector>

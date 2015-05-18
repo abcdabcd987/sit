@@ -115,14 +115,14 @@ std::string DiffString(const DiffItem &item,
 
 	// Generate a diff string
 	std::ostringstream out;
-	out << "diff --git a/" << item.path.generic_string() << " b/" << item.path.generic_string() << std::endl
-	    << baseID << " " << targetID << " 100644" << std::endl
-	    << "--- a/" << item.path.generic_string() << std::endl
-	    << "+++ b/" << item.path.generic_string() << std::endl;
+	out << Color::WHITE << "diff --git a/" << item.path.generic_string() << " b/" << item.path.generic_string() << Color::RESET << std::endl
+	    << Color::WHITE << baseID << " " << targetID << " 100644" << Color::RESET << std::endl
+	    << Color::WHITE << "--- a/" << item.path.generic_string() << Color::RESET << std::endl
+	    << Color::WHITE << "+++ b/" << item.path.generic_string() << Color::RESET << std::endl;
 
 	// TODO: simplify the diff string
 	int baseEnd = base.size(), targetEnd = target.size();
-	out << "@@ -1," << baseEnd << " +1," << targetEnd << " @@" << std::endl;
+	out << Color::CYAN << "@@ -1," << baseEnd << " +1," << targetEnd << " @@" << Color::RESET << std::endl;
 	sol.push_back(std::make_pair(baseEnd, targetEnd)); // padding
 	base.push_back("");                                // padding
 	target.push_back("");                              // padding
@@ -130,9 +130,9 @@ std::string DiffString(const DiffItem &item,
 	int baseLast = 0, targetLast = 0;
 	for (const auto &p : sol) {
 		for (; baseLast < p.first; ++baseLast) 
-			out << "-" << base[baseLast] << std::endl;
+			out << Color::RED << "-" << base[baseLast] << Color::RESET << std::endl;
 		for (; targetLast < p.second; ++targetLast)
-			out << "+" << target[targetLast] << std::endl;
+			out << Color::GREEN << "+" << target[targetLast] << Color::RESET << std::endl;
 		out << " " << base[p.first] << std::endl;
 		++baseLast, ++targetLast;
 	}

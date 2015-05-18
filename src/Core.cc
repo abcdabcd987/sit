@@ -1,5 +1,6 @@
 #include <map>
 #include <vector>
+#include <sstream>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -242,11 +243,13 @@ void Checkout(std::string commitid, const std::string &filename)
 
 void printLog(const Objects::Commit &commit, const std::string &id)
 {
-	std::cout << "Commit " << id << std::endl
+	std::cout << Color::BROWN << "Commit " << id << Color::RESET << std::endl
 	          << "Author: " << commit.author << std::endl
-	          << std::endl
-	          << commit.message
 	          << std::endl;
+	std::istringstream ss(commit.message);
+	std::string line;
+	while (std::getline(ss, line)) std::cout << "    " << line << std::endl;
+	std::cout << std::endl;
 }
 
 void Log(std::string id)
