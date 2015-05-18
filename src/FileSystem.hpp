@@ -41,7 +41,7 @@ void AssertInRepo();
  * If `path` is a regular file, ListRecursive will return a vector contained only `path`
  * Return a vector of the path list, sorted.
  */
-std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path &path, const bool ignoreSit = true);
+std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path &path, const bool ignoreSit = true, const bool relativeToRepoRoot = true);
 
 ///**
 // * Return the relative path of the given argument to the path of the repo root

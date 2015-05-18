@@ -70,7 +70,7 @@ unsigned IndexBase::Remove(const boost::filesystem::path &path)
 		auto newPath = path.relative_path();
 		std::vector<boost::filesystem::path> wouldRm;
 		for (auto &element : _index) {
-			if (element.first.string().find(newPath.generic_string()) == 0) {
+			if (element.first.generic_string().find(newPath.generic_string()) == 0) {
 				wouldRm.push_back(element.first);
 				++rmCount;
 			}

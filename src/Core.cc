@@ -24,7 +24,14 @@ void Init()
 {
 	using namespace boost::filesystem;
 	try {
-		create_directories(".sit/");
+		if (exists(".sit")) {
+			if (is_directory(".sit")) {
+				remove_all(".sit");
+			} else {
+				throw Util::SitException("Fatal: .sit is existed but not a directory please check it.");
+			}
+		}
+		create_directories(".sit");
 #ifdef WIN32
 		SetFileAttributes(L".sit", FILE_ATTRIBUTE_HIDDEN);
 #endif
@@ -60,6 +67,7 @@ std::string AddFile(const boost::filesystem::path &file)
 	if (FileSystem::IsDirectory(file)) {
 		return "";
 	}
+	std::cerr << "Adding file: " << file << std::endl;
 	try {
 		auto fileSize = boost::filesystem::file_size(file);
 		if (fileSize > (100 << 20)) {
@@ -83,8 +91,8 @@ std::string AddFile(const boost::filesystem::path &file)
 
 void Add(const boost::filesystem::path &path)
 {
-	auto fileList = FileSystem::ListRecursive(path);
-	for (auto &file : fileList) {
+	auto fileList = FileSystem::ListRecursive(path, true, false);
+	for (const auto &file : fileList) {
 		if (FileSystem::IsDirectory(file)) {
 			continue;
 		}
@@ -97,7 +105,7 @@ void Add(const boost::filesystem::path &path)
 
 void Rm(const boost::filesystem::path &path)
 {
-	std::cout << "Removed " << Index::index.Remove(path) << " files" << std::endl;
+	Index::index.Remove(FileSystem::GetRelativePath(path));
 	Index::index.Save();
 }
 

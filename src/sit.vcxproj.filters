@@ -42,6 +42,9 @@
     <ClInclude Include="Status.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Messages.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cc">
@@ -72,6 +75,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Status.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Message.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
