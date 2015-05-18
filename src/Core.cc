@@ -202,12 +202,15 @@ void Status()
 	std::cout << Status::StatusString();
 }
 
-void Checkout(std::string commitid, const std::string &filename)
+void Checkout(std::string commitid, std::string filename)
 {
 	commitid = Util::SHA1Complete(commitid);
 	if (!commitid.empty() && !Objects::IsExist(commitid)) {
 		std::cerr << "Error: Commit " << commitid << " doesn't exist." << std::endl;
 		return;
+	}
+	if (!filename.empty()) {
+		filename = FileSystem::GetRelativePath(filename).generic_string();
 	}
 	Index::IndexBase index;
 	if (commitid.empty()) {
@@ -275,7 +278,7 @@ void Log(std::string id)
 	}
 }
 
-void Reset(std::string id, const std::string &filename, const bool isHard)
+void Reset(std::string id, std::string filename, const bool isHard)
 {
 	if (id == "master") {
 		id = Refs::Get(Refs::Local("master"));
@@ -283,6 +286,9 @@ void Reset(std::string id, const std::string &filename, const bool isHard)
 		id = Refs::Get("HEAD");
 	}
 	id = Sit::Util::SHA1Complete(id);
+	if (!filename.empty()) {
+		filename = FileSystem::GetRelativePath(filename).generic_string();
+	}
 	const Index::CommitIndex &commitIndex(id);
 	const bool inCommit = commitIndex.InIndex(filename);
 	const bool inIndex = Index::index.InIndex(filename);

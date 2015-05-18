@@ -36,7 +36,7 @@ void Commit(const bool isAmend = false);
  * Change the index, working directory and `HEAD` to the commit `id`.
  * Make sure the working directory is clean before action.
  */
-void Checkout(std::string commitid, const std::string &filename);
+void Checkout(std::string commitid, std::string filename);
 
 /**
  * Print the diff of two commits or one commit and current working directory
@@ -57,7 +57,7 @@ void Log(std::string id);
  * Reset `filename` status in the index to that in the commit `id`
  * If `isHard`, modify the working directory, too.
  */
-void Reset(std::string id, const std::string &filename, const bool isHard);
+void Reset(std::string id, std::string filename, const bool isHard);
 
 }
 }
