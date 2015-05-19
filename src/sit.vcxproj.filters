@@ -42,13 +42,13 @@
     <ClInclude Include="Status.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Messages.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MurmurHash3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Color.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Message.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MurmurHash3.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -87,6 +87,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MurmurHash3.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Color.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

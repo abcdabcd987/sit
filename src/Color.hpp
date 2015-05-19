@@ -3,8 +3,9 @@
 #include <string>
 
 #ifdef _WIN32
-	#include <windows.h>  // for WinAPI and Sleep()
-	#define _NO_OLDNAMES  // for MinGW compatibility
+#include <windows.h>  // for WinAPI and Sleep()
+#define _NO_OLDNAMES  // for MinGW compatibility
+#undef min
 #endif
 
 namespace Sit {

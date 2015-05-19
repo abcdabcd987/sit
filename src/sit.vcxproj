@@ -86,14 +86,15 @@
     <ClInclude Include="Diff.hpp" />
     <ClInclude Include="FileSystem.hpp" />
     <ClInclude Include="Index.hpp" />
-    <ClInclude Include="Messages.hpp" />
-    <ClInclude Include="MurmurHash3.h" />
+    <ClInclude Include="Message.hpp" />
+    <ClInclude Include="MurmurHash3.hpp" />
     <ClInclude Include="Objects.hpp" />
     <ClInclude Include="Refs.hpp" />
     <ClInclude Include="Status.hpp" />
     <ClInclude Include="Util.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Color.cc" />
     <ClCompile Include="Config.cc" />
     <ClCompile Include="Core.cc" />
     <ClCompile Include="Diff.cc" />
