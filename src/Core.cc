@@ -4,6 +4,8 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <algorithm>
+#include <functional>
 
 #include "Core.hpp"
 #include "FileSystem.hpp"
@@ -67,7 +69,6 @@ std::string AddFile(const boost::filesystem::path &file)
 	if (FileSystem::IsDirectory(file)) {
 		return "";
 	}
-	std::cerr << "Adding file: " << file << std::endl;
 	try {
 		auto fileSize = boost::filesystem::file_size(file);
 		if (fileSize > (100 << 20)) {
@@ -321,5 +322,24 @@ void Diff(const std::string &baseID, const std::string &targetID)
 	std::cout << Diff::DiffIndex(Util::SHA1Complete(baseID), Util::SHA1Complete(targetID));
 }
 
+void GarbageCollection()
+{
+	auto existedList = Objects::ListExistedObjects();
+	auto refedList = Objects::ListRefedObjects();
+	size_t i = 0, j = 0;
+	while (i < existedList.size() && j < refedList.size()) {
+		if (existedList[i] != refedList[j]) {
+			Objects::Remove(existedList[i]);
+			++i;
+		} else {
+			++i;
+			++j;
+		}
+	}
+	while (i < existedList.size()) {
+		Objects::Remove(existedList[i]);
+		++i;
+	}
+}
 }
 }

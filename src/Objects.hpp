@@ -4,6 +4,7 @@
 #include <boost/filesystem.hpp>
 #include <string>
 #include <vector>
+#include <list>
 
 namespace Sit {
 namespace Objects {
@@ -113,6 +114,8 @@ std::string WriteCommit(const Commit& commit);
 std::string WriteIndex();
 
 std::vector<std::string> ListExistedObjects();
+std::vector<std::string> ListRefedObjects();
+void Remove(const std::string &id);
 }
 }
 #endif

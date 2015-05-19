@@ -165,11 +165,10 @@ int main(int argc, char** av)
 			} else {
 				printDiffArg();
 			}
-		} else if (argv[1] == "list") {
-			auto objects = Sit::Objects::ListExistedObjects();
-			for (const auto &o : objects) {
-				std::cout << o << std::endl;
-			}
+		} else if (argv[1] == "clean") {
+			Sit::Core::GarbageCollection();
+		} else {
+			throw Sit::Util::SitException("Fatal: No such a command.");
 		}
 	} catch (const Sit::Util::SitException& e) {
 		std::cerr << "!!! Sit Exception:" << std::endl;

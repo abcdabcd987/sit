@@ -59,6 +59,7 @@ void Log(std::string id);
  */
 void Reset(std::string id, std::string filename, const bool isHard);
 
+void GarbageCollection();
 }
 }
 #endif
