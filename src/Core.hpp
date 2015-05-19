@@ -59,6 +59,9 @@ void Log(std::string id);
  */
 void Reset(std::string id, std::string filename, const bool isHard);
 
+/**
+ * Delete the objects cannot be reached from the last commit of master in order to free some space in disk.
+ */
 void GarbageCollection();
 }
 }

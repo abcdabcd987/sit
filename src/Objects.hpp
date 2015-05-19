@@ -113,8 +113,20 @@ std::string WriteCommit(const Commit& commit);
  */
 std::string WriteIndex();
 
+/**
+ * list all objects which are located at ".sit/objects"
+ */
 std::vector<std::string> ListExistedObjects();
+
+/**
+ * list all objects which can be refered by the last commit of master and all objects which are added to the index.
+ */
 std::set<std::string> ListReferedObjects();
+
+/**
+ * Remove a object from repository.
+ * @param id the name of the object(SHA1 value) and it will call GetPath to get the real path.
+ */
 void Remove(const std::string &id);
 }
 }
