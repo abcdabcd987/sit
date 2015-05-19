@@ -3,11 +3,10 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
-
 #include "Index.hpp"
 #include "Objects.hpp"
 #include "FileSystem.hpp"
-
+#include "Refs.hpp"
 
 namespace Sit {
 namespace Objects {
@@ -192,5 +191,59 @@ std::string WriteIndex()
 	return id;
 }
 
+std::vector<std::string> ListExistedObjects()
+{
+	std::vector<std::string> objectsList;
+	auto objectsFileList = FileSystem::ListRecursive(FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR, false, true);
+	const auto stdLen = std::string(".sit/objects/00/00000000000000000000000000000000000000").length();
+	//list objects as ".sit/objects/00/00000000000000000000000000000000000000"
+	for (const auto &object : objectsFileList) {
+		if (object.generic_string().length() == stdLen) {
+			std::string tmp = object.generic_string();
+			//erase ".sit/objects/" and remain "00/00000000000000000000000000000000000000"
+			tmp.erase(0, 13);
+			tmp.erase(2, 1);
+			objectsList.push_back(tmp);
+		}
+	}
+	return objectsList;
+}
+
+std::vector<std::string> ListRefedObjects()
+{
+	std::vector<std::string> objectsList;
+	std::list<Commit> commitList;
+	std::list<std::string> treeList;
+	for (std::string curCommit = FileSystem::Read(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "refs/heads/master"); curCommit != Refs::EMPTY_REF;) {
+		auto commit = GetCommit(curCommit);
+		commitList.push_back(commit);
+		objectsList.push_back(curCommit);
+		objectsList.push_back(commit.tree);
+		treeList.push_back(commit.tree);
+		curCommit = commit.parent;
+	}
+	for (const auto &tree : treeList) {
+		auto treeMsg = GetTree(tree);
+		for (const auto &treeElement : treeMsg) {
+			if (treeElement.type == TREE) {
+				treeList.push_back(treeElement.id);
+			}
+			objectsList.push_back(treeElement.id);
+		}
+	}
+	for (const auto &indexItem : Index::index.GetIndex()) {
+		objectsList.push_back(indexItem.second);
+	}
+	std::sort(objectsList.begin(), objectsList.end());
+	auto len = std::unique(objectsList.begin(), objectsList.end()) - objectsList.begin();
+	objectsList.resize(len);
+	return objectsList;
+}
+
+void Remove(const std::string &id)
+{
+	std::cout << "Removed object: " << id << std::endl;
+	boost::filesystem::remove(GetPath(id));
+}
 }
 }

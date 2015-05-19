@@ -80,12 +80,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Color.hpp" />
     <ClInclude Include="Config.hpp" />
     <ClInclude Include="Core.hpp" />
     <ClInclude Include="Diff.hpp" />
     <ClInclude Include="FileSystem.hpp" />
     <ClInclude Include="Index.hpp" />
     <ClInclude Include="Messages.hpp" />
+    <ClInclude Include="MurmurHash3.h" />
     <ClInclude Include="Objects.hpp" />
     <ClInclude Include="Refs.hpp" />
     <ClInclude Include="Status.hpp" />
@@ -98,6 +100,7 @@
     <ClCompile Include="FileSystem.cc" />
     <ClCompile Include="Index.cc" />
     <ClCompile Include="Message.cc" />
+    <ClCompile Include="MurmurHash3.cc" />
     <ClCompile Include="Objects.cc" />
     <ClCompile Include="Refs.cc" />
     <ClCompile Include="sit.cc" />

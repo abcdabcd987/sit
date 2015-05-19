@@ -12,24 +12,12 @@
 
 // Microsoft Visual Studio
 
-#if defined(_MSC_VER)
-
-typedef unsigned char uint8_t;
-typedef unsigned long uint32_t;
-typedef unsigned __int64 uint64_t;
-
-// Other compilers
-
-#else   // defined(_MSC_VER)
-
 #include <cstdint>
-
-#endif // !defined(_MSC_VER)
 
 #include <tuple>
 //-----------------------------------------------------------------------------
 
-#if defined(ENV64)
+#ifdef ENV64
 typedef std::tuple<uint64_t, uint64_t> HashValue;
 HashValue MurmurHash3 ( const void * key, int len, uint32_t seed = 42 );
 #else
