@@ -101,7 +101,7 @@ AllHelp::AllHelp()
 		"    Show commit logs",
 		"    sit log\n"
 		"    sit log master\n"
-		"    sit log <Commit ID>\n"
+		"    sit log <Commit ID>"
 		);
 	data["diff"] = HelpMessage(
 		"    sit-diff",
@@ -116,6 +116,11 @@ AllHelp::AllHelp()
 		"        <CommitID>\n"
 		"    Default <base>   = index\n"
 		"    Default <target> = work"
+		);
+	data["clean"] = HelpMessage(
+		"    sit-clean",
+		"    Delete objects which are useless from the disk in order to free disk space.\n",
+		"    sit clean"
 		);
 }
 
