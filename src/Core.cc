@@ -249,15 +249,14 @@ void Checkout(std::string commitid, const std::string &filename)
 	}
 }
 
-void printLog(const Objects::Commit &commit, const std::string &id)
+void printLog(std::ostream &out, const Objects::Commit &commit, const std::string &id)
 {
-	std::cout << Color::BROWN << "Commit " << id << Color::RESET << std::endl
-	          << "Author: " << commit.author << std::endl
-	          << std::endl;
+	out << Color::BROWN << "Commit " << id << Color::RESET << std::endl
+	    << "Author: " << commit.author << std::endl
+	    << std::endl;
 	std::istringstream ss(commit.message);
 	std::string line;
-	while (std::getline(ss, line)) std::cout << "    " << line << std::endl;
-	std::cout << std::endl;
+	while (std::getline(ss, line)) out << "    " << line << std::endl;
 }
 
 void Log(std::string id)
@@ -266,12 +265,12 @@ void Log(std::string id)
 		id = Refs::Get(Refs::Local("master"));
 		while (id != Refs::EMPTY_REF) {
 			Objects::Commit commit(Objects::GetCommit(id));
-			printLog(commit, id);
+			printLog(std::cout, commit, id);
 			id = commit.parent;
 		}
 	} else {
 		Objects::Commit commit(Objects::GetCommit(id));
-		printLog(commit, id);
+		printLog(std::cout, commit, id);
 	}
 }
 
@@ -312,7 +311,7 @@ void Reset(std::string id, const std::string &filename, const bool isHard)
 
 void Diff(const std::string &baseID, const std::string &targetID)
 {
-	std::cout << Diff::DiffIndex(Util::SHA1Complete(baseID), Util::SHA1Complete(targetID));
+	Diff::DiffIndex(std::cout, Util::SHA1Complete(baseID), Util::SHA1Complete(targetID));
 }
 
 }

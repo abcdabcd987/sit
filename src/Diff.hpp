@@ -37,7 +37,7 @@ DiffList Diff(const Index::IndexBase& base, const Index::IndexBase& target);
 /**
  * Return the diff string between two index
  */
-std::string DiffIndex(const std::string &baseID, const std::string &targetID);
+void DiffIndex(std::ostream &out, const std::string &baseID, const std::string &targetID);
 
 }
 }
