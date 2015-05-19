@@ -1,7 +1,7 @@
 #include "Diff.hpp"
 #include "Refs.hpp"
 #include "Objects.hpp"
-#include "MurmurHash3.h"
+#include "MurmurHash3.hpp"
 #include <cassert>
 #include <vector>
 #include <sstream>
@@ -188,7 +188,7 @@ void hashlines(array<HashValue> &out, const std::vector<std::string> &v)
 	for (size_t i = 0; i < v.size(); ++i)
 		out[i+1] = MurmurHash3(v[i].c_str(), v[i].size());
 }
-std::string DiffString(const DiffItem &item,
+void DiffObject(std::ostream &out, const DiffItem &item,
 	const std::string &baseID,
 	const std::string &targetID)
 {
@@ -204,7 +204,6 @@ std::string DiffString(const DiffItem &item,
 	lcs(sol, b, 0, t, 0);
 
 	// Generate a diff string
-	std::ostringstream out;
 	out << Color::WHITE << "diff --git a/" << item.path.generic_string() << " b/" << item.path.generic_string() << Color::RESET << std::endl
 	    << Color::WHITE << baseID << " " << targetID << " 100644" << Color::RESET << std::endl
 	    << Color::WHITE << "--- a/" << item.path.generic_string() << Color::RESET << std::endl
@@ -225,22 +224,18 @@ std::string DiffString(const DiffItem &item,
 			out << " " << base[p.first] << std::endl;
 		++baseLast, ++targetLast;
 	}
-
-	return out.str();
 }
 
-std::string DiffIndex(const std::string &baseID, const std::string &targetID)
+void DiffIndex(std::ostream &out, const std::string &baseID, const std::string &targetID)
 {
 	const Index::IndexBase base(Index::GetIndex(baseID));
 	const Index::IndexBase target(Index::GetIndex(targetID));
 	const DiffList diff(Diff(base, target));
-	std::ostringstream out;
 	for (const auto &item : diff) {
 		if (item.second.status != Same) {
-			out << DiffString(item.second, baseID, targetID);
+			DiffObject(out, item.second, baseID, targetID);
 		};
 	}
-	return out.str();
 }
 
 }
