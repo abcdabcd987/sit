@@ -3,6 +3,7 @@
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/algorithm/string.hpp>
 #include "FileSystem.hpp"
+#include "Util.hpp"
 
 namespace Sit {
 namespace FileSystem {

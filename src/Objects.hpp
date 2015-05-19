@@ -4,7 +4,7 @@
 #include <boost/filesystem.hpp>
 #include <string>
 #include <vector>
-#include <list>
+#include <set>
 
 namespace Sit {
 namespace Objects {
@@ -114,7 +114,7 @@ std::string WriteCommit(const Commit& commit);
 std::string WriteIndex();
 
 std::vector<std::string> ListExistedObjects();
-std::vector<std::string> ListRefedObjects();
+std::set<std::string> ListReferedObjects();
 void Remove(const std::string &id);
 }
 }

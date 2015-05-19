@@ -7,6 +7,7 @@
 #include "Objects.hpp"
 #include "FileSystem.hpp"
 #include "Refs.hpp"
+#include "Util.hpp"
 
 namespace Sit {
 namespace Objects {
@@ -209,16 +210,16 @@ std::vector<std::string> ListExistedObjects()
 	return objectsList;
 }
 
-std::vector<std::string> ListRefedObjects()
+std::set<std::string> ListReferedObjects()
 {
-	std::vector<std::string> objectsList;
+	std::set<std::string> objectsList;
 	std::list<Commit> commitList;
 	std::list<std::string> treeList;
 	for (std::string curCommit = FileSystem::Read(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "refs/heads/master"); curCommit != Refs::EMPTY_REF;) {
 		auto commit = GetCommit(curCommit);
 		commitList.push_back(commit);
-		objectsList.push_back(curCommit);
-		objectsList.push_back(commit.tree);
+		objectsList.insert(curCommit);
+		objectsList.insert(commit.tree);
 		treeList.push_back(commit.tree);
 		curCommit = commit.parent;
 	}
@@ -228,15 +229,12 @@ std::vector<std::string> ListRefedObjects()
 			if (treeElement.type == TREE) {
 				treeList.push_back(treeElement.id);
 			}
-			objectsList.push_back(treeElement.id);
+			objectsList.insert(treeElement.id);
 		}
 	}
 	for (const auto &indexItem : Index::index.GetIndex()) {
-		objectsList.push_back(indexItem.second);
+		objectsList.insert(indexItem.second);
 	}
-	std::sort(objectsList.begin(), objectsList.end());
-	auto len = std::unique(objectsList.begin(), objectsList.end()) - objectsList.begin();
-	objectsList.resize(len);
 	return objectsList;
 }
 

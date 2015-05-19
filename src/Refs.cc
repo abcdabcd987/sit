@@ -1,5 +1,6 @@
 #include "Refs.hpp"
 #include "FileSystem.hpp"
+#include "Util.hpp"
 #include <boost/algorithm/string.hpp>
 
 namespace Sit {

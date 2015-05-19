@@ -1,4 +1,5 @@
 #include "Message.hpp"
+#include "Util.hpp"
 
 namespace Sit {
 namespace Msg {

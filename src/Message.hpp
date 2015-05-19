@@ -1,7 +1,6 @@
 #ifndef _SRC_MESSAGE_HPP
 #define _SRC_MESSAGE_HPP
 
-#include "Util.hpp"
 #include <iostream>
 #include <iomanip>
 

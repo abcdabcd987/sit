@@ -14,6 +14,7 @@
 #include "Config.hpp"
 #include "Refs.hpp"
 #include "Status.hpp"
+#include "Objects.hpp"
 
 #ifdef WIN32
 #include <Windows.h>
@@ -324,20 +325,13 @@ void Diff(const std::string &baseID, const std::string &targetID)
 void GarbageCollection()
 {
 	auto existedList = Objects::ListExistedObjects();
-	auto refedList = Objects::ListRefedObjects();
-	size_t i = 0, j = 0;
-	while (i < existedList.size() && j < refedList.size()) {
-		if (existedList[i] != refedList[j]) {
-			Objects::Remove(existedList[i]);
-			++i;
+	auto refereddList = Objects::ListReferedObjects();
+	for (const auto &element : existedList) {
+		if (refereddList.count(element)) {
+			continue;
 		} else {
-			++i;
-			++j;
+			Objects::Remove(element);
 		}
-	}
-	while (i < existedList.size()) {
-		Objects::Remove(existedList[i]);
-		++i;
 	}
 }
 }

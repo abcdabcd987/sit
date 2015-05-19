@@ -2,6 +2,8 @@
 #include <boost/algorithm/string.hpp>
 #include "FileSystem.hpp"
 #include "Config.hpp"
+#include "Util.hpp"
+
 namespace Sit {
 namespace Config {
 

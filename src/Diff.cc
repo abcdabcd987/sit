@@ -2,6 +2,7 @@
 #include "Refs.hpp"
 #include "Objects.hpp"
 #include "MurmurHash3.hpp"
+#include "Util.hpp"
 #include <cassert>
 #include <vector>
 #include <sstream>

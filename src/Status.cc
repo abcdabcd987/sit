@@ -7,6 +7,7 @@
 #include "Status.hpp"
 #include "FileSystem.hpp"
 #include "Refs.hpp"
+#include "Util.hpp"
 
 #include <iostream>
 
