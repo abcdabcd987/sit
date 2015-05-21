@@ -221,7 +221,7 @@ void Checkout(std::string commitid, std::string filename)
 		index = Index::CommitIndex(commitid);
 	}
 	const std::map<boost::filesystem::path, std::string> &idx(index.GetIndex());
-
+	
 	if (filename.empty()) {
 		// Commit Checkout
 
@@ -242,15 +242,27 @@ void Checkout(std::string commitid, std::string filename)
 	} else {
 		// File Checkout
 
-		if (!index.InIndex(filename)) {
+		if (filename.back() != '/' && index.InIndex(filename)) {
+			const boost::filesystem::path path(filename);
+			const std::string objpath(idx.find(path)->second);
+			const auto src(Objects::GetPath(objpath));
+			const auto dst(FileSystem::REPO_ROOT / filename);
+			FileSystem::SafeCopyFile(src, dst);
+		} else if ((filename.back() != '/' && index.InIndex(filename + '/')) || (filename.back() == '/' && index.InIndex(filename))){
+			const auto newFilename = filename + (filename.back() == '/' ? "" : "/");
+			for (const auto &element : idx) {
+				const auto name = element.first;
+				if (name.generic_string().find(newFilename) == 0) {
+					const std::string objpath(element.second);
+					const auto src(Objects::GetPath(objpath));
+					const auto dst(FileSystem::REPO_ROOT / element.first);
+					FileSystem::SafeCopyFile(src, dst);
+				}
+			}
+		} else {
 			std::cerr << "Error: " << filename << " doesn't exist in file list";
 			return;
 		}
-		const boost::filesystem::path path(filename);
-		const std::string objpath(idx.find(path)->second);
-		const auto &src(Objects::GetPath(objpath));
-		const auto &dst(FileSystem::REPO_ROOT / filename);
-		FileSystem::SafeCopyFile(src, dst);
 	}
 }
 

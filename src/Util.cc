@@ -62,7 +62,7 @@ std::string AuthorString(const std::string& name, const std::string& email, cons
 
 std::string SHA1Complete(std::string _id)
 {
-	if (_id == "index" || _id == "master" || _id == "HEAD" || _id == "work")
+	if (_id == "" || _id == "index" || _id == "master" || _id == "HEAD" || _id == "work")
 		return _id;
 	boost::filesystem::path path = _id.substr(0, 2);
 	boost::filesystem::path filename = _id.substr(2);

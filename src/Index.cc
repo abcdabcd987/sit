@@ -72,7 +72,11 @@ unsigned IndexBase::Remove(const boost::filesystem::path &path)
 		auto newPath = path.relative_path();
 		std::vector<boost::filesystem::path> wouldRm;
 		for (auto &element : _index) {
-			if (element.first.generic_string().find(newPath.generic_string()) == 0) {
+			if (element.first.generic_string() == newPath.generic_string() || 
+					(element.first.generic_string().find(newPath.generic_string()) == 0 && 
+					element.first.generic_string().length() > newPath.generic_string().length() && 
+					element.first.generic_string().at(newPath.generic_string().length()) == '/')
+				) {
 				wouldRm.push_back(element.first);
 				++rmCount;
 			}
@@ -89,7 +93,17 @@ unsigned IndexBase::Remove(const boost::filesystem::path &path)
 bool IndexBase::InIndex(const boost::filesystem::path& path) const
 {
 	try {
-		return _index.count(path) > 0;
+		if (path.generic_string().back() != '/') {
+			return _index.count(path) > 0;
+		} else {
+			for (const auto &element : _index) {
+				auto filename = element.first;
+				if (filename.generic_string().find(path.generic_string()) == 0) {
+					return true;
+				}
+			}
+			return false;
+		}
 	} catch (const std::exception &ec) {
 		std::cerr << ec.what() << std::endl;
 	}
