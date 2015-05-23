@@ -1,4 +1,9 @@
+HEAD
 # sit
+=======
+bin/
+*.swp
+dev
 src/sit
 
 # Compiled Object files
