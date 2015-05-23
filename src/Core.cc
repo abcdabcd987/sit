@@ -65,7 +65,7 @@ void LoadRepo()
 	throw Sit::Util::SitException("Cannot find a sit repository.");
 }
 
-std::string AddFile(const boost::filesystem::path &file)
+std::string addFile(const boost::filesystem::path &file)
 {
 	if (FileSystem::IsDirectory(file)) {
 		return "";
@@ -99,7 +99,7 @@ void Add(const boost::filesystem::path &path)
 			continue;
 		}
 		boost::filesystem::path relativePath = FileSystem::GetRelativePath(file);
-		Index::index.Insert(relativePath, AddFile(file));
+		Index::index.Insert(relativePath, addFile(file));
 	}
 
 	Index::index.Save();
@@ -248,20 +248,18 @@ void Checkout(std::string commitid, std::string filename)
 			const auto src(Objects::GetPath(objpath));
 			const auto dst(FileSystem::REPO_ROOT / filename);
 			FileSystem::SafeCopyFile(src, dst);
-		} else if ((filename.back() != '/' && index.InIndex(filename + '/')) || (filename.back() == '/' && index.InIndex(filename))){
-			const auto newFilename = filename + (filename.back() == '/' ? "" : "/");
-			for (const auto &element : idx) {
-				const auto name = element.first;
-				if (name.generic_string().find(newFilename) == 0) {
-					const std::string objpath(element.second);
-					const auto src(Objects::GetPath(objpath));
-					const auto dst(FileSystem::REPO_ROOT / element.first);
+		} else {
+			const auto fileList(index.ListFile(filename));
+			if (!fileList.empty()) {
+				for (const auto &singleFile : fileList) {
+					const auto src(Objects::GetPath(singleFile.second));
+					const auto dst(FileSystem::REPO_ROOT / singleFile.first);
 					FileSystem::SafeCopyFile(src, dst);
 				}
+			} else {
+				std::cerr << "Error: " << filename << " doesn't exist in file list";
+				return;
 			}
-		} else {
-			std::cerr << "Error: " << filename << " doesn't exist in file list";
-			return;
 		}
 	}
 }
@@ -291,21 +289,8 @@ void Log(std::string id)
 	}
 }
 
-void Reset(std::string id, std::string filename, const bool isHard)
+void resetSingleFile(std::string id, std::string filename, const Index::CommitIndex &commitIndex, const bool &inCommit, const bool &inIndex, const bool isHard)
 {
-	if (id == "master") {
-		id = Refs::Get(Refs::Local("master"));
-	} else if (id == "HEAD" || id.empty()) {
-		id = Refs::Get("HEAD");
-	}
-	id = Sit::Util::SHA1Complete(id);
-	if (!filename.empty()) {
-		filename = FileSystem::GetRelativePath(filename).generic_string();
-	}
-	const Index::CommitIndex &commitIndex(id);
-	const bool inCommit = commitIndex.InIndex(filename);
-	const bool inIndex = Index::index.InIndex(filename);
-
 	if (inCommit && !inIndex) {
 		Index::index.Insert(filename, commitIndex.GetID(filename));
 		if (isHard) {
@@ -327,6 +312,26 @@ void Reset(std::string id, std::string filename, const bool isHard)
 		return;
 	}
 	Index::index.Save();
+}
+
+void Reset(std::string id, std::string filename, const bool isHard)
+{
+	if (id == "master") {
+		id = Refs::Get(Refs::Local("master"));
+	} else if (id == "HEAD" || id.empty()) {
+		id = Refs::Get("HEAD");
+	}
+
+	id = Sit::Util::SHA1Complete(id);
+	if (!filename.empty()) {
+		filename = FileSystem::GetRelativePath(filename).generic_string();
+	}
+
+	const Index::CommitIndex commitIndex(id);
+	const bool inCommit = commitIndex.InIndex(filename);
+	const bool inIndex = Index::index.InIndex(filename);
+
+	resetSingleFile(id, filename, commitIndex, inCommit, inIndex, isHard);
 }
 
 void Diff(const std::string &baseID, const std::string &targetID)

@@ -35,6 +35,11 @@ public:
 	 * Return the _index;
 	 */
 	const std::map<boost::filesystem::path, std::string>& GetIndex() const;
+
+	/*
+	 * List a file which filename == path or all the files which in the path(directory)
+	 */
+	std::vector<std::pair<boost::filesystem::path, std::string>> ListFile(const std::string &prefix) const;
 };
 
 class Index : public IndexBase {

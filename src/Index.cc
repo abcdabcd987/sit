@@ -123,6 +123,21 @@ const std::map<boost::filesystem::path, std::string>& IndexBase::GetIndex() cons
 	return _index;
 }
 
+std::vector<std::pair<boost::filesystem::path, std::string>> IndexBase::ListFile(const std::string &prefix) const
+{
+	std::vector<std::pair<boost::filesystem::path, std::string>> result;
+	for (const auto &element : this->_index) {
+		if (element.first.generic_string() == prefix) {
+			result.push_back(element);
+		} else if (element.first.generic_string().find(prefix) == 0 && element.first.generic_string().at(prefix.length()) == '/') {
+			result.push_back(element);
+		} else if (element.first.generic_string().find(prefix) == 0 && prefix.back() == '/') {
+			result.push_back(element);
+		}
+	}
+	return result;
+}
+
 void CommitIndex::flattenTree(const Objects::Tree &tree, const boost::filesystem::path& prefix)
 {
 	for (auto &item : tree) {
