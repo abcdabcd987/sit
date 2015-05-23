@@ -1,2 +1,0 @@
-# sit
-Simplified Git
