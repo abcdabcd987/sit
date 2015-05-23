@@ -127,6 +127,10 @@ std::vector<std::pair<boost::filesystem::path, std::string>> IndexBase::ListFile
 {
 	std::vector<std::pair<boost::filesystem::path, std::string>> result;
 	for (const auto &element : this->_index) {
+		if (prefix.empty()) {
+			result.push_back(element);
+			continue;
+		}
 		if (element.first.generic_string() == prefix) {
 			result.push_back(element);
 		} else if (element.first.generic_string().find(prefix) == 0 && element.first.generic_string().at(prefix.length()) == '/') {

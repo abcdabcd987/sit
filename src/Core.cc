@@ -323,15 +323,30 @@ void Reset(std::string id, std::string filename, const bool isHard)
 	}
 
 	id = Sit::Util::SHA1Complete(id);
+	
 	if (!filename.empty()) {
 		filename = FileSystem::GetRelativePath(filename).generic_string();
 	}
-
+	
 	const Index::CommitIndex commitIndex(id);
-	const bool inCommit = commitIndex.InIndex(filename);
-	const bool inIndex = Index::index.InIndex(filename);
-
-	resetSingleFile(id, filename, commitIndex, inCommit, inIndex, isHard);
+	const auto commitList = commitIndex.ListFile(filename);
+	const auto indexList = Index::index.ListFile(filename);
+	std::set<std::string> commitSet;
+	std::set<std::string> indexSet;
+	std::set<std::string> allSet;
+	for (const auto &fileInCommit : commitList) {
+		commitSet.insert(fileInCommit.first.generic_string());
+		allSet.insert(fileInCommit.first.generic_string());
+	}
+	for (const auto &fileInIndex : indexList) {
+		indexSet.insert(fileInIndex.first.generic_string());
+		allSet.insert(fileInIndex.first.generic_string());
+	}
+	for (const auto &anyfile : allSet) {
+		const bool inCommit = commitSet.count(anyfile) > 0;
+		const bool inIndex = indexSet.count(anyfile) > 0;
+		resetSingleFile(id, anyfile, commitIndex, inCommit, inIndex, isHard);
+	}
 }
 
 void Diff(const std::string &baseID, const std::string &targetID)
