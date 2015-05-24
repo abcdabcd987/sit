@@ -32,7 +32,7 @@ List getUntracked(const Index::WorkingIndex &workIndex, const Index::Index &inde
 	return v;
 }
 
-List getToBeCommitted(const Index::CommitIndex &head, const Index::Index &index)
+List getToBeCommitted(const Index::IndexBase &head, const Index::Index &index)
 {
 	List v;
 	const Diff::DiffList diff(Diff::Diff(head, index));
@@ -75,12 +75,11 @@ std::string StatusString()
 {
 	const std::string headref(Refs::Get("HEAD"));
 	std::ostringstream ss;
-	if (headref == Refs::EMPTY_REF) {
-		ss << "The current repo is empty." << std::endl;
-		return ss.str();
-	}
 
-	const Index::CommitIndex head(headref);
+	Index::IndexBase head;
+	if (headref != Refs::EMPTY_REF) {
+		head = Index::CommitIndex(headref);
+	}
 	const Index::WorkingIndex work;
 	const Index::Index &index(Index::index);
 
