@@ -86,7 +86,6 @@
     <ClInclude Include="Diff.hpp" />
     <ClInclude Include="FileSystem.hpp" />
     <ClInclude Include="Index.hpp" />
-    <ClInclude Include="Message.hpp" />
     <ClInclude Include="MurmurHash3.hpp" />
     <ClInclude Include="Objects.hpp" />
     <ClInclude Include="Refs.hpp" />
@@ -100,7 +99,6 @@
     <ClCompile Include="Diff.cc" />
     <ClCompile Include="FileSystem.cc" />
     <ClCompile Include="Index.cc" />
-    <ClCompile Include="Message.cc" />
     <ClCompile Include="MurmurHash3.cc" />
     <ClCompile Include="Objects.cc" />
     <ClCompile Include="Refs.cc" />
