@@ -294,19 +294,19 @@ void resetSingleFile(std::ostream &stream, std::string id, std::string filename,
 {
 	stream << "  " << boost::filesystem::path(filename);
 	if (inCommit && !inIndex) {
-		stream << " >>> index" << std::endl;
+		stream << " >+> index" << std::endl;
 		Index::index.Insert(filename, commitIndex.GetID(filename));
 		if (isHard) {
 			Checkout(id, filename);
 		}
 	} else if (!inCommit && inIndex) {
-		stream << " <<< index" << std::endl;
+		stream << " <-< index" << std::endl;
 		Index::index.Remove(filename);
 		if (isHard) {
 			FileSystem::Remove(filename);
 		}
 	} else if (inCommit && inIndex) {
-		stream << " = " << commitIndex.GetID(filename) << std::endl;
+		stream << " <== " << commitIndex.GetID(filename) << std::endl;
 		Index::index.Remove(filename);
 		Index::index.Insert(filename, commitIndex.GetID(filename));
 		if (isHard) {

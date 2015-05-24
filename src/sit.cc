@@ -220,7 +220,7 @@ int reset(int ac, char** av)
 		Sit::Core::Reset(oss, commit, p, vm.count("hard"));
 	}
 	if (!oss.str().empty()) {
-		cout << "The followed files will be reseted:" << endl;
+		cout << "The followed files have be reseted:" << endl;
 		cout << oss.str();
 	}
 	return 0;
