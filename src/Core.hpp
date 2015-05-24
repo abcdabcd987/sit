@@ -56,8 +56,9 @@ void Log(std::string id);
 /**
  * Reset `filename` status in the index to that in the commit `id`
  * If `isHard`, modify the working directory, too.
+ * Reset will print message to stream.
  */
-void Reset(std::string id, std::string filename, const bool isHard);
+void Reset(std::ostream &stream, std::string id, std::string filename, const bool isHard);
 
 /**
  * Delete the objects cannot be reached from the last commit of master in order to free some space in disk.

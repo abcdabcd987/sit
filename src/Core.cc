@@ -290,37 +290,36 @@ void Log(std::string id)
 	}
 }
 
-void resetSingleFile(std::string id, std::string filename, const Index::CommitIndex &commitIndex, const bool &inCommit, const bool &inIndex, const bool isHard)
+void resetSingleFile(std::ostream &stream, std::string id, std::string filename, const Index::CommitIndex &commitIndex, const bool &inCommit, const bool &inIndex, const bool isHard)
 {
-	std::cout << "  " << boost::filesystem::path(filename);
+	stream << "  " << boost::filesystem::path(filename);
 	if (inCommit && !inIndex) {
-		std::cout << " >>> index" << std::endl;
+		stream << " >>> index" << std::endl;
 		Index::index.Insert(filename, commitIndex.GetID(filename));
 		if (isHard) {
 			Checkout(id, filename);
 		}
 	} else if (!inCommit && inIndex) {
-		std::cout << " <<< index" << std::endl;
+		stream << " <<< index" << std::endl;
 		Index::index.Remove(filename);
 		if (isHard) {
 			FileSystem::Remove(filename);
 		}
 	} else if (inCommit && inIndex) {
-		std::cout << " = " << commitIndex.GetID(filename) << std::endl;
+		stream << " = " << commitIndex.GetID(filename) << std::endl;
 		Index::index.Remove(filename);
 		Index::index.Insert(filename, commitIndex.GetID(filename));
 		if (isHard) {
 			Checkout(id, filename);
 		}
 	} else {
-		std::cout << std::endl;
 		std::cerr << "Error: " << filename << " is not tracked" << std::endl;
 		return;
 	}
 	Index::index.Save();
 }
 
-void Reset(std::string id, std::string filename, const bool isHard)
+void Reset(std::ostream &stream, std::string id, std::string filename, const bool isHard)
 {
 	if (id == "master") {
 		id = Refs::Get(Refs::Local("master"));
@@ -356,7 +355,7 @@ void Reset(std::string id, std::string filename, const bool isHard)
 				continue;
 			}
 		}
-		resetSingleFile(id, anyfile, commitIndex, inCommit, inIndex, isHard);
+		resetSingleFile(stream, id, anyfile, commitIndex, inCommit, inIndex, isHard);
 	}
 }
 

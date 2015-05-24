@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
@@ -213,9 +214,14 @@ int reset(int ac, char** av)
 	if (path.empty()) {
 		path.push_back(".");
 	}
-	cout << "The followed files will be reseted:" << endl;
+	std::ostringstream oss;
+	
 	for (const auto &p : path) {
-		Sit::Core::Reset(commit, p, vm.count("hard"));
+		Sit::Core::Reset(oss, commit, p, vm.count("hard"));
+	}
+	if (!oss.str().empty()) {
+		cout << "The followed files will be reseted:" << endl;
+		cout << oss.str();
 	}
 	return 0;
 }
