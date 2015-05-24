@@ -63,7 +63,7 @@ void LoadRepo()
 		}
 		curPath = curPath.parent_path();
 	}
-	throw Sit::Util::SitException("Cannot find a sit repository.");
+	throw Sit::Util::SitException("Fatal: Not a sit repository (or any of the parent directories): .sit");
 }
 
 std::string addFile(const boost::filesystem::path &file)
@@ -292,23 +292,28 @@ void Log(std::string id)
 
 void resetSingleFile(std::string id, std::string filename, const Index::CommitIndex &commitIndex, const bool &inCommit, const bool &inIndex, const bool isHard)
 {
+	std::cout << "  " << boost::filesystem::path(filename);
 	if (inCommit && !inIndex) {
+		std::cout << " >>> index" << std::endl;
 		Index::index.Insert(filename, commitIndex.GetID(filename));
 		if (isHard) {
 			Checkout(id, filename);
 		}
 	} else if (!inCommit && inIndex) {
+		std::cout << " <<< index" << std::endl;
 		Index::index.Remove(filename);
 		if (isHard) {
 			FileSystem::Remove(filename);
 		}
 	} else if (inCommit && inIndex) {
+		std::cout << " = " << commitIndex.GetID(filename) << std::endl;
 		Index::index.Remove(filename);
 		Index::index.Insert(filename, commitIndex.GetID(filename));
 		if (isHard) {
 			Checkout(id, filename);
 		}
 	} else {
+		std::cout << std::endl;
 		std::cerr << "Error: " << filename << " is not tracked" << std::endl;
 		return;
 	}
@@ -346,6 +351,11 @@ void Reset(std::string id, std::string filename, const bool isHard)
 	for (const auto &anyfile : allSet) {
 		const bool inCommit = commitSet.count(anyfile) > 0;
 		const bool inIndex = indexSet.count(anyfile) > 0;
+		if (inCommit && inIndex) {
+			if (Util::SHA1sum(FileSystem::Read(anyfile)) == Index::index.GetID(anyfile) && commitIndex.GetID(anyfile) == Index::index.GetID(anyfile)) {
+				continue;
+			}
+		}
 		resetSingleFile(id, anyfile, commitIndex, inCommit, inIndex, isHard);
 	}
 }

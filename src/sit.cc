@@ -130,9 +130,9 @@ int help(int argc, char** argv)
 	     << "  checkout   Checkout paths to the working tree" << endl
 	     << "  commit     Record changes to the repository" << endl
 	     << "  diff       Show changes between commits, commit and working tree, etc" << endl
-	     << "  gc         Create an empty sit repository or reinitialize an existing one" << endl
+	     << "  gc         Remove useless files to free disk space" << endl
 	     << "  help       Show this help message" << endl
-	     << "  init       Create an empty sit repository" << endl
+	     << "  init       Create an empty sit repository or reinitialize an existing one" << endl
 	     << "  log        Show commit logs" << endl
 	     << "  reset      Reset current HEAD to the specified state" << endl
 	     << "  rm         Remove files from the working tree and from the index" << endl
@@ -195,7 +195,7 @@ int reset(int ac, char** av)
 	desc.add_options()
 		("help", "Show this help message")
 		("hard", "Resets the index and working tree, otherwise, only the index but not working tree")
-		("commit", po::value<string>(&commit)->default_value(""), "Specify the commit which the HEAD will reset to")
+		("commit", po::value<string>(&commit)->default_value("HEAD"), "Specify the commit which the HEAD will reset to")
 		("path", po::value<vector<string>>(&path), "Path list to reset")
 	;
 	po::positional_options_description p;
@@ -206,11 +206,14 @@ int reset(int ac, char** av)
 	auto unrecog = po::collect_unrecognized(parsed.options, po::include_positional);
 	po::notify(vm);
 
-	if (!vm.count("path") || vm.count("help")) {
+	if (vm.count("help")) {
 		cout << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
-	
+	if (path.empty()) {
+		path.push_back(".");
+	}
+	cout << "The followed files will be reseted:" << endl;
 	for (const auto &p : path) {
 		Sit::Core::Reset(commit, p, vm.count("hard"));
 	}
