@@ -42,6 +42,7 @@ void Init()
 		create_directories(".sit/refs/heads");
 		create_directories(".sit/objects");
 		FileSystem::Write(".sit/HEAD", Refs::EMPTY_REF);
+		FileSystem::Write(".sit/COMMIT_MSG", "");
 		FileSystem::Write(".sit/refs/heads/master", Refs::EMPTY_REF);
 	} catch (const boost::filesystem::filesystem_error &fe) {
 		std::cerr << fe.what() << std::endl;
@@ -147,7 +148,7 @@ void amend(const std::string &oldid, const std::string &newid)
 	Refs::Set(Refs::Local("master"), last);
 }
 
-void Commit(const bool isAmend)
+void Commit(const std::string &msg, const bool isAmend)
 {
 	using Util::SitException;
 	using boost::posix_time::to_simple_string;
@@ -164,7 +165,7 @@ void Commit(const bool isAmend)
 	if (!FileSystem::IsFile(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "COMMIT_MSG")) {
 		throw SitException("Commit message not found.");
 	}
-	commit.message = getCommitMessage();
+	commit.message = msg.empty() ? getCommitMessage() : msg;
 	if (commit.message.empty()) {
 		throw SitException("Commit message is empty.");
 	}
@@ -201,7 +202,7 @@ void Commit(const bool isAmend)
 
 void Status()
 {
-	std::cout << Status::StatusString();
+	Status::PrintStatus(std::cout);
 }
 
 void Checkout(std::string commitid, std::string filename)

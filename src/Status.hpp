@@ -3,11 +3,12 @@
 
 #include "Index.hpp"
 #include "Diff.hpp"
+#include <ostream>
 
 namespace Sit {
 namespace Status {
 
-std::string StatusString();
+void PrintStatus(std::ostream& out);
 
 /**
  * Whether the repo is clean
