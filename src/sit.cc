@@ -77,7 +77,7 @@ int checkout(int ac, char **av)
 		cout << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
-	
+
 	for (const auto &p : path) {
 		Sit::Core::Checkout(commit, p);
 	}
@@ -215,12 +215,12 @@ int reset(int ac, char** av)
 		path.push_back(".");
 	}
 	std::ostringstream oss;
-	
+
 	for (const auto &p : path) {
 		Sit::Core::Reset(oss, commit, p, vm.count("hard"));
 	}
 	if (!oss.str().empty()) {
-		cout << "The followed files have be reseted:" << endl;
+		cout << "The followed files have be reset:" << endl;
 		cout << oss.str();
 	}
 	return 0;
