@@ -14,21 +14,6 @@ using std::endl;
 using std::string;
 using std::vector;
 
-void printDiffArg()
-{
-	std::cerr <<
-		"Wrong arguments\n"
-		"    sit diff [<base>] [<target>]\n"
-		"    <base> and <target> could be:\n"
-		"        index\n"
-		"        work\n"
-		"        master\n"
-		"        HEAD\n"
-		"        <CommitID>\n"
-		"    Default <base>   = index\n"
-		"    Default <target> = work\n" << endl;
-}
-
 int add(int ac, char **av)
 {
 	vector<string> path;
@@ -46,7 +31,10 @@ int add(int ac, char **av)
 	po::notify(vm);
 
 	if (!vm.count("path") || vm.count("help")) {
-		cout << desc << endl;
+		cout << "'sit add' - Add file contents to the index" << endl
+		     << "usage: sit add <path1> [<path2> ...]" << endl
+		     << endl
+		     << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
 	for (const auto &p : path) {
