@@ -44,6 +44,11 @@ void Checkout(std::string commitid, std::string filename);
 void Diff(const std::string& base, const std::string& target);
 
 /**
+* Print the diff of the same file(filename) between two commits or one commit and current working directory
+*/
+void Diff(const std::string &baseID, const std::string &targetID, const std::vector<std::string> &filename);
+
+/**
  * Print lists of untracked files, files to be committed, files not staged
  */
 void Status();
