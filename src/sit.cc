@@ -51,7 +51,7 @@ int checkout(int ac, char **av)
 	desc.add_options()
 		("help", "Show this help message")
 		("commit", po::value<string>(&commit)->default_value(""), "Specify the commit which the file will checkout from. Be empty if you want to checkout files in index")
-		("path", po::value<vector<string>>(&path), "Path list to checkout. Be empty if you want to checkout the whole commit")
+		("path", po::value<vector<string>>(&path), "Path list to checkout. Be empty if you want to checkout the whole commit and update the HEAD to <commit>")
 	;
 	po::positional_options_description p;
 	p.add("path", -1);
@@ -62,7 +62,9 @@ int checkout(int ac, char **av)
 	po::notify(vm);
 
 	if (vm.count("help")) {
-		cout << desc << endl;
+		cout << "usage: sit checkout [--commit=<commit-id> | master | HEAD | index] [<path1> <path2> ...]" << endl
+			 << endl
+			 << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
 	if (!vm.count("path")) {
@@ -109,23 +111,6 @@ int commit(int ac, char** av)
 	Sit::Core::Commit(message, vm.count("amend") > 0);
 	return 0;
 }
-/*
-int diff(int ac, char **av)
-{
-	// TODO
-	if (ac == 2) {
-		Sit::Core::Diff("index", "work");
-	} else if (ac == 3) {
-		Sit::Core::Diff(av[2], "work");
-	} else if (ac == 4) {
-		Sit::Core::Diff(av[2], av[3]);
-	} else {
-		printDiffArg();
-		return 1;
-	}
-	return 0;
-}
-*/
 
 int diff(int ac, char **av)
 {
@@ -135,7 +120,7 @@ int diff(int ac, char **av)
 	desc.add_options()
 		("help", "Show this help message")
 		("base-id", po::value<string>(&baseID)->default_value("index"), "Specify the commit which the one version of files from")
-		("target-id", po::value<string>(&targetID)->default_value("work"), "Specify the commit which the one version of files from")
+		("target-id", po::value<string>(&targetID)->default_value("work"), "Specify the commit which the anthor version of files from")
 		("path", po::value<vector<string>>(&path), "Path list to checkout")
 	;
 	po::positional_options_description p;
@@ -205,7 +190,6 @@ int log(int ac, char** av)
 	desc.add_options()
 		("help", "Show this help message")
 		("commit", po::value<string>(&commit)->default_value("master"), "Specify log of which commit will show")
-		("amend", "Amend history commit")
 	;
 	po::positional_options_description p;
 	p.add("commit", -1);
@@ -230,9 +214,9 @@ int reset(int ac, char** av)
 	po::options_description desc("'sit reset' Allowed options");
 	desc.add_options()
 		("help", "Show this help message")
-		("hard", "Resets the index and working tree, otherwise, only the index but not working tree")
-		("commit", po::value<string>(&commit)->default_value("HEAD"), "Specify the commit which the HEAD will reset to")
-		("path", po::value<vector<string>>(&path), "Path list to reset")
+		("hard", "Resets the index and working tree, otherwise, only the index but not working tree, cannnot be together with any paths")
+		("commit", po::value<string>(&commit)->default_value("HEAD"), "Specify the commit which the index will reset from")
+		("path", po::value<vector<string>>(&path), "Path list to reset. If there is no path given, reset will set the current branch head to <commit>")
 	;
 	po::positional_options_description p;
 	p.add("path", -1);
@@ -243,16 +227,24 @@ int reset(int ac, char** av)
 	po::notify(vm);
 
 	if (vm.count("help")) {
-		cout << desc << endl;
+		cout << "usage: sit reset [--commit=<commit-id> | HEAD | master] <path1> [<path2> ...]" << endl
+			 << "       sit reset [--hard] [--commit=<commit-id> | HEAD | master]" << endl 
+			 << endl
+			 << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
-	if (path.empty()) {
-		path.push_back(".");
-	}
+
 	std::ostringstream oss;
 
-	for (const auto &p : path) {
-		Sit::Core::Reset(oss, commit, p, vm.count("hard") > 0);
+	if (path.empty()) {
+		Sit::Core::Reset(oss, commit, vm.count("hard") > 0);
+	} else {
+		if (vm.count("hard") > 0) {
+			throw Sit::Util::SitException("Fatal: the option \"--hard\" cannot be together with path");
+		}
+		for (const auto &p : path) {
+			Sit::Core::Reset(oss, commit, p);
+		}
 	}
 	if (!oss.str().empty()) {
 		cout << "The following files have been reset:" << endl;
