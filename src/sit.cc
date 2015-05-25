@@ -62,8 +62,8 @@ int checkout(int ac, char **av)
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "Show this help message")
-		("commit", po::value<string>(&commit)->default_value(""), "Specify the commit which the file will checkout from")
-		("path", po::value<vector<string>>(&path), "Path list to checkout")
+		("commit", po::value<string>(&commit)->default_value(""), "Specify the commit which the file will checkout from. Be empty if you want to checkout files in index")
+		("path", po::value<vector<string>>(&path), "Path list to checkout. Be empty if you want to checkout the whole commit")
 	;
 	po::positional_options_description p;
 	p.add("path", -1);
@@ -73,11 +73,13 @@ int checkout(int ac, char **av)
 	auto unrecog = po::collect_unrecognized(parsed.options, po::include_positional);
 	po::notify(vm);
 
-	if (!vm.count("path") || vm.count("help")) {
+	if (vm.count("help")) {
 		cout << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
-
+	if (!vm.count("path")) {
+		path.push_back("");
+	}
 	for (const auto &p : path) {
 		Sit::Core::Checkout(commit, p);
 	}
@@ -89,24 +91,27 @@ int commit(int ac, char** av)
 	string message;
 	po::options_description desc("Allowed options");
 	desc.add_options()
+		("all,a", "Add all files to index before commit")
+		("amend", "Amend history commit")
 		("help", "Show this help message")
 		("message,m", po::value<string>(&message), "Commit message")
-		("amend", "Amend history commit")
 	;
 	po::variables_map vm;
 	auto parsed = po::command_line_parser(ac-1, av+1).options(desc).run();
 	po::store(parsed, vm);
 	auto unrecog = po::collect_unrecognized(parsed.options, po::include_positional);
 	po::notify(vm);
-
 	if (vm.count("help")) {
 		cout << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
-	Sit::Core::Commit(message, vm.count("amend"));
+	if (vm.count("all")) {
+		Sit::Core::Add(Sit::FileSystem::REPO_ROOT / ".");
+	}
+	Sit::Core::Commit(message, vm.count("amend") > 0);
 	return 0;
 }
-
+/*
 int diff(int ac, char **av)
 {
 	// TODO
@@ -119,6 +124,37 @@ int diff(int ac, char **av)
 	} else {
 		printDiffArg();
 		return 1;
+	}
+	return 0;
+}
+*/
+
+int diff(int ac, char **av)
+{
+	string baseID, targetID;
+	vector<string> path;
+	po::options_description desc("Allowed options");
+	desc.add_options()
+		("help", "Show this help message")
+		("base-id", po::value<string>(&baseID)->default_value("index"), "Specify the commit which the one version of files from")
+		("target-id", po::value<string>(&targetID)->default_value("work"), "Specify the commit which the one version of files from")
+		("path", po::value<vector<string>>(&path), "Path list to checkout")
+	;
+	po::positional_options_description p;
+	p.add("path", -1);
+	po::variables_map vm;
+	auto parsed = po::command_line_parser(ac - 1, av + 1).options(desc).positional(p).run();
+	po::store(parsed, vm);
+	auto unrecog = po::collect_unrecognized(parsed.options, po::include_positional);
+	po::notify(vm);
+	if (vm.count("help")) {
+		cout << desc << endl;
+		return vm.count("help") ? 0 : 1;
+	}
+	if (vm.count("path")) {
+		Sit::Core::Diff(baseID, targetID, path);
+	} else {
+		Sit::Core::Diff(baseID, targetID);
 	}
 	return 0;
 }
@@ -217,10 +253,10 @@ int reset(int ac, char** av)
 	std::ostringstream oss;
 
 	for (const auto &p : path) {
-		Sit::Core::Reset(oss, commit, p, vm.count("hard"));
+		Sit::Core::Reset(oss, commit, p, vm.count("hard") > 0);
 	}
 	if (!oss.str().empty()) {
-		cout << "The followed files have be reset:" << endl;
+		cout << "The following files have been reset:" << endl;
 		cout << oss.str();
 	}
 	return 0;

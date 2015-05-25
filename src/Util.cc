@@ -1,4 +1,5 @@
 #include "Util.hpp"
+#include <cctype>
 
 namespace Sit {
 namespace Util {
@@ -40,8 +41,12 @@ std::string FirstLine(const std::string& str)
 int FileModeToInt(const std::string& mode)
 {
 	int res = 0;
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < 6; ++i) {
+		if (!isdigit(mode[i])) {
+			throw SitException("Fatal: Bad File Mode.");
+		}
 		res = res * 8 + mode[i] - '0';
+	}
 	return res;
 }
 

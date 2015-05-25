@@ -123,20 +123,19 @@ const std::map<boost::filesystem::path, std::string>& IndexBase::GetIndex() cons
 	return _index;
 }
 
-std::vector<std::pair<boost::filesystem::path, std::string>> IndexBase::ListFile(const std::string &prefix) const
+FileSet IndexBase::ListFile(const std::string &prefix) const
 {
-	std::vector<std::pair<boost::filesystem::path, std::string>> result;
+	FileSet result;
+	if (prefix == "") {
+		return _index;
+	}
 	for (const auto &element : this->_index) {
-		if (prefix.empty()) {
-			result.push_back(element);
-			continue;
-		}
 		if (element.first.generic_string() == prefix) {
-			result.push_back(element);
+			result.insert(element);
 		} else if (element.first.generic_string().find(prefix) == 0 && element.first.generic_string().at(prefix.length()) == '/') {
-			result.push_back(element);
+			result.insert(element);
 		} else if (element.first.generic_string().find(prefix) == 0 && prefix.back() == '/') {
-			result.push_back(element);
+			result.insert(element);
 		}
 	}
 	return result;

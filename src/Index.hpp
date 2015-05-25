@@ -3,9 +3,13 @@
 
 #include "Objects.hpp"
 #include <map>
+#include <set>
 
 namespace Sit {
 namespace Index {
+
+using IndexList = std::vector<std::pair<boost::filesystem::path, std::string>>;
+using FileSet = std::map<boost::filesystem::path, std::string>;
 
 class IndexBase {
 protected:
@@ -39,7 +43,7 @@ public:
 	/*
 	 * List a file which filename == path or all the files which in the path(directory)
 	 */
-	std::vector<std::pair<boost::filesystem::path, std::string>> ListFile(const std::string &prefix) const;
+	FileSet ListFile(const std::string &prefix) const;
 };
 
 class Index : public IndexBase {

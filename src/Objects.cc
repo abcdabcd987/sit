@@ -54,10 +54,16 @@ Commit GetCommit(const std::string& id)
 
 	// tree d8329fc1cc938780ffdd9f94e0d364e0ea74f579
 	getline(ss, commit.tree);
+	if (commit.tree.substr(0, 4) != "tree") {
+		throw Util::SitException("Fatal: Wrong Objects (Not a commit)", "GetCommit(" + id + ")");
+	}
 	commit.tree.erase(0, 5);
 
 	// parent 5a174a6c45eadc12180f5e9466e547777c3b3118
 	getline(ss, commit.parent);
+	if (commit.parent.substr(0, 6) != "parent") {
+		throw Util::SitException("Fatal: Wrong Objects (Not a commit)", "GetCommit(" + id + ")");
+	}
 	commit.parent.erase(0, 7);
 
 	// author Scott Chacon <schacon@gmail.com> 1243040974 -0700
