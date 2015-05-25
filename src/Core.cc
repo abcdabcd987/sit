@@ -43,6 +43,7 @@ void Init()
 		create_directories(".sit/objects");
 		FileSystem::Write(".sit/HEAD", Refs::EMPTY_REF);
 		FileSystem::Write(".sit/COMMIT_MSG", "");
+		FileSystem::Write(".sit/config", "");
 		FileSystem::Write(".sit/refs/heads/master", Refs::EMPTY_REF);
 	} catch (const boost::filesystem::filesystem_error &fe) {
 		std::cerr << fe.what() << std::endl;
