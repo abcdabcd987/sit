@@ -6,7 +6,6 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <algorithm>
 #include <functional>
-#include <thread>
 
 #include "Core.hpp"
 #include "FileSystem.hpp"
