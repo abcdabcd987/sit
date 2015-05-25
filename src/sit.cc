@@ -111,23 +111,6 @@ int commit(int ac, char** av)
 	Sit::Core::Commit(message, vm.count("amend") > 0);
 	return 0;
 }
-/*
-int diff(int ac, char **av)
-{
-	// TODO
-	if (ac == 2) {
-		Sit::Core::Diff("index", "work");
-	} else if (ac == 3) {
-		Sit::Core::Diff(av[2], "work");
-	} else if (ac == 4) {
-		Sit::Core::Diff(av[2], av[3]);
-	} else {
-		printDiffArg();
-		return 1;
-	}
-	return 0;
-}
-*/
 
 int diff(int ac, char **av)
 {
@@ -207,7 +190,6 @@ int log(int ac, char** av)
 	desc.add_options()
 		("help", "Show this help message")
 		("commit", po::value<string>(&commit)->default_value("master"), "Specify log of which commit will show")
-		("amend", "Amend history commit")
 	;
 	po::positional_options_description p;
 	p.add("commit", -1);
