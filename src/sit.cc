@@ -51,7 +51,7 @@ int checkout(int ac, char **av)
 	desc.add_options()
 		("help", "Show this help message")
 		("commit", po::value<string>(&commit)->default_value(""), "Specify the commit which the file will checkout from. Be empty if you want to checkout files in index")
-		("path", po::value<vector<string>>(&path), "Path list to checkout. Be empty if you want to checkout the whole commit and update the HEAD")
+		("path", po::value<vector<string>>(&path), "Path list to checkout. Be empty if you want to checkout the whole commit and update the HEAD to <commit>")
 	;
 	po::positional_options_description p;
 	p.add("path", -1);
@@ -62,7 +62,9 @@ int checkout(int ac, char **av)
 	po::notify(vm);
 
 	if (vm.count("help")) {
-		cout << desc << endl;
+		cout << "usage: sit checkout [--commit=<commit-id> | master | HEAD | index] [<path1> <path2> ...]" << endl
+			 << endl
+			 << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
 	if (!vm.count("path")) {
@@ -230,9 +232,9 @@ int reset(int ac, char** av)
 	po::options_description desc("'sit reset' Allowed options");
 	desc.add_options()
 		("help", "Show this help message")
-		("hard", "Resets the index and working tree, otherwise, only the index but not working tree")
-		("commit", po::value<string>(&commit)->default_value("HEAD"), "Specify the commit which the HEAD will reset to")
-		("path", po::value<vector<string>>(&path), "Path list to reset")
+		("hard", "Resets the index and working tree, otherwise, only the index but not working tree, cannnot be together with any paths")
+		("commit", po::value<string>(&commit)->default_value("HEAD"), "Specify the commit which the index will reset from")
+		("path", po::value<vector<string>>(&path), "Path list to reset. If there is no path given, reset will set the current branch head to <commit>")
 	;
 	po::positional_options_description p;
 	p.add("path", -1);
@@ -243,7 +245,10 @@ int reset(int ac, char** av)
 	po::notify(vm);
 
 	if (vm.count("help")) {
-		cout << desc << endl;
+		cout << "usage: sit reset [--commit=<commit-id> | HEAD | master] <path1> [<path2> ...]" << endl
+			 << "       sit reset [--hard] [--commit=<commit-id> | HEAD | master]" << endl 
+			 << endl
+			 << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
 

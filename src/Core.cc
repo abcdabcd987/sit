@@ -213,6 +213,13 @@ void Checkout(std::string commitid, std::string filename)
 		std::cerr << "Error: Commit " << commitid << " doesn't exist." << std::endl;
 		return;
 	}
+	if (commitid == "master") {
+		commitid = Refs::Get(Refs::Local("master"));
+	} else if (commitid == "HEAD") {
+		commitid = Refs::Get("HEAD");
+	} else if (commitid == "index") {
+		commitid = "";
+	}
 	if (!filename.empty()) {
 		filename = FileSystem::GetRelativePath(filename).generic_string();
 	}
