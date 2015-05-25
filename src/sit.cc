@@ -1,5 +1,6 @@
 #include "Core.hpp"
 #include "Util.hpp"
+#include "Config.hpp"
 #include "FileSystem.hpp"
 #include <iostream>
 
@@ -31,8 +32,7 @@ int add(int ac, char **av)
 	po::notify(vm);
 
 	if (!vm.count("path") || vm.count("help")) {
-		cout << "'sit add' - Add file contents to the index" << endl
-		     << "usage: sit add <path1> [<path2> ...]" << endl
+		cout << "usage: sit add <path1> [<path2> ...]" << endl
 		     << endl
 		     << desc << endl;
 		return vm.count("help") ? 0 : 1;
@@ -71,6 +71,16 @@ int checkout(int ac, char **av)
 	for (const auto &p : path) {
 		Sit::Core::Checkout(commit, p);
 	}
+	return 0;
+}
+
+int config(int ac, char** av)
+{
+	if (ac != 4) {
+		cout << "usage: sit config <key> <value>" << endl;
+		return ac == 3 && strcmp(av[2], "--help") == 0 ? 0 : 1;
+	}
+	Sit::Config::Set(av[2], av[3]);
 	return 0;
 }
 
@@ -153,6 +163,7 @@ int help(int argc, char** argv)
 	     << "sit commands are:" << endl
 	     << "  add        Add file contents to the index" << endl
 	     << "  checkout   Checkout paths to the working tree" << endl
+	     << "  config     Get and set repository or global options" << endl
 	     << "  commit     Record changes to the repository" << endl
 	     << "  diff       Show changes between commits, commit and working tree, etc" << endl
 	     << "  gc         Remove useless files to free disk space" << endl
@@ -298,6 +309,7 @@ int main(int argc, char** argv)
 
 			DISPATCHER(add);
 			DISPATCHER(checkout);
+			DISPATCHER(config);
 			DISPATCHER(commit);
 			DISPATCHER(diff);
 			DISPATCHER(gc);
