@@ -267,6 +267,13 @@ void Checkout(std::string commitid, std::string filename)
 	}
 }
 
+void CheckoutObjects(const std::string &id, const std::string &filename)
+{
+	const auto src(Objects::GetPath(id));
+	const auto dst(FileSystem::REPO_ROOT / filename);
+	FileSystem::SafeCopyFile(src, dst);
+}
+
 void printLog(std::ostream &out, const Objects::Commit &commit, const std::string &id)
 {
 	out << Color::BROWN << "Commit " << id << Color::RESET << std::endl
@@ -292,14 +299,14 @@ void Log(std::string id)
 	}
 }
 
-void resetSingleFile(std::ostream &stream, std::string id, std::string filename, const Index::CommitIndex &commitIndex, const bool &inCommit, const bool &inIndex, const bool isHard)
+void resetSingleFile(std::ostream &stream, const std::string &filename, const std::string &objectID, const bool &inCommit, const bool &inIndex, const bool isHard)
 {
 	
 	if (inCommit && !inIndex) {
 		stream << "  index <++ ";
-		Index::index.Insert(filename, commitIndex.GetID(filename));
+		Index::index.Insert(filename, objectID);
 		if (isHard) {
-			Checkout(id, filename);
+			CheckoutObjects(objectID, filename);
 		}
 	} else if (!inCommit && inIndex) {
 		stream << "  index --> ";
@@ -308,11 +315,11 @@ void resetSingleFile(std::ostream &stream, std::string id, std::string filename,
 			FileSystem::Remove(filename);
 		}
 	} else if (inCommit && inIndex) {
-		stream << commitIndex.GetID(filename) << " ==> ";
+		stream << objectID << " ==> ";
 		Index::index.Remove(filename);
-		Index::index.Insert(filename, commitIndex.GetID(filename));
+		Index::index.Insert(filename, objectID);
 		if (isHard) {
-			Checkout(id, filename);
+			CheckoutObjects(objectID, filename);
 		}
 	} else {
 		std::cerr << "Error: " << filename << " is not tracked" << std::endl;
@@ -322,7 +329,7 @@ void resetSingleFile(std::ostream &stream, std::string id, std::string filename,
 	Index::index.Save();
 }
 
-void Reset(std::ostream &stream, std::string id, std::string filename, const bool isHard)
+void Reset(std::ostream &stream, std::string id, std::string filename)
 {
 	if (id == "master") {
 		id = Refs::Get(Refs::Local("master"));
@@ -334,6 +341,8 @@ void Reset(std::ostream &stream, std::string id, std::string filename, const boo
 	
 	if (!filename.empty()) {
 		filename = FileSystem::GetRelativePath(filename).generic_string();
+	} else {
+		throw Util::SitException("Fatal: there must be some incorrect arguments and a wrong function call happened.");
 	}
 	
 	const Index::CommitIndex commitIndex(id);
@@ -349,8 +358,43 @@ void Reset(std::ostream &stream, std::string id, std::string filename, const boo
 	for (const auto &anyfile : allSet) {
 		const bool inCommit = commitSet.count(anyfile) > 0;
 		const bool inIndex = indexSet.count(anyfile) > 0;
-		resetSingleFile(stream, id, anyfile, commitIndex, inCommit, inIndex, isHard);
+		resetSingleFile(stream, anyfile, commitIndex.GetID(anyfile), inCommit, inIndex, false);
 	}
+}
+
+void Reset(std::ostream &stream, std::string id, const bool isHard)
+{
+	if (id == "master") {
+		id = Refs::Get(Refs::Local("master"));
+	} else if (id == "HEAD" || id.empty()) {
+		id = Refs::Get("HEAD");
+	}
+
+	id = Sit::Util::SHA1Complete(id);
+
+	const Index::CommitIndex commitIndex(id);
+	const auto &commitSet = commitIndex.GetIndex();
+	const auto &indexSet = Index::index.GetIndex();
+	std::map<std::string, int> allSet;
+	for (const auto &fileInCommit : commitSet) {
+		allSet.insert(std::make_pair(fileInCommit.first.generic_string(), 1));
+	}
+	for (const auto &fileInIndex : indexSet) {
+		--allSet[fileInIndex.first.generic_string()];
+	}
+	for (const auto &anyfile : allSet) {
+		bool inCommit;
+		bool inIndex;
+		if (anyfile.second == 0) {
+			inCommit = inIndex = true;
+		} else if (anyfile.second == 1) {
+			inCommit = true, inIndex = false;
+		} else if (anyfile.second == -1) {
+			inCommit = false, inIndex = true;
+		}
+		resetSingleFile(stream, anyfile.first, commitIndex.GetID(anyfile.first), inCommit, inIndex, isHard);
+	}
+	Refs::Set(Refs::Local("master"), id);
 }
 
 void Diff(const std::string &baseID, const std::string &targetID)

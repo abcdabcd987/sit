@@ -63,7 +63,7 @@ int checkout(int ac, char **av)
 	desc.add_options()
 		("help", "Show this help message")
 		("commit", po::value<string>(&commit)->default_value(""), "Specify the commit which the file will checkout from. Be empty if you want to checkout files in index")
-		("path", po::value<vector<string>>(&path), "Path list to checkout. Be empty if you want to checkout the whole commit")
+		("path", po::value<vector<string>>(&path), "Path list to checkout. Be empty if you want to checkout the whole commit and update the HEAD")
 	;
 	po::positional_options_description p;
 	p.add("path", -1);
@@ -137,7 +137,7 @@ int diff(int ac, char **av)
 	desc.add_options()
 		("help", "Show this help message")
 		("base-id", po::value<string>(&baseID)->default_value("index"), "Specify the commit which the one version of files from")
-		("target-id", po::value<string>(&targetID)->default_value("work"), "Specify the commit which the one version of files from")
+		("target-id", po::value<string>(&targetID)->default_value("work"), "Specify the commit which the anthor version of files from")
 		("path", po::value<vector<string>>(&path), "Path list to checkout")
 	;
 	po::positional_options_description p;
@@ -247,13 +247,18 @@ int reset(int ac, char** av)
 		cout << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
-	if (path.empty()) {
-		path.push_back(".");
-	}
+
 	std::ostringstream oss;
 
-	for (const auto &p : path) {
-		Sit::Core::Reset(oss, commit, p, vm.count("hard") > 0);
+	if (path.empty()) {
+		Sit::Core::Reset(oss, commit, vm.count("hard") > 0);
+	} else {
+		if (vm.count("hard") > 0) {
+			throw Sit::Util::SitException("Fatal: the option \"--hard\" cannot be together with path");
+		}
+		for (const auto &p : path) {
+			Sit::Core::Reset(oss, commit, p);
+		}
 	}
 	if (!oss.str().empty()) {
 		cout << "The following files have been reset:" << endl;
