@@ -29,16 +29,30 @@ std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path
 {
 	using namespace boost::filesystem;
 	std::vector<boost::filesystem::path> ls;
+
+	auto insert_list = [&] (const boost::filesystem::path & path) {
+		const boost::filesystem::path p(GetRelativePath(path));
+		const std::string s(p.generic_string());
+		if (relativeToRepoRoot) {
+			ls.push_back(p);
+		} else {
+			ls.push_back(path);
+		}
+	};
+
 	try {
 		if (IsDirectory(path)) {
-			for (recursive_directory_iterator iter(path), end; iter != end; ++iter) {
-				const boost::filesystem::path p(GetRelativePath(iter->path()));
-				const std::string s(p.generic_string());
-				if (ignoreSit && s.substr(0, 4) == ".sit") continue;
-				if (relativeToRepoRoot) {
-					ls.push_back(p);
-				} else {
-					ls.push_back(iter->path());
+			for(directory_iterator iter(path), end; iter != end ; ++iter) {
+				const auto fn = iter->path().filename();
+				if (fn == ".sit" && ignoreSit) continue;
+
+				if (is_regular_file(iter->status())) {
+					insert_list(iter->path());
+					continue;
+				}
+
+				for (recursive_directory_iterator iter(path / fn), end; iter != end; ++iter) {
+					insert_list(iter->path());
 				}
 			}
 		} else {

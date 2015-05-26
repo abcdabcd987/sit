@@ -8,14 +8,14 @@ import tempfile
 
 def main():
     TMPROOT = r'/Volumes/RAM Disk'
-    REPO = r"/Volumes/RAM Disk/webpy/"
+    REPO = r"/Volumes/RAM Disk/redis/"
     SIT_BIN = r"/Users/abcdabcd987/Developer/sit/bin/sit"
-    report = open('stress_test_%s.csv' % str(datetime.datetime.today()), 'w')
-    report.write('no, git_cur, sit_cur, git_tot, sit_tot\n')
+    report = open('stress_test_%s.csv' % datetime.datetime.today().strftime('%Y%m%d_%H%M%S'), 'w')
+    report.write('git_cur, sit_cur, git_tot, sit_tot\n')
 
     # get commits
-    commits = ['master']
-    args = ['git', 'log', '--pretty=%P', "master"]
+    commits = ['unstable']
+    args = ['git', 'log', '--pretty=%P', "unstable"]
     proc = subprocess.Popen(args, cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     outs, errs = proc.communicate(timeout=15)
     for line in outs.decode('utf-8').split('\n'):
@@ -123,7 +123,7 @@ def main():
         timeused_sit += cur_timeused_sit
         timeused_git += cur_timeused_git
         print('[%d/%d] cur: (git %.6fs, sit %.6fs) | tot: (git %.6fs, sit %.6fs)' % (i, len(commits), cur_timeused_git, cur_timeused_sit, timeused_git, timeused_sit))
-        report.write('%d, %.10fs, %.10fs, %.10fs, %.10fs\n' % (i+1, cur_timeused_git, cur_timeused_sit, timeused_git, timeused_sit))
+        report.write('%.10f, %.10f, %.10f, %.10f\n' % (cur_timeused_git, cur_timeused_sit, timeused_git, timeused_sit))
 
     report.close()
 
