@@ -238,7 +238,7 @@ void Checkout(std::string commitid, std::string filename)
 	} else {
 		index = Index::CommitIndex(commitid);
 	}
-	const std::map<boost::filesystem::path, std::string> &idx(index.GetIndex());
+	const auto &idx(index.GetIndex());
 	
 	if (filename.empty()) {
 		// Commit Checkout

@@ -118,7 +118,7 @@ const std::string& IndexBase::GetID(const boost::filesystem::path &path) const
 	throw Util::SitException(std::string("Path ") + path.string() + " not in the index.");
 }
 
-const std::map<boost::filesystem::path, std::string>& IndexBase::GetIndex() const
+const std::unordered_map<boost::filesystem::path, std::string>& IndexBase::GetIndex() const
 {
 	return _index;
 }

@@ -11,7 +11,7 @@ def main():
     REPO = r"/Volumes/RAM Disk/redis/"
     SIT_BIN = r"/Users/abcdabcd987/Developer/sit/bin/sit"
     report = open('stress_test_%s.csv' % datetime.datetime.today().strftime('%Y%m%d_%H%M%S'), 'w')
-    report.write('git_cur, sit_cur, git_tot, sit_tot\n')
+    report.write('git_cur, sit_cur, git_tot, sit_tot, git_commit_cur, sit_commit_cur, git_commit_tot, sit_commit_tot, git_add_cur, sit_add_cur, git_add_tot, sit_add_tot\n')
 
     # get commits
     commits = ['unstable']
@@ -43,6 +43,10 @@ def main():
 
     timeused_sit = 0
     timeused_git = 0
+    timeused_sit_commit = 0
+    timeused_git_commit = 0
+    timeused_sit_add = 0
+    timeused_git_add = 0
 
     # loop commits
     for i, commit in enumerate(commits):
@@ -80,19 +84,19 @@ def main():
                     shutil.copy(src, dst2)
 
         # add
-        time_st_sit = time.time()
+        time_st = time.time()
         args = [SIT_BIN, 'add', '.']
         proc = subprocess.Popen(args, cwd=tmp_sit, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         outs, errs = proc.communicate(timeout=15)        
-        time_ed_sit = time.time()
-        cur_timeused_sit += time_ed_sit - time_st_sit
+        time_ed = time.time()
+        cur_timeused_sit_add = time_ed - time_st
 
-        time_st_git = time.time()
+        time_st = time.time()
         args = ['git', 'add', '.']
         proc = subprocess.Popen(args, cwd=tmp_git, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         outs, errs = proc.communicate(timeout=15)        
-        time_ed_git = time.time()
-        cur_timeused_git += time_ed_git - time_st_git
+        time_ed = time.time()
+        cur_timeused_git_add = time_ed - time_st
 
         # get commit log
         args = ['git', 'log', '--pretty=%s', '-n', '1', commit]
@@ -105,25 +109,40 @@ def main():
             f.write(message)
 
         # commit
-        time_st_sit = time.time()
+        time_st = time.time()
         args = [SIT_BIN, 'commit']
         proc = subprocess.Popen(args, cwd=tmp_sit, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         outs, errs = proc.communicate(timeout=15)
-        time_ed_sit = time.time()
-        cur_timeused_sit += time_ed_sit - time_st_sit
+        time_ed = time.time()
+        cur_timeused_sit_commit = time_ed - time_st
 
-        time_st_git = time.time()
+        time_st = time.time()
         args = ['git', 'commit', '-m', message]
         proc = subprocess.Popen(args, cwd=tmp_git, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         outs, errs = proc.communicate(timeout=15)
-        time_ed_git = time.time()
-        cur_timeused_git += time_ed_git - time_st_git
+        time_ed = time.time()
+        cur_timeused_git_commit = time_ed - time_st
 
 
+        cur_timeused_sit = cur_timeused_sit_commit + cur_timeused_sit_add
+        cur_timeused_git = cur_timeused_git_commit + cur_timeused_git_add
         timeused_sit += cur_timeused_sit
         timeused_git += cur_timeused_git
-        print('[%d/%d] cur: (git %.6fs, sit %.6fs) | tot: (git %.6fs, sit %.6fs)' % (i, len(commits), cur_timeused_git, cur_timeused_sit, timeused_git, timeused_sit))
-        report.write('%.10f, %.10f, %.10f, %.10f\n' % (cur_timeused_git, cur_timeused_sit, timeused_git, timeused_sit))
+        timeused_sit_add += cur_timeused_sit_add
+        timeused_git_add += cur_timeused_git_add
+        timeused_sit_commit += cur_timeused_sit_commit
+        timeused_git_commit += cur_timeused_git_commit
+
+        print('[%d/%d] cur(%.0fms, %.0fms), tot(%.0fms, %.0fms) | cmt(%.0fms, %.0fms) | add(%.0fms, %.0fms)' % 
+            (i, len(commits), 
+             cur_timeused_git*1000, cur_timeused_sit*1000, 
+             timeused_git*1000, timeused_sit*1000, 
+             cur_timeused_git_commit*1000, cur_timeused_sit_commit*1000, 
+             cur_timeused_git_add*1000, cur_timeused_sit_add*1000))
+        report.write('%.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, \n' % 
+            (cur_timeused_git, cur_timeused_sit, timeused_git, timeused_sit, 
+             cur_timeused_git_commit, cur_timeused_sit_commit, timeused_git_commit, timeused_sit_commit,
+             cur_timeused_git_add, cur_timeused_sit_add, timeused_git_add, cur_timeused_sit_add))
 
     report.close()
 
