@@ -98,6 +98,12 @@ void Remove(const boost::filesystem::path& path);
 boost::filesystem::path GetRelativePath(
 	const boost::filesystem::path &file,
 	const boost::filesystem::path &base = REPO_ROOT);
+
+/**
+ * Hash a file
+ */
+std::string FileSHA1(const boost::filesystem::path &path);
+
 }
 }
 #endif
