@@ -191,5 +191,26 @@ boost::filesystem::path GetRelativePath(
 	return resultPath;
 }
 
+std::string FileSHA1(const boost::filesystem::path &path)
+{
+	static char buf[1024];
+	boost::uuids::detail::sha1 shaEngine;
+	boost::filesystem::ifstream file(path, std::ios::in | std::ios::binary);
+	unsigned shaValue[5] = {0};
+	while (file.good()) {
+		file.read(buf, sizeof(buf));
+		shaEngine.process_bytes(buf, file.gcount());
+	}
+	if (!file.eof()) {
+		throw Util::SitException(std::string("SHA1sum fail: ") + path.string());
+	}
+	shaEngine.get_digest(shaValue);
+	std::ostringstream result;
+	for (auto &x : shaValue) {
+		result << std::setw(8) << std::setfill('0') << std::hex << x;
+	}
+	return result.str();
+}
+
 }
 }

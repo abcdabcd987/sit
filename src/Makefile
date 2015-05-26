@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -O2 -std=c++11 -DENV64
+CXXFLAGS = -Wall -g -O2 -std=c++11 -DENV64
 LIBS = -lpthread -lboost_system -lboost_filesystem -lboost_date_time -lboost_program_options
 
 OBJECTS = Color.o Config.o Core.o Diff.o FileSystem.o Index.o \
@@ -9,7 +9,7 @@ EXECUTABLE = sit
 all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CXX) $(OBJECTS) $(CXXFLAGS) -o $@ $(LIBS)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 .PHONY: clean
 

@@ -80,7 +80,7 @@ std::string addFile(const boost::filesystem::path &file)
 		if (fileSize > (200 << 20)) {
 			throw Sit::Util::SitException("Fatal: Try to add a file larger than 200MB", file.string());
 		}
-		std::string sha1Value = Sit::Util::SHA1sum(FileSystem::Read(file));
+		std::string sha1Value = FileSystem::FileSHA1(file);
 		boost::filesystem::path dstFile(FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR / sha1Value.substr(0, 2) / sha1Value.substr(2));
 		FileSystem::SafeCopyFile(file, dstFile);
 		std::cout << file << " added." << std::endl;

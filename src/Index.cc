@@ -165,8 +165,7 @@ void WorkingIndex::load()
 	const auto ls(FileSystem::ListRecursive(FileSystem::REPO_ROOT));
 	for (const auto &path : ls) {
 		if (FileSystem::IsDirectory(path)) continue;
-		const std::string content(FileSystem::Read(path));
-		const std::string sha1(Util::SHA1sum(content));
+		const std::string sha1(FileSystem::FileSHA1(path));
 		_index.insert(std::make_pair(path, sha1));
 	}
 }
