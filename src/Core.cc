@@ -2,10 +2,9 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <ctime>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <algorithm>
-#include <functional>
 
 #include "Core.hpp"
 #include "FileSystem.hpp"
