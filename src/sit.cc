@@ -102,7 +102,10 @@ int commit(int ac, char** av)
 	auto unrecog = po::collect_unrecognized(parsed.options, po::include_positional);
 	po::notify(vm);
 	if (vm.count("help")) {
-		cout << desc << endl;
+		cout << "usage: sit commit [-a] [-m <commit messages>]" << endl
+		     << "       sit commit --amend [-a] [-m <commit messages>]" << endl
+		     << endl
+		     << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
 	if (vm.count("all")) {
@@ -131,7 +134,9 @@ int diff(int ac, char **av)
 	auto unrecog = po::collect_unrecognized(parsed.options, po::include_positional);
 	po::notify(vm);
 	if (vm.count("help")) {
-		cout << desc << endl;
+		cout << "usage: sit diff [--base-id=<baseid>] [--target-id=<targetid>] [<path1> [<path2> ...]]" << endl
+		     << endl
+		     << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
 	if (vm.count("path")) {
@@ -200,7 +205,10 @@ int log(int ac, char** av)
 	po::notify(vm);
 
 	if (vm.count("help")) {
-		cout << desc << endl;
+		cout << "usage: sit log" << endl
+		     << "usage: sit log --commit=<commit id>" << endl
+		     << endl
+		     << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
 	Sit::Core::Log(commit);
@@ -270,7 +278,8 @@ int rm(int ac, char **av)
 	po::notify(vm);
 
 	if (!vm.count("path") || vm.count("help")) {
-		cout << desc << endl;
+		cout << "usage: sit rm <path1> [<path2> ...]"
+		     << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
 	for (const auto &p : path) {
