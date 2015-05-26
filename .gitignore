@@ -5,6 +5,7 @@ bin/
 *.swp
 dev
 src/sit
+test/*.csv
 
 # Compiled Object files
 *.slo

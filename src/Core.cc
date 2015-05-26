@@ -290,6 +290,7 @@ void printLog(std::ostream &out, const Objects::Commit &commit, const std::strin
 	std::istringstream ss(commit.message);
 	std::string line;
 	while (std::getline(ss, line)) out << "    " << line << std::endl;
+	out << std::endl;
 }
 
 void Log(std::string id)
