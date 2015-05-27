@@ -15,7 +15,7 @@ def main():
 
     # get commits
     commits = ['unstable']
-    args = ['git', 'log', '--pretty=%P', "unstable"]
+    args = ['git', 'log', '--pretty=%P', commits[0]]
     proc = subprocess.Popen(args, cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     outs, errs = proc.communicate(timeout=15)
     for line in outs.decode('utf-8').split('\n'):
@@ -139,7 +139,7 @@ def main():
              timeused_git*1000, timeused_sit*1000, 
              cur_timeused_git_commit*1000, cur_timeused_sit_commit*1000, 
              cur_timeused_git_add*1000, cur_timeused_sit_add*1000))
-        report.write('%.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, \n' % 
+        report.write('%.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f, %.10f\n' % 
             (cur_timeused_git, cur_timeused_sit, timeused_git, timeused_sit, 
              cur_timeused_git_commit, cur_timeused_sit_commit, timeused_git_commit, timeused_sit_commit,
              cur_timeused_git_add, cur_timeused_sit_add, timeused_git_add, cur_timeused_sit_add))
