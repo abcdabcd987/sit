@@ -23,7 +23,7 @@ namespace Sit {
 namespace Index {
 
 using IndexList = std::vector<std::pair<boost::filesystem::path, std::string>>;
-using FileSet = std::map<boost::filesystem::path, std::string>;
+using FileSet = std::unordered_map<boost::filesystem::path, std::string>;
 
 class IndexBase {
 protected:

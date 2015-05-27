@@ -343,7 +343,6 @@ void resetSingleFile(std::ostream &stream, const std::string &filename, const st
 		return;
 	}
 	stream << boost::filesystem::path(filename) << std::endl;
-	Index::index.Save();
 }
 
 void Reset(std::ostream &stream, std::string id, std::string filename)
@@ -377,6 +376,7 @@ void Reset(std::ostream &stream, std::string id, std::string filename)
 		const bool inIndex = indexSet.count(anyfile) > 0;
 		resetSingleFile(stream, anyfile, commitIndex.GetID(anyfile), inCommit, inIndex, false);
 	}
+	Index::index.Save();
 }
 
 void Reset(std::ostream &stream, std::string id, const bool isHard)
@@ -415,6 +415,7 @@ void Reset(std::ostream &stream, std::string id, const bool isHard)
 			resetSingleFile(stream, anyfile.first, Refs::EMPTY_REF, inCommit, inIndex, isHard);
 		}
 	}
+	Index::index.Save();
 	Refs::Set(Refs::Local("master"), id);
 }
 
