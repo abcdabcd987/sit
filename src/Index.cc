@@ -118,7 +118,7 @@ const std::string& IndexBase::GetID(const boost::filesystem::path &path) const
 	throw Util::SitException(std::string("Path ") + path.string() + " not in the index.");
 }
 
-const std::unordered_map<boost::filesystem::path, std::string>& IndexBase::GetIndex() const
+const FileSet& IndexBase::GetIndex() const
 {
 	return _index;
 }
@@ -155,6 +155,9 @@ void CommitIndex::flattenTree(const Objects::Tree &tree, const boost::filesystem
 
 void CommitIndex::load(const std::string& id)
 {
+	if (id == Refs::EMPTY_REF) {
+		return ;
+	}
 	const Objects::Commit commit(Objects::GetCommit(id));
 	const Objects::Tree tree(Objects::GetTree(commit.tree));
 	flattenTree(tree, "");
