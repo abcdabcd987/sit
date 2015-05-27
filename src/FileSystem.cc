@@ -193,7 +193,7 @@ boost::filesystem::path GetRelativePath(
 
 std::string FileSHA1(const boost::filesystem::path &path)
 {
-	static char buf[1024];
+	static char buf[65536];
 	boost::uuids::detail::sha1 shaEngine;
 	boost::filesystem::ifstream file(path, std::ios::in | std::ios::binary);
 	unsigned shaValue[5] = {0};
