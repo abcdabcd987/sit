@@ -82,7 +82,6 @@ std::string addFile(const boost::filesystem::path &file)
 		std::string sha1Value = FileSystem::FileSHA1(file);
 		boost::filesystem::path dstFile(FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR / sha1Value.substr(0, 2) / sha1Value.substr(2));
 		FileSystem::CompressCopy(file, dstFile);
-		std::cout << file << " added." << std::endl;
 		return sha1Value;
 	} catch (const boost::filesystem::filesystem_error &fe) {
 		std::cerr << fe.what() << std::endl;
@@ -100,6 +99,17 @@ void Add(const boost::filesystem::path &path)
 			continue;
 		}
 		boost::filesystem::path relativePath = FileSystem::GetRelativePath(file);
+
+		std::time_t curFileTime = boost::filesystem::last_write_time(file);
+		std::time_t existedFileTime = 0;
+		if (Index::index.GetIndex().count(relativePath) > 0) {
+			existedFileTime = boost::filesystem::last_write_time(Objects::GetPath(Index::index.GetID(relativePath)));
+		}
+		if (curFileTime == existedFileTime) {
+			//std::cout << file << " is same as it in index." << std::endl;
+			continue;
+		}
+
 		Index::index.Insert(relativePath, addFile(file));
 	}
 
@@ -229,7 +239,7 @@ void Checkout(std::string commitid, std::string filename)
 		index = Index::CommitIndex(commitid);
 	}
 	const auto &idx(index.GetIndex());
-	
+
 	if (filename.empty()) {
 		// Commit Checkout
 		if (!Status::IsClean()) {
@@ -309,7 +319,7 @@ void Log(std::string id)
 
 void resetSingleFile(std::ostream &stream, const std::string &filename, const std::string &objectID, const bool &inCommit, const bool &inIndex, const bool isHard)
 {
-	
+
 	if (inCommit && !inIndex) {
 		stream << "  index <++ ";
 		Index::index.Insert(filename, objectID);
@@ -334,7 +344,6 @@ void resetSingleFile(std::ostream &stream, const std::string &filename, const st
 		return;
 	}
 	stream << boost::filesystem::path(filename) << std::endl;
-	Index::index.Save();
 }
 
 void Reset(std::ostream &stream, std::string id, std::string filename)
@@ -346,13 +355,13 @@ void Reset(std::ostream &stream, std::string id, std::string filename)
 	}
 
 	id = Sit::Util::SHA1Complete(id);
-	
+
 	if (!filename.empty()) {
 		filename = FileSystem::GetRelativePath(filename).generic_string();
 	} else {
 		throw Util::SitException("Fatal: there must be some incorrect arguments and a wrong function call happened.");
 	}
-	
+
 	const Index::CommitIndex commitIndex(id);
 	Index::FileSet commitSet = commitIndex.ListFile(filename);
 	Index::FileSet indexSet = Index::index.ListFile(filename);
@@ -368,6 +377,7 @@ void Reset(std::ostream &stream, std::string id, std::string filename)
 		const bool inIndex = indexSet.count(anyfile) > 0;
 		resetSingleFile(stream, anyfile, commitIndex.GetID(anyfile), inCommit, inIndex, false);
 	}
+	Index::index.Save();
 }
 
 void Reset(std::ostream &stream, std::string id, const bool isHard)
@@ -400,8 +410,13 @@ void Reset(std::ostream &stream, std::string id, const bool isHard)
 		} else if (anyfile.second == -1) {
 			inCommit = false, inIndex = true;
 		}
-		resetSingleFile(stream, anyfile.first, commitIndex.GetID(anyfile.first), inCommit, inIndex, isHard);
+		if (inCommit) {
+			resetSingleFile(stream, anyfile.first, commitIndex.GetID(anyfile.first), inCommit, inIndex, isHard);
+		} else {
+			resetSingleFile(stream, anyfile.first, Refs::EMPTY_REF, inCommit, inIndex, isHard);
+		}
 	}
+	Index::index.Save();
 	Refs::Set(Refs::Local("master"), id);
 }
 

@@ -27,7 +27,7 @@ using FileSet = std::unordered_map<boost::filesystem::path, std::string>;
 
 class IndexBase {
 protected:
-	std::unordered_map<boost::filesystem::path, std::string> _index;
+	FileSet _index;
 public:
 	/**
 	 * Check whether the `path` in the index or not
@@ -52,7 +52,7 @@ public:
 	/**
 	 * Return the _index;
 	 */
-	const std::unordered_map<boost::filesystem::path, std::string>& GetIndex() const;
+	const FileSet& GetIndex() const;
 
 	/*
 	 * List a file which filename == path or all the files which in the path(directory)
