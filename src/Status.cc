@@ -18,6 +18,10 @@ struct StatusItem {
 	boost::filesystem::path path;
 	Diff::FileStatus status;
 };
+inline bool operator<(const StatusItem& lhs, const StatusItem& rhs)
+{
+	return lhs.path < rhs.path;
+}
 typedef std::vector<StatusItem> List;
 
 List getUntracked(const Index::WorkingIndex &workIndex, const Index::Index &index)
@@ -29,6 +33,7 @@ List getUntracked(const Index::WorkingIndex &workIndex, const Index::Index &inde
 			v.push_back(StatusItem({item.first, Diff::Untracked}));
 		}
 	}
+	std::sort(v.begin(), v.end());
 	return v;
 }
 
@@ -41,6 +46,7 @@ List getToBeCommitted(const Index::IndexBase &head, const Index::Index &index)
 			v.push_back(StatusItem({item.first, item.second.status}));
 		}
 	}
+	std::sort(v.begin(), v.end());
 	return v;
 }
 
@@ -53,6 +59,7 @@ List getNotStaged(const Index::Index &index, const Index::WorkingIndex &work)
 			v.push_back(StatusItem({item.first, item.second.status}));
 		}
 	}
+	std::sort(v.begin(), v.end());
 	return v;
 }
 
