@@ -267,9 +267,13 @@ void DiffObject(std::ostream &out, const DiffItem &item,
 		if (vec.empty()) {
 			break;
 		}
+		const int st1 = std::get<2>(diffLines[vec.front()]) + 1;
+		const int ed1 = std::get<2>(diffLines[vec.back()]) + 1;
+		const int st2 = std::get<3>(diffLines[vec.front()]) + 1;
+		const int ed2 = std::get<3>(diffLines[vec.back()]) + 1;
 		out << Color::CYAN 
-			<< "@@ -" << std::get<2>(diffLines[vec.front()]) + 1 << "," << std::get<2>(diffLines[vec.back()]) + 1 
-			<< " +" << std::get<3>(diffLines[vec.front()]) + 1 << "," << std::get<3>(diffLines[vec.back()]) + 1 
+			<< "@@ -" << st1 << "," << ed1-st1+1
+			<< " +" << st2 << "," << ed2-st2+1 
 			<< " @@" << Color::RESET << std::endl;
 		for (const auto &x : vec) {
 			auto status = std::get<0>(diffLines[x]);
