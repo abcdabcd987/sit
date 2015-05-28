@@ -20,8 +20,8 @@ char buf[256*1024];
 void CompressCopy(const boost::filesystem::path &src, const boost::filesystem::path &dst)
 {
 	boost::filesystem::create_directories(dst.parent_path());
-	FILE *in = fopen(src.c_str(), "rb");
-	gzFile out = gzopen(dst.c_str(), "wb");
+	FILE *in = fopen(src.string().c_str(), "rb");
+	gzFile out = gzopen(dst.string().c_str(), "wb");
 	if (!in) {
 		throw Sit::Util::SitException(std::string("compress fail, input: ") + src.string());
 	}
@@ -41,7 +41,7 @@ void CompressCopy(const boost::filesystem::path &src, const boost::filesystem::p
 void CompressWrite(const boost::filesystem::path &dst, const std::string &content)
 {
 	boost::filesystem::create_directories(dst.parent_path());
-	gzFile out = gzopen(dst.c_str(), "wb");
+	gzFile out = gzopen(dst.string().c_str(), "wb");
 	if (!out) {
 		throw Sit::Util::SitException(std::string("compress fail, output: ") + dst.string());
 	}
@@ -54,8 +54,8 @@ void CompressWrite(const boost::filesystem::path &dst, const std::string &conten
 void DecompressCopy(const boost::filesystem::path &src, const boost::filesystem::path &dst)
 {
 	boost::filesystem::create_directories(dst.parent_path());
-	gzFile in = gzopen(src.c_str(), "rb");
-	FILE *out = fopen(dst.c_str(), "wb");
+	gzFile in = gzopen(src.string().c_str(), "rb");
+	FILE *out = fopen(dst.string().c_str(), "wb");
 	if (!in) {
 		throw Sit::Util::SitException(std::string("decompress fail, input: ") + src.string());
 	}
@@ -75,7 +75,7 @@ void DecompressCopy(const boost::filesystem::path &src, const boost::filesystem:
 std::string DecompressRead(const boost::filesystem::path &src)
 {
 	std::string res;
-	gzFile in = gzopen(src.c_str(), "rb");
+	gzFile in = gzopen(src.string().c_str(), "rb");
 	if (!in) {
 		throw Sit::Util::SitException(std::string("decompress fail, input: ") + src.string());
 	}

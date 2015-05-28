@@ -246,7 +246,9 @@ void Checkout(std::string commitid, std::string filename)
 			std::cerr << "Error: You have something staged. Commit or reset before checkout." << std::endl;
 			return;
 		}
-
+		for (const auto &item : Index::index.GetIndex()) {
+			FileSystem::Remove(FileSystem::REPO_ROOT / item.first);
+		}
 		Index::index.Clear();
 		for (const auto &item : idx) {
 			const auto src(Objects::GetPath(item.second));

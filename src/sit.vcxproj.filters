@@ -87,4 +87,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Library Include="D:\SDK\zlib-1.2.8\zdll.lib" />
+  </ItemGroup>
 </Project>

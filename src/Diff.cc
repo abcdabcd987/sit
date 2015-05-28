@@ -289,18 +289,6 @@ void DiffObject(std::ostream &out, const DiffItem &item,
 		out << std::endl;
 	}
 	
-/*
-	int baseLast = 0, targetLast = 0;
-	for (const auto &p : sol) {
-		for (; baseLast < p.first; ++baseLast) 
-			out << Color::RED << "-" << base[baseLast] << Color::RESET << std::endl;
-		for (; targetLast < p.second; ++targetLast)
-			out << Color::GREEN << "+" << target[targetLast] << Color::RESET << std::endl;
-		if (p.first != baseEnd)
-			out << " " << base[p.first] << std::endl;
-		++baseLast, ++targetLast;
-	}
-*/
 }
 
 void DiffIndex(std::ostream &out, const std::string &baseID, const std::string &targetID)
