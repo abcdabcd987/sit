@@ -81,7 +81,7 @@ std::string addFile(const boost::filesystem::path &file)
 		}
 		std::string sha1Value = FileSystem::FileSHA1(file);
 		boost::filesystem::path dstFile(FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR / sha1Value.substr(0, 2) / sha1Value.substr(2));
-		FileSystem::SafeCopyFile(file, dstFile);
+		FileSystem::CompressCopy(file, dstFile);
 		std::cout << file << " added." << std::endl;
 		return sha1Value;
 	} catch (const boost::filesystem::filesystem_error &fe) {
@@ -241,7 +241,7 @@ void Checkout(std::string commitid, std::string filename)
 		for (const auto &item : idx) {
 			const auto src(Objects::GetPath(item.second));
 			const auto dst(FileSystem::REPO_ROOT / item.first);
-			FileSystem::SafeCopyFile(src, dst);
+			FileSystem::DecompressCopy(src, dst);
 			Index::index.Insert(item.first, item.second);
 		}
 
@@ -257,14 +257,14 @@ void Checkout(std::string commitid, std::string filename)
 			const std::string objpath(idx.find(path)->second);
 			const auto src(Objects::GetPath(objpath));
 			const auto dst(FileSystem::REPO_ROOT / filename);
-			FileSystem::SafeCopyFile(src, dst);
+			FileSystem::DecompressCopy(src, dst);
 		} else {
 			const auto &&fileSet(index.ListFile(filename));
 			if (!fileSet.empty()) {
 				for (const auto &singleFile : fileSet) {
 					const auto src(Objects::GetPath(singleFile.second));
 					const auto dst(FileSystem::REPO_ROOT / singleFile.first);
-					FileSystem::SafeCopyFile(src, dst);
+					FileSystem::DecompressCopy(src, dst);
 				}
 			} else {
 				std::cerr << "Error: " << filename << " doesn't exist in file list";
@@ -278,7 +278,7 @@ void CheckoutObjects(const std::string &id, const std::string &filename)
 {
 	const auto src(Objects::GetPath(id));
 	const auto dst(FileSystem::REPO_ROOT / filename);
-	FileSystem::SafeCopyFile(src, dst);
+	FileSystem::DecompressCopy(src, dst);
 }
 
 void printLog(std::ostream &out, const Objects::Commit &commit, const std::string &id)

@@ -1,6 +1,6 @@
 CXX = g++
 CXXFLAGS = -Wall -g -O2 -std=c++11 -DENV64
-LIBS = -lpthread -lboost_system -lboost_filesystem -lboost_date_time -lboost_program_options
+LIBS = -lpthread -lboost_system -lboost_filesystem -lboost_date_time -lboost_program_options -lz
 
 OBJECTS = Color.o Config.o Core.o Diff.o FileSystem.o Index.o \
 	MurmurHash3.o Objects.o Refs.o sit.o Status.o Util.o

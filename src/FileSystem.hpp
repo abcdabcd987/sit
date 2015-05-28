@@ -41,27 +41,6 @@ void AssertInRepo();
  */
 std::vector<boost::filesystem::path> ListRecursive(const boost::filesystem::path &path, const bool ignoreSit = true, const bool relativeToRepoRoot = true);
 
-///**
-// * Return the relative path of the given argument to the path of the repo root
-// */
-//boost::filesystem::path PathFromRepoRoot(const boost::filesystem::path& path);
-//
-// Seems not useful??
-
-///**
-// * Return the relative path of the given argument to the path of the `.sit` root
-// */
-//boost::filesystem::path PathFromSitRoot(const boost::filesystem::path& path);
-//
-// Seems not useful?
-
-/**
- * Copy a file in a safer way.
- * @param from the file would be copied.
- * @param to   the destination.
- */
-void SafeCopyFile(const boost::filesystem::path &from, const boost::filesystem::path &to);
-
 /**
  * Check whether the `path` exists
  */
@@ -103,6 +82,27 @@ boost::filesystem::path GetRelativePath(
  * Hash a file
  */
 std::string FileSHA1(const boost::filesystem::path &path);
+
+/**
+ * Copy from src to dst with gzlib compression
+ */
+void CompressCopy(const boost::filesystem::path &src, const boost::filesystem::path &dst);
+
+/**
+ * Write content to dst with gzlib compression
+ */
+void CompressWrite(const boost::filesystem::path &dst, const std::string &content);
+
+/**
+ * Extract src to dst
+ */
+void DecompressCopy(const boost::filesystem::path &src, const boost::filesystem::path &dst);
+
+/**
+ * Return the extracted src
+ */
+std::string DecompressRead(const boost::filesystem::path &src);
+
 
 }
 }
