@@ -1,0 +1,38 @@
+综述
+
+	源代码的管理在计算机科学中是一个非常重要的部分。一个优秀的代码仓库可以帮助程序员高效率地完成工作。这个学期的数据结构大作业，我们二人参考了git的设计编写了一个可持久化的本地代码仓库。
+
+
+项目简介
+	项目名称：sit(Simplified Git)
+	支持功能：链式版本（每个版本只有一个父版本）的保存与检出及修改历史版本
+	主要模块：FileSystem,Objects,Diff,Index
+	主要命令：add,checkout,commit,diff,init,log,status,reset,rm
+	
+模块介绍
+	Color
+	Config
+	Hash
+	Core
+	Diff
+	FileSystem
+	Index
+	Objects
+	Refs
+	Status
+	Util
+
+命令介绍
+	add
+	config
+	checkout
+	commit
+	diff
+	gc
+	init
+	log
+	status
+	reset
+	rm
+
+	
