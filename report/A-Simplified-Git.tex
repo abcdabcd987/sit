@@ -81,6 +81,7 @@ sit(a Simplified Git)
 \end{description}
 
 \section{模块介绍}
+
 \subsection{Color}
 \subsubsection{简介}
 用于实现对输出信息的高亮，使得输出信息的可读性更佳。
@@ -91,6 +92,7 @@ sit(a Simplified Git)
 \end{description}
 \subsubsection{相关文件}
 Color.hpp Color.cc
+
 \subsection{Config}
 \subsubsection{简介}
 sit的配置模块，用来保存作者信息（包括作者名字和Email地址）
@@ -101,6 +103,7 @@ Config.hpp Config.cc
 sit的核心模块，sit的所有命令都调用Core中相关函数实现
 \subsubsection{相关文件}
 Core.hpp Core.cc
+
 \subsection{Diff}
 \subsubsection{简介}
 用于比较两个文件之间或两个版本之间的差异
@@ -111,6 +114,7 @@ Core.hpp Core.cc
 \end{description}
 \subsubsection{相关文件}
 Diff.hpp Diff.cc MurmurHash3.hpp MurmurHash3.cc
+
 \subsection{Hash}
 \subsubsection{简介}
 Hash在本项目中扮演了非常重要的角色，包括版本的管理和Diff算法的实现。
@@ -118,6 +122,7 @@ Hash在本项目中扮演了非常重要的角色，包括版本的管理和Diff
 使用SHA1算法的Hash值作为文件名来保存文件。虽然效率上会受到一定的影响，但为了保证跨平台的兼容性，SHA1算法直接使用了boost库中的实现而不是git中使用了大量内嵌汇编的SHA1算法。
 
 在针对文件的比较算法中，先使用了MurmurHash3的Hash算法，并且针对32bit和64bit的系统做出了针对性优化。
+
 \subsection{FileSystem}
 \subsubsection{简介}
 由于Windows和Linux对文件操作的API各不相同，因此使用boost库中的filesystem进行文件操作。同时为了方便代码的编写和实现一些必要的操作，对boost::filesystem进行了再封装。
@@ -132,6 +137,7 @@ Hash在本项目中扮演了非常重要的角色，包括版本的管理和Diff
 \end{description}
 \subsubsection{相关文件}
 FileSystem.hpp FileSystem.cc
+
 \subsection{Index}
 \subsubsection{简介}
 程序运行时用于处理版本的文件列表信息的数据结构，其本质是对std::unordered\_map的再封装。
@@ -149,7 +155,97 @@ FileSystem.hpp FileSystem.cc
 文件列表的读取和写入都是通过FileSystem模块来实现的。
 \subsubsection{相关文件}
 Index.hpp Index.cc
-\section{命令介绍}
 
+\subsection{Objects}
+\subsubsection{简介}
+作为文件与Index之间的中间数据结构，在Index与Commit文件的转换中具有重要的作用。tree类型的object以树形结构保存了index中的文件列表，清楚的记录了文件和路径的关系。
+\subsubsection{实现细节}
+包含三种类型的Objects：
+\begin{description}
+	\item[commit] 这个类型的Objects表示该文件记录的是一个版本信息，包含文件的信息和该commit的信息（作者，时间，以及COMMIT\_MSG）。
+	\item[tree] 表示这个文件是一个文件列表，记录了同一个文件夹下所有文件的信息，每行一个object，分别是，文件权限，该object的类型，SHA1 Hash值，以及object的名字（如果是blob类型则是文件名，如果是tree类型，则表示这个文件夹的名字）。
+	\item[blob] 一个基本的object类型，表示它是路径树上的叶子节点，记录的是相应的文件（可以是文本文件，也可以是二进制文件）。
+\end{description}
+保存Object的结构体：
+\begin{lstlisting}
+struct TreeItem {
+	int mode;                         // Linux文件权限，如10644
+	ObjectType type;                  // 这个Object的类型：tree or blob
+	std::string id;                   // 文件的SHA1值，其实等价于文件的路径
+	boost::filesystem::path filename; // 文件路径
+};
+\end{lstlisting}
+保存Commit信息的结构体
+\begin{lstlisting}
+struct Commit {
+	std::string tree;      // 以REPO_ROOT为根的目录树的SHA1 Hash值
+	std::string parent;    // 该提交的父版本
+	std::string author;    // 作者的名字，Email地址，时间戳，时区
+	std::string committer; // 提交者的名字，Email地址，时间戳，时区
+	std::string message;   // Commit Messages
+};
+\end{lstlisting}
+\subsubsection{相关文件}
+Objects.hpp Objects.cc
+
+\subsection{Refs}
+\subsubsection{简介}
+由于处理与版本指针相关的引用信息，如，当前工作区的版本（HEAD指针），当前分支的版本指针（指向当前分支的最后一个版本，由于目前的sit不支持分支功能，故只有一个默认生成的master分支）。该模块的目的主要是为了减少以后需要增加分支功能的时候的工作量。
+\subsubsection{相关文件}
+Refs.hpp Refs.cc
+
+\subsection{Status}
+\subsubsection{简介}
+用于处理工作区和index以及版本库之间的关系，输出当前工作区的状态。
+\subsubsection{实现细节}
+使用了Index模块中的WorkingIndex类，会与保存在".sit/index"中的Index以及HEAD指针指向的commit的Index比较，得出哪些文件是新出现且没有加入index的，那些文件已经被index记录，那些文件被删除。如果WorkingIndex中的所有文件记录与HEAD指向的commit的文件记录都相同那么认为工作区是Clean的。checkout操作在检出commit的时候要求工作区必须是Clean的。
+\subsubsection{相关文件}
+Status.hpp Status.cc
+
+\subsection{Util}
+\subsubsection{简介}
+重要的一个模块，作为整个工程的工具模块，其中包含了对boost库中SHA1算法的封装，以及根据当前的objects目录提供的SHA1值的补全功能，增强了sit的易用性。
+
+在这个模块里还定义了sit的异常类SitException，用于对用户的非法操作给出提示与警告。
+\subsubsection{相关文件}
+Util.hpp Util.cc
+
+\section{命令介绍}
+\subsection{add}
+\subsubsection{Introduction}
+\subsubsection{Usage}
+\subsubsection{Options}
+\subsection{config}
+\subsubsection{Introduction}
+\subsubsection{Usage}
+\subsubsection{Options}
+\subsection{checkout}
+\subsubsection{Introduction}
+\subsubsection{Usage}
+\subsubsection{Options}
+\subsection{commit}
+\subsubsection{Introduction}
+\subsubsection{Usage}
+\subsubsection{Options}
+\subsubsection{diff}
+\subsubsection{Introduction}
+\subsubsection{Usage}
+\subsubsection{Options}
+\subsection{gc}
+\subsubsection{Introduction}
+\subsubsection{Usage}
+\subsection{init}
+\subsubsection{Introduction}
+\subsubsection{Usage}
+\subsection{log}
+\subsubsection{Introduction}
+\subsubsection{Usage}
+\subsection{status}
+\subsubsection{Introduction}
+\subsubsection{Usage}
+\subsection{reset}
+\subsubsection{Introduction}
+\subsubsection{Usage}
+\subsubsection{Options}
 
 \end{document}
