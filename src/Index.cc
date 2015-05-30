@@ -118,25 +118,24 @@ const std::string& IndexBase::GetID(const boost::filesystem::path &path) const
 	throw Util::SitException(std::string("Path ") + path.string() + " not in the index.");
 }
 
-const std::map<boost::filesystem::path, std::string>& IndexBase::GetIndex() const
+const FileSet& IndexBase::GetIndex() const
 {
 	return _index;
 }
 
-std::vector<std::pair<boost::filesystem::path, std::string>> IndexBase::ListFile(const std::string &prefix) const
+FileSet IndexBase::ListFile(const std::string &prefix) const
 {
-	std::vector<std::pair<boost::filesystem::path, std::string>> result;
+	FileSet result;
+	if (prefix == "") {
+		return _index;
+	}
 	for (const auto &element : this->_index) {
-		if (prefix.empty()) {
-			result.push_back(element);
-			continue;
-		}
 		if (element.first.generic_string() == prefix) {
-			result.push_back(element);
+			result.insert(element);
 		} else if (element.first.generic_string().find(prefix) == 0 && element.first.generic_string().at(prefix.length()) == '/') {
-			result.push_back(element);
+			result.insert(element);
 		} else if (element.first.generic_string().find(prefix) == 0 && prefix.back() == '/') {
-			result.push_back(element);
+			result.insert(element);
 		}
 	}
 	return result;
@@ -156,6 +155,9 @@ void CommitIndex::flattenTree(const Objects::Tree &tree, const boost::filesystem
 
 void CommitIndex::load(const std::string& id)
 {
+	if (id == Refs::EMPTY_REF) {
+		return ;
+	}
 	const Objects::Commit commit(Objects::GetCommit(id));
 	const Objects::Tree tree(Objects::GetTree(commit.tree));
 	flattenTree(tree, "");
@@ -166,8 +168,7 @@ void WorkingIndex::load()
 	const auto ls(FileSystem::ListRecursive(FileSystem::REPO_ROOT));
 	for (const auto &path : ls) {
 		if (FileSystem::IsDirectory(path)) continue;
-		const std::string content(FileSystem::Read(path));
-		const std::string sha1(Util::SHA1sum(content));
+		const std::string sha1(FileSystem::FileSHA1(path));
 		_index.insert(std::make_pair(path, sha1));
 	}
 }

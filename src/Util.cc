@@ -1,4 +1,6 @@
 #include "Util.hpp"
+#include "Refs.hpp"
+#include <cctype>
 
 namespace Sit {
 namespace Util {
@@ -40,8 +42,12 @@ std::string FirstLine(const std::string& str)
 int FileModeToInt(const std::string& mode)
 {
 	int res = 0;
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < 6; ++i) {
+		if (!isdigit(mode[i])) {
+			throw SitException("Fatal: Bad File Mode.");
+		}
 		res = res * 8 + mode[i] - '0';
+	}
 	return res;
 }
 
@@ -62,6 +68,9 @@ std::string AuthorString(const std::string& name, const std::string& email, cons
 
 std::string SHA1Complete(std::string _id)
 {
+	if (Refs::EMPTY_REF.find(_id) == 0) {
+		return Refs::EMPTY_REF;
+	}
 	if (_id == "" || _id == "index" || _id == "master" || _id == "HEAD" || _id == "work")
 		return _id;
 	boost::filesystem::path path = _id.substr(0, 2);

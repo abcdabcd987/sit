@@ -9,11 +9,15 @@ namespace Config {
 
 const std::string NOT_FOUND("\0<CONFIG_NOT_FOUND>\0");
 
-Config readConfig()
+Config readConfig(bool create_if_not_exist = false)
 {
 	const auto config_path = FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "config";
 	if (!FileSystem::IsFile(config_path)) {
-		throw Util::SitException(std::string("Cannot read configuration file."));
+		if (create_if_not_exist) {
+			FileSystem::Write(".sit/config", "");
+		} else {
+			throw Util::SitException(std::string("Cannot read configuration file."));
+		}
 	}
 	boost::filesystem::ifstream fin(config_path);
 	std::string line;
@@ -53,7 +57,7 @@ std::string Get(const std::string& key)
 
 void Set(const std::string& key, const std::string& value)
 {
-	Config config(readConfig());
+	Config config(readConfig(true));
 	config[key] = value;
 	writeConfig(config);
 }

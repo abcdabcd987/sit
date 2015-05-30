@@ -6,6 +6,8 @@
 #include <cassert>
 #include <vector>
 #include <sstream>
+#include <tuple>
+#include <iostream>
 
 namespace Sit {
 namespace Diff {
@@ -212,19 +214,81 @@ void DiffObject(std::ostream &out, const DiffItem &item,
 
 	// TODO: simplify the diff string
 	int baseEnd = base.size(), targetEnd = target.size();
-	out << Color::CYAN << "@@ -1," << baseEnd << " +1," << targetEnd << " @@" << Color::RESET << std::endl;
+
 	sol.push_back(std::make_pair(baseEnd, targetEnd)); // padding
 
+	std::vector<std::tuple<char, std::string, unsigned, unsigned>> diffLines;
 	int baseLast = 0, targetLast = 0;
 	for (const auto &p : sol) {
-		for (; baseLast < p.first; ++baseLast) 
-			out << Color::RED << "-" << base[baseLast] << Color::RESET << std::endl;
+		for (; baseLast < p.first; ++baseLast)
+			diffLines.push_back(std::make_tuple('-', base[baseLast], baseLast, targetLast));
 		for (; targetLast < p.second; ++targetLast)
-			out << Color::GREEN << "+" << target[targetLast] << Color::RESET << std::endl;
+			diffLines.push_back(std::make_tuple('+', target[targetLast], baseLast, targetLast));
 		if (p.first != baseEnd)
-			out << " " << base[p.first] << std::endl;
+			diffLines.push_back(std::make_tuple('=', base[p.first], baseLast, targetLast));
 		++baseLast, ++targetLast;
 	}
+	std::vector<std::vector<unsigned>> diffBlob;
+
+	for (size_t i = 0; i < diffLines.size(); ++i) {
+		if (std::get<0>(diffLines[i]) != '=') {
+			if (std::get<0>(diffLines[i]) == '+') {
+				if (diffBlob.empty()) {
+					diffBlob.push_back(std::vector<unsigned>());
+				}
+				diffBlob.back().push_back(i);
+			} else {
+				if (diffBlob.empty()) {
+					diffBlob.push_back(std::vector<unsigned>());
+				}
+				diffBlob.back().push_back(i);
+			}
+		} else {
+			if ((i >= 1 && std::get<0>(diffLines[i - 1]) != '=')
+				|| (i >= 2 && std::get<0>(diffLines[i - 2]) != '=')
+				|| (i + 1 < diffLines.size() && std::get<0>(diffLines[i + 1]) != '=')
+				|| (i + 2 < diffLines.size() && std::get<0>(diffLines[i + 2]) != '=')) {
+				if (diffBlob.empty()) {
+					diffBlob.push_back(std::vector<unsigned>());
+				}
+				diffBlob.back().push_back(i);
+			} else {
+				if (diffBlob.empty()) {
+					diffBlob.push_back(std::vector<unsigned>());
+				}
+				if (!diffBlob.back().empty()) {
+					diffBlob.push_back(std::vector<unsigned>());
+				}
+			}
+		}
+	}
+	
+	for (const auto &vec : diffBlob) {
+		if (vec.empty()) {
+			break;
+		}
+		const int st1 = std::get<2>(diffLines[vec.front()]) + 1;
+		const int ed1 = std::get<2>(diffLines[vec.back()]) + 1;
+		const int st2 = std::get<3>(diffLines[vec.front()]) + 1;
+		const int ed2 = std::get<3>(diffLines[vec.back()]) + 1;
+		out << Color::CYAN 
+			<< "@@ -" << st1 << "," << ed1-st1+1
+			<< " +" << st2 << "," << ed2-st2+1 
+			<< " @@" << Color::RESET << std::endl;
+		for (const auto &x : vec) {
+			auto status = std::get<0>(diffLines[x]);
+			auto str = std::get<1>(diffLines[x]);
+			if (status == '-') {
+				out << Color::RED << "-" << str << Color::RESET << std::endl;
+			} else if (status == '+') {
+				out << Color::GREEN << "+" << str << Color::RESET << std::endl;
+			} else if (status == '=') {
+				out << " " << str << std::endl;
+			}
+		}
+		out << std::endl;
+	}
+	
 }
 
 void DiffIndex(std::ostream &out, const std::string &baseID, const std::string &targetID)

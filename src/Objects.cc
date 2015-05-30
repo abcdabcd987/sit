@@ -24,13 +24,13 @@ bool IsExist(const std::string& id)
 
 std::string GetBlob(const std::string& id)
 {
-	return FileSystem::Read(GetPath(id));
+	return FileSystem::DecompressRead(GetPath(id));
 }
 
 Tree GetTree(const std::string& id)
 {
 	using std::getline;
-	std::istringstream ss(FileSystem::Read(GetPath(id)));
+	std::istringstream ss(FileSystem::DecompressRead(GetPath(id)));
 	std::string line;
 	Tree tree;
 	while (getline(ss, line)) {
@@ -48,16 +48,22 @@ Tree GetTree(const std::string& id)
 Commit GetCommit(const std::string& id)
 {
 	using std::getline;
-	std::istringstream ss(FileSystem::Read(GetPath(id)));
+	std::istringstream ss(FileSystem::DecompressRead(GetPath(id)));
 	std::string line;
 	Commit commit;
 
 	// tree d8329fc1cc938780ffdd9f94e0d364e0ea74f579
 	getline(ss, commit.tree);
+	if (commit.tree.substr(0, 4) != "tree") {
+		throw Util::SitException("Fatal: Wrong Objects (Not a commit)", "GetCommit(" + id + ")");
+	}
 	commit.tree.erase(0, 5);
 
 	// parent 5a174a6c45eadc12180f5e9466e547777c3b3118
 	getline(ss, commit.parent);
+	if (commit.parent.substr(0, 6) != "parent") {
+		throw Util::SitException("Fatal: Wrong Objects (Not a commit)", "GetCommit(" + id + ")");
+	}
 	commit.parent.erase(0, 7);
 
 	// author Scott Chacon <schacon@gmail.com> 1243040974 -0700
@@ -83,7 +89,7 @@ Commit GetCommit(const std::string& id)
 std::string WriteBlob(const std::string& blob)
 {
 	const std::string sha1(Util::SHA1sum(blob));
-	FileSystem::Write(GetPath(sha1), blob);
+	FileSystem::CompressWrite(GetPath(sha1), blob);
 	return sha1;
 }
 
@@ -99,7 +105,7 @@ std::string WriteTree(const Tree& tree)
 	}
 	const std::string str(ss.str());
 	const std::string sha1(Util::SHA1sum(str));
-	FileSystem::Write(GetPath(sha1), str);
+	FileSystem::CompressWrite(GetPath(sha1), str);
 	return sha1;
 }
 
@@ -114,7 +120,7 @@ std::string WriteCommit(const Commit& commit)
 	   << commit.message;
 	const std::string str(ss.str());
 	const std::string sha1(Util::SHA1sum(str));
-	FileSystem::Write(GetPath(sha1), str);
+	FileSystem::CompressWrite(GetPath(sha1), str);
 	return sha1;
 }
 

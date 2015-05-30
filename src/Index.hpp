@@ -3,13 +3,31 @@
 
 #include "Objects.hpp"
 #include <map>
+#include <set>
+#include <unordered_map>
+#include <boost/filesystem.hpp>
+#include <boost/functional/hash.hpp>
+
+namespace std
+{
+	template<> struct hash<boost::filesystem::path>
+	{
+		size_t operator()(const boost::filesystem::path& p) const
+		{
+			return boost::filesystem::hash_value(p);
+		}
+	};
+}
 
 namespace Sit {
 namespace Index {
 
+using IndexList = std::vector<std::pair<boost::filesystem::path, std::string>>;
+using FileSet = std::unordered_map<boost::filesystem::path, std::string>;
+
 class IndexBase {
 protected:
-	std::map<boost::filesystem::path, std::string> _index;
+	FileSet _index;
 public:
 	/**
 	 * Check whether the `path` in the index or not
@@ -34,12 +52,12 @@ public:
 	/**
 	 * Return the _index;
 	 */
-	const std::map<boost::filesystem::path, std::string>& GetIndex() const;
+	const FileSet& GetIndex() const;
 
 	/*
 	 * List a file which filename == path or all the files which in the path(directory)
 	 */
-	std::vector<std::pair<boost::filesystem::path, std::string>> ListFile(const std::string &prefix) const;
+	FileSet ListFile(const std::string &prefix) const;
 };
 
 class Index : public IndexBase {

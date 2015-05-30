@@ -41,13 +41,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Boost\include\boost-1_58;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Boost\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <IncludePath>C:\Boost\include\boost-1_58;$(VC_IncludePath);$(WindowsSDK_IncludePath);D:\SDK\zlib-1.2.8</IncludePath>
+    <LibraryPath>D:\SDK\zlib-1.2.8\contrib\vstudio\vc11\x86\ZlibDllRelease;C:\Boost\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);D:\SDK\zlib-1.2.8</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Boost\include\boost-1_58;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Boost\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <IncludePath>C:\Boost\include\boost-1_58;$(VC_IncludePath);$(WindowsSDK_IncludePath);D:\SDK\zlib-1.2.8</IncludePath>
+    <LibraryPath>D:\SDK\zlib-1.2.8\contrib\vstudio\vc11\x86\ZlibDllRelease;C:\Boost\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);D:\SDK\zlib-1.2.8</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -86,7 +86,6 @@
     <ClInclude Include="Diff.hpp" />
     <ClInclude Include="FileSystem.hpp" />
     <ClInclude Include="Index.hpp" />
-    <ClInclude Include="Message.hpp" />
     <ClInclude Include="MurmurHash3.hpp" />
     <ClInclude Include="Objects.hpp" />
     <ClInclude Include="Refs.hpp" />
@@ -100,13 +99,15 @@
     <ClCompile Include="Diff.cc" />
     <ClCompile Include="FileSystem.cc" />
     <ClCompile Include="Index.cc" />
-    <ClCompile Include="Message.cc" />
     <ClCompile Include="MurmurHash3.cc" />
     <ClCompile Include="Objects.cc" />
     <ClCompile Include="Refs.cc" />
     <ClCompile Include="sit.cc" />
     <ClCompile Include="Status.cc" />
     <ClCompile Include="Util.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="D:\SDK\zlib-1.2.8\zdll.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

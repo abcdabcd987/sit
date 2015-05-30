@@ -18,6 +18,10 @@ struct StatusItem {
 	boost::filesystem::path path;
 	Diff::FileStatus status;
 };
+inline bool operator<(const StatusItem& lhs, const StatusItem& rhs)
+{
+	return lhs.path < rhs.path;
+}
 typedef std::vector<StatusItem> List;
 
 List getUntracked(const Index::WorkingIndex &workIndex, const Index::Index &index)
@@ -29,10 +33,11 @@ List getUntracked(const Index::WorkingIndex &workIndex, const Index::Index &inde
 			v.push_back(StatusItem({item.first, Diff::Untracked}));
 		}
 	}
+	std::sort(v.begin(), v.end());
 	return v;
 }
 
-List getToBeCommitted(const Index::CommitIndex &head, const Index::Index &index)
+List getToBeCommitted(const Index::IndexBase &head, const Index::Index &index)
 {
 	List v;
 	const Diff::DiffList diff(Diff::Diff(head, index));
@@ -41,6 +46,7 @@ List getToBeCommitted(const Index::CommitIndex &head, const Index::Index &index)
 			v.push_back(StatusItem({item.first, item.second.status}));
 		}
 	}
+	std::sort(v.begin(), v.end());
 	return v;
 }
 
@@ -53,6 +59,7 @@ List getNotStaged(const Index::Index &index, const Index::WorkingIndex &work)
 			v.push_back(StatusItem({item.first, item.second.status}));
 		}
 	}
+	std::sort(v.begin(), v.end());
 	return v;
 }
 
@@ -71,16 +78,14 @@ void print(std::ostream &out, const List &v)
 	}
 }
 
-std::string StatusString()
+void PrintStatus(std::ostream &out)
 {
 	const std::string headref(Refs::Get("HEAD"));
-	std::ostringstream ss;
-	if (headref == Refs::EMPTY_REF) {
-		ss << "The current repo is empty." << std::endl;
-		return ss.str();
-	}
 
-	const Index::CommitIndex head(headref);
+	Index::IndexBase head;
+	if (headref != Refs::EMPTY_REF) {
+		head = Index::CommitIndex(headref);
+	}
 	const Index::WorkingIndex work;
 	const Index::Index &index(Index::index);
 
@@ -88,41 +93,45 @@ std::string StatusString()
 	List toBeCommitted(getToBeCommitted(head, index));
 	List notStaged(getNotStaged(index, work));
 
-	ss << "On branch: master" << std::endl;
+	out << "On branch: master" << std::endl;
 	if (headref != Refs::Get(Refs::Local("master"))) {
-		ss << "HEAD detached at " << headref << std::endl;
+		out << "HEAD detached at " << headref << std::endl;
 	}
 
 	if (untracked.empty() && toBeCommitted.empty() && notStaged.empty()) {
-		ss << "Nothing to commit, working directory clean" << std::endl;
-		return ss.str();
+		out << "Nothing to commit, working directory clean" << std::endl;
+		return;
 	}
 
 	if (!toBeCommitted.empty()) {
-		ss << "Changes to be committed:" << std::endl
+		out << "Changes to be committed:" << std::endl
 		   << "  (Use \"sit reset -- <file>\" to unstage)" << std::endl
 		   << std::endl;
-		print(ss, toBeCommitted);
-		ss << std::endl;
+		out << Color::GREEN;
+		print(out, toBeCommitted);
+		out << Color::RESET;
+		out << std::endl;
 	}
 
 	if (!notStaged.empty()) {
-		ss << "Changes not staged for commit:" << std::endl
+		out << "Changes not staged for commit:" << std::endl
 		   << "  (Use \"sit add <file>...\" to update what will be committed)" << std::endl
 		   << std::endl;
-		print(ss, notStaged);
-		ss << std::endl;
+		out << Color::RED;
+		print(out, notStaged);
+		out << Color::RESET;
+		out << std::endl;
 	}
 
 	if (!untracked.empty()) {
-		ss << "Untracked files:" << std::endl
+		out << "Untracked files:" << std::endl
 		   << "  (Use \"sit add <file>...\" to include in what will be committed)" << std::endl
 		   << std::endl;
-		print(ss, untracked);
-		ss << std::endl;
+		out << Color::BROWN;
+		print(out, untracked);
+		out << Color::RESET;
+		out << std::endl;
 	}
-
-	return ss.str();
 }
 
 bool IsClean()

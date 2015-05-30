@@ -30,7 +30,7 @@ void Rm(const boost::filesystem::path& path);
  * Create an commit object and point `HEAD` at that commit.
  * Read commit log from `.sit/COMMIT_MSG`
  */
-void Commit(const bool isAmend = false);
+void Commit(const std::string &msg, const bool isAmend = false);
 
 /**
  * Change the index, working directory and `HEAD` to the commit `id`.
@@ -42,6 +42,11 @@ void Checkout(std::string commitid, std::string filename);
  * Print the diff of two commits or one commit and current working directory
  */
 void Diff(const std::string& base, const std::string& target);
+
+/**
+* Print the diff of the same file(filename) between two commits or one commit and current working directory
+*/
+void Diff(const std::string &baseID, const std::string &targetID, const std::vector<std::string> &filename);
 
 /**
  * Print lists of untracked files, files to be committed, files not staged
@@ -56,9 +61,16 @@ void Log(std::string id);
 /**
  * Reset `filename` status in the index to that in the commit `id`
  * If `isHard`, modify the working directory, too.
+ * Reset will print message to stream.
  */
-void Reset(std::string id, std::string filename, const bool isHard);
+void Reset(std::ostream &stream, std::string id, std::string filename);
 
+/**
+* Reset `filename` status in the index to that in the commit `id`
+* If `isHard`, modify the working directory, too.
+* Reset will print message to stream.
+*/
+void Reset(std::ostream &stream, std::string id, const bool isHard);
 /**
  * Delete the objects cannot be reached from the last commit of master in order to free some space in disk.
  */
