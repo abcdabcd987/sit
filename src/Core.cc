@@ -59,6 +59,7 @@ void LoadRepo()
 		if (is_directory(curPath / ".sit")) {
 			FileSystem::REPO_ROOT = curPath;
 			Index::index.Load();
+			Refs::LoadBranch();
 			return ;
 		}
 		curPath = curPath.parent_path();
@@ -143,7 +144,7 @@ std::string getCommitMessage()
 void amend(const std::string &oldid, const std::string &newid)
 {
 	std::vector<std::pair<std::string, Objects::Commit>> olds;
-	for (std::string id(Refs::Get(Refs::Local("master"))); id != oldid; ) {
+	for (std::string id(Refs::Get("master")); id != oldid; ) {
 		const Objects::Commit commit(Objects::GetCommit(id));
 		olds.push_back(std::make_pair(id, commit));
 		id = commit.parent;
@@ -165,7 +166,7 @@ void Commit(const std::string &msg, const bool isAmend)
 	using boost::posix_time::second_clock;
 
 	const std::string headref(Refs::Get("HEAD"));
-	const std::string masterref(Refs::Get(Refs::Local("master")));
+	const std::string masterref(Refs::Get("master"));
 
 	Objects::Commit commit;
 
@@ -203,7 +204,7 @@ void Commit(const std::string &msg, const bool isAmend)
 	const std::string id(Objects::WriteCommit(commit));
 
 	if (!isAmend) {
-		Refs::Set(Refs::Local("master"), id);
+		Refs::Set("master", id);
 	} else {
 		amend(headref, id);
 	}
@@ -223,7 +224,7 @@ void Checkout(std::string commitid, std::string filename)
 		return;
 	}
 	if (commitid == "master") {
-		commitid = Refs::Get(Refs::Local("master"));
+		commitid = Refs::Get("master");
 	} else if (commitid == "HEAD") {
 		commitid = Refs::Get("HEAD");
 	} else if (commitid == "index") {
@@ -307,7 +308,7 @@ void printLog(std::ostream &out, const Objects::Commit &commit, const std::strin
 void Log(std::string id)
 {
 	if (id == "master") {
-		id = Refs::Get(Refs::Local("master"));
+		id = Refs::Get("master");
 		while (id != Refs::EMPTY_REF) {
 			Objects::Commit commit(Objects::GetCommit(id));
 			printLog(std::cout, commit, id);
@@ -351,7 +352,7 @@ void resetSingleFile(std::ostream &stream, const std::string &filename, const st
 void Reset(std::ostream &stream, std::string id, std::string filename)
 {
 	if (id == "master") {
-		id = Refs::Get(Refs::Local("master"));
+		id = Refs::Get("master");
 	} else if (id == "HEAD" || id.empty()) {
 		id = Refs::Get("HEAD");
 	}
@@ -385,7 +386,7 @@ void Reset(std::ostream &stream, std::string id, std::string filename)
 void Reset(std::ostream &stream, std::string id, const bool isHard)
 {
 	if (id == "master") {
-		id = Refs::Get(Refs::Local("master"));
+		id = Refs::Get("master");
 	} else if (id == "HEAD" || id.empty()) {
 		id = Refs::Get("HEAD");
 	}
@@ -419,7 +420,8 @@ void Reset(std::ostream &stream, std::string id, const bool isHard)
 		}
 	}
 	Index::index.Save();
-	Refs::Set(Refs::Local("master"), id);
+	Refs::Set("master", id);
+	Refs::Set("HEAD", "master");
 }
 
 void Diff(const std::string &baseID, const std::string &targetID)
