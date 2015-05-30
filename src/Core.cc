@@ -99,17 +99,6 @@ void Add(const boost::filesystem::path &path)
 			continue;
 		}
 		boost::filesystem::path relativePath = FileSystem::GetRelativePath(file);
-
-		std::time_t curFileTime = boost::filesystem::last_write_time(file);
-		std::time_t existedFileTime = 0;
-		if (Index::index.GetIndex().count(relativePath) > 0) {
-			existedFileTime = boost::filesystem::last_write_time(Objects::GetPath(Index::index.GetID(relativePath)));
-		}
-		if (curFileTime == existedFileTime) {
-			//std::cout << file << " is same as it in index." << std::endl;
-			continue;
-		}
-
 		Index::index.Insert(relativePath, addFile(file));
 	}
 
