@@ -403,8 +403,8 @@ void Reset(std::ostream &stream, std::string id, const bool isHard)
 		--allSet[fileInIndex.first.generic_string()];
 	}
 	for (const auto &anyfile : allSet) {
-		bool inCommit;
-		bool inIndex;
+		bool inCommit = false;
+		bool inIndex = false;
 		if (anyfile.second == 0) {
 			inCommit = inIndex = true;
 		} else if (anyfile.second == 1) {
