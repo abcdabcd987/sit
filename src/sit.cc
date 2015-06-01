@@ -149,8 +149,13 @@ int diff(int ac, char **av)
 
 int help(int argc, char** argv)
 {
-	cout << "usage: sit <command> [<command arguments>...]" << endl
-	     << "sit commands are:" << endl
+	cout << "usage: sit <command> [<command arguments>...]" << endl;
+#ifdef ENABLE_COMPRESSION
+	cout << "objects compression enabled" << endl << endl;
+#else
+	cout << "objects compression disabled" << endl << endl;
+#endif
+	cout << "sit commands are:" << endl
 	     << "  add        Add file contents to the index" << endl
 	     << "  checkout   Checkout paths to the working tree" << endl
 	     << "  config     Get and set repository or global options" << endl

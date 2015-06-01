@@ -10,4 +10,4 @@ install:
 
 clean:
 	$(MAKE) -C src clean
-	rm src/sit
+	rm -f bin/sit

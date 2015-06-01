@@ -17,6 +17,7 @@ boost::filesystem::path REPO_ROOT("./");
 
 char buf[256*1024];
 
+#ifdef ENABLE_COMPRESSION
 void CompressCopy(const boost::filesystem::path &src, const boost::filesystem::path &dst)
 {
 	boost::filesystem::create_directories(dst.parent_path());
@@ -88,6 +89,31 @@ std::string DecompressRead(const boost::filesystem::path &src)
 	gzclose(in);
 	return res;
 }
+
+#else
+
+void CompressCopy(const boost::filesystem::path &src, const boost::filesystem::path &dst)
+{
+	using namespace boost::filesystem;
+	copy_file(src, dst, copy_option::overwrite_if_exists);
+}
+
+void CompressWrite(const boost::filesystem::path &dst, const std::string &content)
+{
+	Write(dst, content);
+}
+
+void DecompressCopy(const boost::filesystem::path &src, const boost::filesystem::path &dst)
+{
+	using namespace boost::filesystem;
+	copy_file(src, dst, copy_option::overwrite_if_exists);
+}
+
+std::string DecompressRead(const boost::filesystem::path &src)
+{
+	return Read(src);
+}
+#endif
 
 bool InRepo()
 {
