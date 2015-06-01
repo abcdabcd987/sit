@@ -327,11 +327,12 @@ int main(int argc, char** argv)
 		}
 		help(argc, argv);
 	} catch (const Sit::Util::SitException& e) {
-		std::cerr << "!!! Sit Exception:" << endl;
 		std::cerr << e.message << endl;
+#ifdef DEBUG
 		if (!e.detail.empty()) {
 			std::cerr << e.detail << endl;
 		}
+#endif
 	} catch (const boost::filesystem::filesystem_error &fe) {
 		std::cerr << fe.what() << endl;
 	} catch (const std::exception &ec) {
