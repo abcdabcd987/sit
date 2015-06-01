@@ -1,0 +1,5 @@
+space usage comparison:
+benchmark repo: redis 2.4
+.git:                       94324  kb
+.sit (with compression):    82180  kb ~  87.1% git
+.sit (without compression): 264004 kb ~ 279.9% git

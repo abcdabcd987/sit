@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -g -O2 -std=c++11 -DENV64
+CXXFLAGS = -Wall -O3 -std=c++11 -DENV64 -DENABLE_COMPRESSION
 LIBS = -lpthread -lboost_system -lboost_filesystem -lboost_date_time -lboost_program_options -lz
 
 OBJECTS = Color.o Config.o Core.o Diff.o FileSystem.o Index.o \

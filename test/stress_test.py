@@ -14,7 +14,7 @@ def main():
     report.write('git_cur, sit_cur, git_tot, sit_tot, git_commit_cur, sit_commit_cur, git_commit_tot, sit_commit_tot, git_add_cur, sit_add_cur, git_add_tot, sit_add_tot\n')
 
     # get commits
-    commits = ['unstable']
+    commits = ['2.4']
     args = ['git', 'log', '--pretty=%P', commits[0]]
     proc = subprocess.Popen(args, cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     outs, errs = proc.communicate(timeout=15)
