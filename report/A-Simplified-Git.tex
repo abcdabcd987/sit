@@ -86,50 +86,50 @@ sit(a Simplified Git)
 \section{模块介绍}
 
 \subsection{Color}
-\subsubsection{简介}
+\subsubsection*{简介}
 用于实现对输出信息的高亮，使得输出信息的可读性更佳。
-\subsubsection{实现方法}
+\subsubsection*{实现方法}
 \begin{description}
 	\item[Windows] 使用Windows API实现，颜色数量较少，实际效果较差。
 	\item[Unix及其他POSIX标准系统] 使用ANSI颜色序列实现，色彩丰富，实际效果较好。
 \end{description}
-\subsubsection{相关文件}
+\subsubsection*{相关文件}
 Color.hpp Color.cc
 
 \subsection{Config}
-\subsubsection{简介}
+\subsubsection*{简介}
 sit的配置模块，用来保存作者信息（包括作者名字和Email地址）
-\subsubsection{相关文件}
+\subsubsection*{相关文件}
 Config.hpp Config.cc
 \subsection{Core}
-\subsubsection{简介}
+\subsubsection*{简介}
 sit的核心模块，sit的所有命令都调用Core中相关函数实现
-\subsubsection{相关文件}
+\subsubsection*{相关文件}
 Core.hpp Core.cc
 
 \subsection{Diff}
-\subsubsection{简介}
+\subsubsection*{简介}
 用于比较两个文件之间或两个版本之间的差异
-\subsubsection{实现方法}
+\subsubsection*{实现方法}
 \begin{description}
 	\item[版本之间] 先对两个版本的index进行diff，等到两个版本的文件列表的额差异信息（Add, Rm, Modify, Same），然后对差异信息为Modify的文件调用针对文件的比较算法。
 	\item[文件之间] 对两个文件逐行Hash，对得到的Hash值列表执行LCS近似算法（时间复杂度$O(len*d)$，其中$len$为两个列表中较长的那个的值,$d$为输入数据的差异个数）。
 \end{description}
-\subsubsection{相关文件}
+\subsubsection*{相关文件}
 Diff.hpp Diff.cc MurmurHash3.hpp MurmurHash3.cc
 
 \subsection{Hash}
-\subsubsection{简介}
+\subsubsection*{简介}
 Hash在本项目中扮演了非常重要的角色，包括版本的管理和Diff算法的实现。
-\subsubsection{Hash的使用}
+\subsubsection*{Hash在项目中的使用}
 使用SHA1算法的Hash值作为文件名来保存文件。虽然效率上会受到一定的影响，但为了保证跨平台的兼容性，SHA1算法直接使用了boost库中的实现而不是git中使用了大量内嵌汇编的SHA1算法。
 
 在针对文件的比较算法中，先使用了MurmurHash3的Hash算法，并且针对32bit和64bit的系统做出了针对性优化。
 
 \subsection{FileSystem}
-\subsubsection{简介}
+\subsubsection*{简介}
 由于Windows和Linux对文件操作的API各不相同，因此使用boost库中的filesystem进行文件操作。同时为了方便代码的编写和实现一些必要的操作，对boost::filesystem进行了再封装。
-\subsubsection{主要函数}
+\subsubsection*{主要函数}
 \begin{description}
 	\item[CompressCopy] 对源文件进行压缩后进行复制，主要用于add命令的实现。
 	\item[CompressWrite] 将一个字符串压缩后写入文件，主要用于版本信息的压缩与写入。
@@ -138,13 +138,13 @@ Hash在本项目中扮演了非常重要的角色，包括版本的管理和Diff
 	\item[GetRelativePath] 得到路径A相对于路径B的相对路径，用于保证在仓库的子目录中调用sit是可以得到正确的执行结果。
 	\item[ListRecursive] 返回包含某一个目录下的所有文件的vector，主要用于实现需要文件夹递归的命令(add, checkout, etc)
 \end{description}
-\subsubsection{相关文件}
+\subsubsection*{相关文件}
 FileSystem.hpp FileSystem.cc
 
 \subsection{Index}
-\subsubsection{简介}
+\subsubsection*{简介}
 程序运行时用于处理版本的文件列表信息的数据结构，其本质是对std::unordered\_map的再封装。
-\subsubsection{实现细节}
+\subsubsection*{实现细节}
 考虑到在程序运行过程中需要处理三种类型的文件列表信息：
 \begin{enumerate}
 	\item 保存在".sit/index"中的已暂存的文件信息
@@ -156,13 +156,13 @@ FileSystem.hpp FileSystem.cc
 在项目中编写了基类IndexBase，以及其针对文件中的index信息的派生类CommitIndex、针对".sit/index"中的文件信息的派生类Index、针对当前工作目录的所有文件的派生类WorkingIndex。
 
 文件列表的读取和写入都是通过FileSystem模块来实现的。
-\subsubsection{相关文件}
+\subsubsection*{相关文件}
 Index.hpp Index.cc
 
 \subsection{Objects}
-\subsubsection{简介}
+\subsubsection*{简介}
 作为文件与Index之间的中间数据结构，在Index与Commit文件的转换中具有重要的作用。tree类型的object以树形结构保存了index中的文件列表，清楚的记录了文件和路径的关系。
-\subsubsection{实现细节}
+\subsubsection*{实现细节}
 包含三种类型的Objects：
 \begin{description}
 	\item[commit] 这个类型的Objects表示该文件记录的是一个版本信息，包含文件的信息和该commit的信息（作者，时间，以及COMMIT\_MSG）。
@@ -188,29 +188,29 @@ struct Commit {
 	std::string message;   // Commit Messages
 };
 \end{lstlisting}
-\subsubsection{相关文件}
+\subsubsection*{相关文件}
 Objects.hpp Objects.cc
 
 \subsection{Refs}
-\subsubsection{简介}
+\subsubsection*{简介}
 由于处理与版本指针相关的引用信息，如，当前工作区的版本（HEAD指针），当前分支的版本指针（指向当前分支的最后一个版本，由于目前的sit不支持分支功能，故只有一个默认生成的master分支）。该模块的目的主要是为了减少以后需要增加分支功能的时候的工作量。
-\subsubsection{相关文件}
+\subsubsection*{相关文件}
 Refs.hpp Refs.cc
 
 \subsection{Status}
-\subsubsection{简介}
+\subsubsection*{简介}
 用于处理工作区和index以及版本库之间的关系，输出当前工作区的状态。
-\subsubsection{实现细节}
+\subsubsection*{实现细节}
 使用了Index模块中的WorkingIndex类，会与保存在".sit/index"中的Index以及HEAD指针指向的commit的Index比较，得出哪些文件是新出现且没有加入index的，那些文件已经被index记录，那些文件被删除。如果WorkingIndex中的所有文件记录与HEAD指向的commit的文件记录都相同那么认为工作区是Clean的。checkout操作在检出commit的时候要求工作区必须是Clean的。
-\subsubsection{相关文件}
+\subsubsection*{相关文件}
 Status.hpp Status.cc
 
 \subsection{Util}
-\subsubsection{简介}
+\subsubsection*{简介}
 重要的一个模块，作为整个工程的工具模块，其中包含了对boost库中SHA1算法的封装，以及根据当前的objects目录提供的SHA1值的补全功能，增强了sit的易用性。
 
 在这个模块里还定义了sit的异常类SitException，用于对用户的非法操作给出提示与警告。
-\subsubsection{相关文件}
+\subsubsection*{相关文件}
 Util.hpp Util.cc
 
 %===============================================================================================
@@ -229,21 +229,21 @@ sit使用了boost中的program\_options模块来格式化处理命令行参数�
 
 参数中commit-id都是代表某个commit的SHA1值(或版本指针（HEAD,index,work,master）)。
 \subsection{add}
-\subsubsection{Introduction}
+\subsubsection* {Introduction}
 把文件内容加入到index
-\subsubsection{Usage}
+\subsubsection*{Usage}
 \begin{lstlisting}[language=sh,basicstyle=\small\YaHeiMono,numbers=none]
 sit add <path_1> [<path_2> ...]
 \end{lstlisting}
-\subsubsection{Options}
+\subsubsection*{Options}
 \begin{description}
 	\item[\YaHeiMono <path>（默认参数）] 要加入index的文件（或文件夹，如果是文件夹将递归加入该文件夹下所有的子文件（夹））
 \end{description}
 
 \subsection{checkout}
-\subsubsection{Introduction}
+\subsubsection*{Introduction}
 将代码库/index中的文件解压并复制到当前的工作区中。
-\subsubsection{Usage}
+\subsubsection*{Usage}
 checkout命令有两种基本形式：
 \begin{lstlisting}[language=sh,basicstyle=\small\YaHeiMono,numbers=none]
 sit chekcout [--commit=<commit-id>]
@@ -251,47 +251,47 @@ sit chekcout [--commit=<commit-id>]
 \begin{lstlisting}[language=sh,basicstyle=\small\YaHeiMono,numbers=none]
 sit checkout [--commit=<commit-id>] --path=<path_1> [--path=<path_2> ...]
 \end{lstlisting}
-\subsubsection{Options}
+\subsubsection*{Options}
 \begin{description}
 	\item[\YaHeiMono commit] 指定复制到工作区的文件来源，接受的值为任意一个commit的ID的前缀（可以自动补全）或者是版本指针（目前支持的有HEAD,index,master），默认值为index。
 	\item[\YaHeiMono path（默认参数）] 指定需要复制到工作区的文件（夹），如果没有指定任何一个文件，那么checkout将复制该commit的所有文件到工作区，并且将HEAD指针指向checkout的commit（如果commit参数为index则不改变HEAD指针）。
 \end{description}
 
 \subsection{config}
-\subsubsection{Introduction}
+\subsubsection*{Introduction}
 修改该仓库的配置，目前支持的仓库配置有用户名和用户的Email地址。
-\subsubsection{Usage}
+\subsubsection*{Usage}
 \begin{lstlisting}[language=sh,basicstyle=\small\YaHeiMono,numbers=none]
 sit config <key> <value>
 \end{lstlisting}
-\subsubsection{Options}
+\subsubsection*{Options}
 \begin{description}
 	\item[\YaHeiMono <key>] 修改配置的字段名
 	\item[\YaHeiMono <value>] 新的配置值
 \end{description}
 
 \subsection{commit}
-\subsubsection{Introduction}
+\subsubsection*{Introduction}
 将当前``.sit/index''文件中所记录的index信息写入版本仓库。
-\subsubsection{Usage}
+\subsubsection*{Usage}
 \begin{lstlisting}[language=sh,basicstyle=\small\YaHeiMono,numbers=none]
 sit commit  [--amend] [--all | -a] [--message | -m COMMIT_MSG]
 \end{lstlisting}
-\subsubsection{Options}
+\subsubsection*{Options}
 \begin{description}
 	\item[\YaHeiMono all,a] 等价于在执行commit操作之前先执行一次`add <REPO\_ROOT>'，其中REPO\_ROOT表示仓库的绝对路径。
 	\item[\YaHeiMono amend] 表示新的commit将取代原来的HEAD所指向的commit在版本链中的位置。\\\textbf{注意：如果没有amend参数，那么commit只有当HEAD指针与master指针相等的时候才会执行（为了保证版本链的唯一）。}
 	\item[\YaHeiMono message,m] 以参数的形式提供用于描述该commit改动的信息。
 \end{description}
 
-\subsubsection{diff}
-\subsubsection{Introduction}
+\subsection{diff}
+\subsubsection*{Introduction}
 比较两个commit的文件信息（或两个不同版本的同一文件（夹））的差异。
-\subsubsection{Usage}
+\subsubsection*{Usage}
 \begin{lstlisting}[language=sh,basicstyle=\small\YaHeiMono,numbers=none]
 sit diff [--base-id=<commit-id>] [--target-id=<commit-id>] [--path=<path> ...]
 \end{lstlisting}
-\subsubsection{Options}
+\subsubsection*{Options}
 \begin{description}
 	\item[\YaHeiMono base-id] 作为基准的commit的ID，默认值为index。
 	\item[\YaHeiMono target-id] 比较差异的commit的ID，默认值为work（即当前的工作区）。
@@ -299,41 +299,41 @@ sit diff [--base-id=<commit-id>] [--target-id=<commit-id>] [--path=<path> ...]
 \end{description}
 
 \subsection{gc}
-\subsubsection{Introduction}
+\subsubsection*{Introduction}
 删除那些``不再需要''的object，释放它们占用的硬盘空间。
-\subsubsection{Usage}
+\subsubsection*{Usage}
 \begin{lstlisting}[language=sh,basicstyle=\small\YaHeiMono,numbers=none]
 sit gc
 \end{lstlisting}
 
 \subsection{init}
-\subsubsection{Introduction}
+\subsubsection*{Introduction}
 在当前的工作目录下建立一个sit的版本仓库，如果已经存在了一个sit的版本仓库，那么将把这个版本仓库初始化（即删除再创建）。
-\subsubsection{Usage}
+\subsubsection*{Usage}
 \begin{lstlisting}[language=sh,basicstyle=\small\YaHeiMono,numbers=none]
 sit init
 \end{lstlisting}
 
 \subsection{log}
-\subsubsection{Introduction}
+\subsubsection*{Introduction}
 以当前HEAD指针指向的commit为最后的commit，输出该commit以及它的所有父版本的信息（作者，提交时间，提交信息）。
-\subsubsection{Usage}
+\subsubsection*{Usage}
 \begin{lstlisting}[language=sh,basicstyle=\small\YaHeiMono,numbers=none]
 sit log
 \end{lstlisting}
 
 \subsection{status}
-\subsubsection{Introduction}
+\subsubsection*{Introduction}
 将当前的工作区的index和HEAD指针所指向的commit的index进行比较，输出新增的文件，修改过的文件，被删除的文件。
-\subsubsection{Usage}
+\subsubsection*{Usage}
 \begin{lstlisting}[language=sh,basicstyle=\small\YaHeiMono,numbers=none]
 sit status
 \end{lstlisting}
 
 \subsection{reset}
-\subsubsection{Introduction}
+\subsubsection*{Introduction}
 将仓库中某个commit中保存的文件信息恢复到当前的index中。
-\subsubsection{Usage}
+\subsubsection*{Usage}
 reset命令有两种形式：
 \begin{lstlisting}[language=sh,basicstyle=\small\YaHeiMono,numbers=none]
 sit reset [--hard] [--commit=<commit-id>]
@@ -345,7 +345,7 @@ sit reset  [--commit=<commit-id>] --path=<path_1> [--path=<path_2> ...]
 第一种形式会将当前分支的版本指针移动到指定的commit上。（移动版本链的链表尾，操作后尾后的commit还会存在仓库中，此时执行gc命令将把这些commit相关的且没有被其他文件引用的objects清理掉。）
 
 第二种形式必须指定最少要恢复的文件，否则sit会将其解释为第一种形式。
-\subsubsection{Options}
+\subsubsection*{Options}
 \begin{description}
 	\item[\YaHeiMono hard] 如果给出``--hard''参数，那么reset命令在恢复index中的文件信息的同时，会从仓库中复制相应的文件到工作区。如果没有则reset命令只会对index进行修改。
 	\item[\YaHeiMono commit] 用于指定要恢复到index的文件信息来自于哪一个commit。
