@@ -4,6 +4,7 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{fontspec}
+\usepackage{graphicx}
 \setmainfont{Times New Roman}
 
 \definecolor{mygreen}{rgb}{0,0.6,0}
@@ -350,6 +351,39 @@ sit reset  [--commit=<commit-id>] --path=<path_1> [--path=<path_2> ...]
 	\item[\YaHeiMono path（默认参数）] 用于指定恢复哪些文件的信息。\textbf{注意：path参数和hard参数不能同时存在。如果必要的话，可以先后执行reset和checkout两个命令来满足要求。}
 \end{description}
 
-%TODO: add something about stress tests.
+\newpage
+\section{压力测试}
+从github上获取redis 2.4的版本仓库用于测试git与sit的时空效率。
+\subsection{测试方法}
+在redis中以master分支为基准，找出一条版本链，如果这个版本是merge得到的，那么就选择它的第一个父版本。然后将版本链上的每一个版本checkout，然后执行add和commit命令，同时监控其CPU时间的消耗。
+\subsection{空间占用}
+把所有的文件都add和commit到仓库中后分别查看``.sit''和``.git''文件夹的大小。
+\begin{center}
+\begin{tabular}{|l|r|r|}
+\hline
+                         & 仓库大小 & 相对大小\\
+\hline
+.git                     & 94324 kB           &   100\% \\
+\hline
+.sit(with compression)   & 82180 kB           &  87.1\% \\
+\hline
+.sit(without compression)& 264004 kB          & 279.9\% \\
+\hline
+\end{tabular}
+\end{center}
+\subsection{时间使用}
+比较了sit（有无压缩功能）与git的时间效率（结果见后图）。
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.7]{figure_1.png}
+	\caption{单次commit操作所需要的时间}
+	\centering
+	\includegraphics[scale=0.7]{figure_2.png}
+	\caption{耗去的总时间}
+\end{figure}
+\subsection{结论}
+从时间和空间的测试结果可以初步得出结论：在不支持压缩的情况下，sit比git运行的更快，当仓库占用的空间比较可怕，大约是git的2.8倍；支持压缩的sit的运行速度明显下降，相对git略慢，但是在空间效率上比git更好。
 
+\section{总结}
+在这个编写这个项目的过程中，遇到了不少的困难。考虑到用户的使用体验，我们在设计参数和处理命令的时候增加了很多人性化的设计。就目前来说sit中大量使用了C++STL中的模版来存储各类信息，同时为了保证多平台的支持，使用了boost库来实现与文件系统的交互，因此，在效率上还有一定的提升空间。当然，目前sit的功能还比较孱弱，有一些不人性化的处理还有待完善。
 \end{document}
