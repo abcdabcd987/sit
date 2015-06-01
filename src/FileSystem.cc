@@ -95,17 +95,21 @@ std::string DecompressRead(const boost::filesystem::path &src)
 void CompressCopy(const boost::filesystem::path &src, const boost::filesystem::path &dst)
 {
 	using namespace boost::filesystem;
+	create_directories(dst.parent_path());
 	copy_file(src, dst, copy_option::overwrite_if_exists);
 }
 
 void CompressWrite(const boost::filesystem::path &dst, const std::string &content)
 {
+	using namespace boost::filesystem;
+	create_directories(dst.parent_path());
 	Write(dst, content);
 }
 
 void DecompressCopy(const boost::filesystem::path &src, const boost::filesystem::path &dst)
 {
 	using namespace boost::filesystem;
+	create_directories(dst.parent_path());
 	copy_file(src, dst, copy_option::overwrite_if_exists);
 }
 
