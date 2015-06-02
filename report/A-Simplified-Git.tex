@@ -9,6 +9,22 @@
 \usepackage{extramarks}
 \setmainfont{Times New Roman}
 
+\usepackage{tikz}
+\usepackage{wallpaper}
+\newcommand\BackgroundPicture{%
+  \put(0,0){%
+    \parbox[b][\paperheight]{\paperwidth}{%
+      \vfill
+      \centering%
+        \begin{tikzpicture}[remember picture,overlay]
+        \node [rotate=0,scale=1.1,text opacity=0.05] at (current page.center)
+        { 
+        	\includegraphics{SJTU_BLUE.png}       %\copyright XXX Powered by~\LaTeX
+        };
+        \end{tikzpicture}%
+%      \vfill
+    }}}
+
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \definecolor{mygray}{rgb}{0.5,0.5,0.5}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
@@ -49,9 +65,13 @@
 \title{可持久化本地代码仓库——sit}
 \author{柯嵩宇\quad 陈乐群 \\ 2014级ACM班 \\ 上海交通大学}
 
-\fancyhead[L]{}
+\fancyhead[L]{\textit{sit项目介绍}}
+\fancyhead[C]{ACM班数据结构大作业(2015)}
+\addtolength{\headheight}{12pt}
 
 \begin{document}
+\AddToShipoutPicture{\BackgroundPicture}
+
 \pagestyle{fancy}
 \maketitle
 {\small \tableofcontents}
