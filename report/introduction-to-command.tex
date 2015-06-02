@@ -1,0 +1,146 @@
+\section{命令介绍}
+sit使用了boost中的program\_options模块来格式化处理命令行参数。除了非默认参数外，其余参数在使用时均需要满足下列格式之一：
+\begin{lstlisting}[language=sh]
+--<option_name>=<option_value>
+-<option_abbr>=<option_value>
+\end{lstlisting}
+
+其中等号可以用空格代替。默认参数可以省略掉等号前面的部分。
+
+下文提到的{\YaHeiMono <commit-id>}都代表此处接受某个commit的SHA1值的足够长的前缀或版本指针的名字（如HEAD,index,work,master）。
+\subsection{add}
+\subsubsection* {Introduction}
+把文件内容加入到index
+\subsubsection*{Usage}
+\begin{lstlisting}[language=sh]
+sit add <path_1> [<path_2> ...]
+\end{lstlisting}
+\subsubsection*{Options}
+\begin{description}
+	\item[\YaHeiMono <path>（默认参数）] 要加入index的文件（或文件夹，如果是文件夹将递归加入该文件夹下所有的子文件（夹））
+\end{description}
+
+\subsection{checkout}
+\subsubsection*{Introduction}
+将代码库/index中的文件解压并复制到当前的工作区中。
+\subsubsection*{Usage}
+checkout命令有两种基本形式：
+\begin{lstlisting}[language=sh]
+sit chekcout [--commit=<commit-id>]
+\end{lstlisting}
+\begin{lstlisting}[language=sh]
+sit checkout [--commit=<commit-id>] --path=<path_1> [--path=<path_2> ...]
+\end{lstlisting}
+\subsubsection*{Options}
+\begin{description}
+	\item[\YaHeiMono commit] 指定复制到工作区的文件来源，接受的值为任意一个commit的ID的前缀（可以自动补全）或者是版本指针（目前支持的有HEAD,index,master），默认值为index。
+	\item[\YaHeiMono path（默认参数）] 指定需要复制到工作区的文件（夹），如果没有指定任何一个文件，那么checkout将复制该commit的所有文件到工作区，并且将HEAD指针指向checkout的commit（如果commit参数为index则不改变HEAD指针）。
+\end{description}
+
+\subsection{config}
+\subsubsection*{Introduction}
+修改该仓库的配置，目前支持的仓库配置有用户名和用户的Email地址（user.name和user.email）。
+\subsubsection*{Usage}
+\begin{lstlisting}[language=sh]
+sit config <key> <value>
+\end{lstlisting}
+\subsubsection*{Options}
+\begin{description}
+	\item[\YaHeiMono <key>] 修改配置的字段名
+	\item[\YaHeiMono <value>] 新的配置值
+\end{description}
+
+\subsection{commit}
+\subsubsection*{Introduction}
+将当前``.sit/index''文件中记录的文件信息写入仓库。
+\subsubsection*{Usage}
+\begin{lstlisting}[language=sh]
+sit commit  [--amend] [--all | -a] [--message | -m COMMIT_MSG]
+\end{lstlisting}
+\subsubsection*{Options}
+\begin{description}
+	\item[\YaHeiMono all,a] 等价于在执行commit操作之前先执行一次`add <REPO\_ROOT>'，其中REPO\_ROOT表示仓库的绝对路径。
+	\item[\YaHeiMono amend] 表示新的commit将取代原来的HEAD所指向的commit在版本链中的位置。\\\textbf{注意：如果没有amend参数，那么commit只有当HEAD指针与master指针相等的时候才会执行（为了保证版本链的唯一）。}
+	\item[\YaHeiMono message,m] 以参数的形式提供用于描述该commit改动的信息。
+\end{description}
+
+\subsection{diff}
+\subsubsection*{Introduction}
+比较两个commit的文件信息（或两个不同版本的同一文件（夹））的差异。
+\subsubsection*{Usage}
+\begin{lstlisting}[language=sh]
+sit diff [--base-id=<commit-id>] [--target-id=<commit-id>] [--path=<path> ...]
+\end{lstlisting}
+\subsubsection*{Options}
+\begin{description}
+	\item[\YaHeiMono base-id] 作为基准的commit的ID，默认值为index。
+	\item[\YaHeiMono target-id] 比较差异的commit的ID，默认值为work（即当前的工作区）。
+	\item[\YaHeiMono path（默认参数）] 用于指定需要比较的文件（夹），如果没有指定任何一个文件，那么将比较两个版本的index以及每一个有修改的文件。
+\end{description}
+
+\subsection{gc}
+\subsubsection*{Introduction}
+删除那些``不再需要''的objects，释放它们占用的硬盘空间。
+\subsubsection*{Usage}
+\begin{lstlisting}[language=sh]
+sit gc
+\end{lstlisting}
+
+\subsection{init}
+\subsubsection*{Introduction}
+在当前的工作目录下建立一个sit的版本仓库，如果已经存在了一个sit的版本仓库，那么将把这个版本仓库删除后再创建
+（即初始化）。
+\subsubsection*{Usage}
+\begin{lstlisting}[language=sh]
+sit init
+\end{lstlisting}
+
+\subsection{log}
+\subsubsection*{Introduction}
+以当前HEAD指针指向的commit为最后的commit，输出该commit以及它的所有父版本的信息（作者，提交时间，提交信息）。
+\subsubsection*{Usage}
+\begin{lstlisting}[language=sh]
+sit log
+\end{lstlisting}
+
+\subsection{status}
+\subsubsection*{Introduction}
+将当前的工作区的index和HEAD指针所指向的commit的index进行比较，分别输出新增的文件、被修改的文件、被删除的文件的列表。
+\subsubsection*{Usage}
+\begin{lstlisting}[language=sh]
+sit status
+\end{lstlisting}
+
+\subsection{reset}
+\subsubsection*{Introduction}
+将仓库中某个commit中保存的文件信息恢复到当前的index中。
+\subsubsection*{Usage}
+reset命令有两种形式：
+\begin{lstlisting}[language=sh]
+sit reset [--hard] [--commit=<commit-id>]
+\end{lstlisting}
+\begin{lstlisting}[language=sh]
+sit reset  [--commit=<commit-id>] --path=<path_1> [--path=<path_2> ...]
+\end{lstlisting}
+
+第一种形式会将当前分支的版本指针移动到指定的commit上。（移动版本链的链表尾，操作后尾后的commit还会存在仓库中，此时执行gc命令将把这些commit相关的且没有被其他文件引用的objects清理掉。）
+
+第二种形式必须指定最少要恢复的文件，否则sit会将其解释为第一种形式。
+\subsubsection*{Options}
+\begin{description}
+	\item[\YaHeiMono hard] 如果给出``--hard''参数，那么reset命令在恢复index中的文件信息的同时，会从仓库中复制相应的文件到工作区。如果没有则reset命令只会对index进行修改。
+	\item[\YaHeiMono commit] 用于指定要恢复到index的文件信息来自于哪一个commit，默认值为HEAD。
+	\item[\YaHeiMono path（默认参数）] 用于指定恢复哪些文件的信息。\textbf{注意：path参数和hard参数不能同时存在。如果必要的话，可以先后执行reset和checkout两个命令来满足要求。}
+\end{description}
+
+\subsection{rm}
+\subsubsection*{Introduction}
+把文件（夹）的记录从index中移除，不会修改工作区的文件（夹）。
+\subsubsection*{Usage}
+\begin{lstlisting}[language=sh]
+sit rm --path=<path_1> [--path=<path_2> ...]
+\end{lstlisting}
+\subsubsection*{Options}
+\begin{description}
+	\item[\YaHeiMono path（默认参数）] 表示要从index中移除的文件（夹）。
+\end{description}
