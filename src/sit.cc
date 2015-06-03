@@ -310,6 +310,7 @@ int main(int argc, char** argv)
 {
 	try {
 		if (argc > 1) {
+			DISPATCHER(help);
 			DISPATCHER(init);
 			Sit::Core::LoadRepo();
 
