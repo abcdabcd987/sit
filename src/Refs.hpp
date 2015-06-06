@@ -1,31 +1,12 @@
 #ifndef _SRC_REFS_HPP
 #define _SRC_REFS_HPP
 
-#include <unordered_map>
 #include <string>
 
 namespace Sit {
 namespace Refs {
 
 extern const std::string EMPTY_REF;
-
-using RefMap = std::unordered_map<std::string, std::string>;
-extern RefMap branchList;
-
-/*
- * Load all branches from `.sit/refs/`
- */
-void LoadBranch();
-
-/*
- * return which branch `HEAD` is located now.
- */
-const std::string &CurBranch();
-
-/*
- * set current branch to `branchName`
- */
-void SetBranch(const std::string &branchName);
 
 /**
  * `name` => `refs/heads/name`

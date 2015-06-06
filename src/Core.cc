@@ -59,7 +59,6 @@ void LoadRepo()
 		if (is_directory(curPath / ".sit")) {
 			FileSystem::REPO_ROOT = curPath;
 			Index::index.Load();
-			Refs::LoadBranch();
 			return ;
 		}
 		curPath = curPath.parent_path();
@@ -94,23 +93,18 @@ std::string addFile(const boost::filesystem::path &file)
 
 void Add(const boost::filesystem::path &path)
 {
+	auto rmCount = Index::index.Remove(FileSystem::GetRelativePath(path));
+	if (!FileSystem::IsExist(path) && rmCount > 0) {
+		return;
+	} else if (!FileSystem::IsExist(path) && rmCount == 0) {
+		throw Util::SitException("Fatal: No such a record.");
+	}
 	auto fileList = FileSystem::ListRecursive(path, true, false);
 	for (const auto &file : fileList) {
 		if (FileSystem::IsDirectory(file)) {
 			continue;
 		}
-		boost::filesystem::path relativePath = FileSystem::GetRelativePath(file);
-
-		std::time_t curFileTime = boost::filesystem::last_write_time(file);
-		std::time_t existedFileTime = 0;
-		if (Index::index.GetIndex().count(relativePath) > 0) {
-			existedFileTime = boost::filesystem::last_write_time(Objects::GetPath(Index::index.GetID(relativePath)));
-		}
-		if (curFileTime == existedFileTime) {
-			//std::cout << file << " is same as it in index." << std::endl;
-			continue;
-		}
-
+		auto relativePath = FileSystem::GetRelativePath(file);
 		Index::index.Insert(relativePath, addFile(file));
 	}
 
@@ -144,7 +138,7 @@ std::string getCommitMessage()
 void amend(const std::string &oldid, const std::string &newid)
 {
 	std::vector<std::pair<std::string, Objects::Commit>> olds;
-	for (std::string id(Refs::Get("master")); id != oldid; ) {
+	for (std::string id(Refs::Get(Refs::Local("master"))); id != oldid; ) {
 		const Objects::Commit commit(Objects::GetCommit(id));
 		olds.push_back(std::make_pair(id, commit));
 		id = commit.parent;
@@ -166,7 +160,7 @@ void Commit(const std::string &msg, const bool isAmend)
 	using boost::posix_time::second_clock;
 
 	const std::string headref(Refs::Get("HEAD"));
-	const std::string masterref(Refs::Get("master"));
+	const std::string masterref(Refs::Get(Refs::Local("master")));
 
 	Objects::Commit commit;
 
@@ -182,11 +176,11 @@ void Commit(const std::string &msg, const bool isAmend)
 	}
 	const std::string user_name = Config::Get("user.name");
 	if (user_name == Config::NOT_FOUND) {
-		throw SitException("Config `user.name` not found.", "config: user.name");
+		throw SitException("`user.name` not found in configuration file.\n`sit config user.name <your name>` may help.", "config: user.name");
 	}
 	const std::string user_email = Config::Get("user.email");
 	if (user_email == Config::NOT_FOUND) {
-		throw SitException("Config `user.email` not found.", "config: user.email");
+		throw SitException("`user.email` not found in configuration file.\n`sit config user.email <your email>` may help.", "config: user.email");
 	}
 
 	const std::string datetime(to_simple_string(second_clock::local_time()));
@@ -204,7 +198,7 @@ void Commit(const std::string &msg, const bool isAmend)
 	const std::string id(Objects::WriteCommit(commit));
 
 	if (!isAmend) {
-		Refs::Set("master", id);
+		Refs::Set(Refs::Local("master"), id);
 	} else {
 		amend(headref, id);
 	}
@@ -219,16 +213,17 @@ void Status()
 void Checkout(std::string commitid, std::string filename)
 {
 	commitid = Util::SHA1Complete(commitid);
-	if (!commitid.empty() && !Objects::IsExist(commitid)) {
-		std::cerr << "Error: Commit " << commitid << " doesn't exist." << std::endl;
-		return;
-	}
 	if (commitid == "master") {
-		commitid = Refs::Get("master");
+		commitid = Refs::Get(Refs::Local("master"));
 	} else if (commitid == "HEAD") {
 		commitid = Refs::Get("HEAD");
 	} else if (commitid == "index") {
 		commitid = "";
+	} else {
+		if (!commitid.empty() && !Objects::IsExist(commitid)) {
+			std::cerr << "Error: Commit " << commitid << " doesn't exist." << std::endl;
+			return;
+		}
 	}
 	if (!filename.empty()) {
 		filename = FileSystem::GetRelativePath(filename).generic_string();
@@ -308,7 +303,7 @@ void printLog(std::ostream &out, const Objects::Commit &commit, const std::strin
 void Log(std::string id)
 {
 	if (id == "master") {
-		id = Refs::Get("master");
+		id = Refs::Get(Refs::Local("master"));
 		while (id != Refs::EMPTY_REF) {
 			Objects::Commit commit(Objects::GetCommit(id));
 			printLog(std::cout, commit, id);
@@ -352,7 +347,7 @@ void resetSingleFile(std::ostream &stream, const std::string &filename, const st
 void Reset(std::ostream &stream, std::string id, std::string filename)
 {
 	if (id == "master") {
-		id = Refs::Get("master");
+		id = Refs::Get(Refs::Local("master"));
 	} else if (id == "HEAD" || id.empty()) {
 		id = Refs::Get("HEAD");
 	}
@@ -386,7 +381,7 @@ void Reset(std::ostream &stream, std::string id, std::string filename)
 void Reset(std::ostream &stream, std::string id, const bool isHard)
 {
 	if (id == "master") {
-		id = Refs::Get("master");
+		id = Refs::Get(Refs::Local("master"));
 	} else if (id == "HEAD" || id.empty()) {
 		id = Refs::Get("HEAD");
 	}
@@ -420,8 +415,7 @@ void Reset(std::ostream &stream, std::string id, const bool isHard)
 		}
 	}
 	Index::index.Save();
-	Refs::Set("master", id);
-	Refs::Set("HEAD", "master");
+	Refs::Set(Refs::Local("master"), id);
 }
 
 void Diff(const std::string &baseID, const std::string &targetID)
@@ -458,10 +452,7 @@ void Diff(const std::string &baseID, const std::string &targetID, const std::vec
 	}
 	for (const auto &file : AllFile) {
 		const auto &item = diff.at(file);
-		std::cout << "Diffing at " << file << std::endl;
-		if (item.status == Diff::Same) {
-			std::cout << "  No difference between two version" << std::endl;
-		} else {
+		if (item.status != Diff::Same) {
 			Diff::DiffObject(std::cout, item, baseID, targetID);
 		}
 	}

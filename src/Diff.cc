@@ -212,7 +212,6 @@ void DiffObject(std::ostream &out, const DiffItem &item,
 	    << Color::WHITE << "--- a/" << item.path.generic_string() << Color::RESET << std::endl
 	    << Color::WHITE << "+++ b/" << item.path.generic_string() << Color::RESET << std::endl;
 
-	// TODO: simplify the diff string
 	int baseEnd = base.size(), targetEnd = target.size();
 
 	sol.push_back(std::make_pair(baseEnd, targetEnd)); // padding

@@ -67,6 +67,9 @@ void IndexBase::Insert(const boost::filesystem::path &file, const std::string &c
 
 unsigned IndexBase::Remove(const boost::filesystem::path &path)
 {
+	if (path.empty()) {
+		_index.clear();
+	}
 	unsigned rmCount = 0;
 	try {
 		auto newPath = path.relative_path();

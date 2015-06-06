@@ -88,6 +88,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="D:\SDK\zlib-1.2.8\zdll.lib" />
+    <Library Include="D:\SDK\zlib-1.2.8\contrib\vstudio\vc11\x86\ZlibStatRelease\zlibstat.lib" />
   </ItemGroup>
 </Project>
