@@ -87,6 +87,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Color.hpp" />
+    <ClInclude Include="Commit.hpp" />
     <ClInclude Include="Config.hpp" />
     <ClInclude Include="Core.hpp" />
     <ClInclude Include="Diff.hpp" />
@@ -100,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Color.cc" />
+    <ClCompile Include="Commit.cc" />
     <ClCompile Include="Config.cc" />
     <ClCompile Include="Core.cc" />
     <ClCompile Include="Diff.cc" />

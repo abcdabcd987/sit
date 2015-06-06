@@ -210,18 +210,18 @@ void Status()
 	Status::PrintStatus(std::cout);
 }
 
-void Checkout(std::string commitid, std::string filename)
+void Checkout(std::string commitID, std::string filename)
 {
-	commitid = Util::SHA1Complete(commitid);
-	if (commitid == "master") {
-		commitid = Refs::Get(Refs::Local("master"));
-	} else if (commitid == "HEAD") {
-		commitid = Refs::Get("HEAD");
-	} else if (commitid == "index") {
-		commitid = "";
+	commitID = Util::SHA1Complete(commitID);
+	if (commitID == "master") {
+		commitID = Refs::Get(Refs::Local("master"));
+	} else if (commitID == "HEAD") {
+		commitID = Refs::Get("HEAD");
+	} else if (commitID == "index") {
+		commitID = "";
 	} else {
-		if (!commitid.empty() && !Objects::IsExist(commitid)) {
-			std::cerr << "Error: Commit " << commitid << " doesn't exist." << std::endl;
+		if (!commitID.empty() && !Objects::IsExist(commitID)) {
+			std::cerr << "Error: Commit " << commitID << " doesn't exist." << std::endl;
 			return;
 		}
 	}
@@ -229,10 +229,10 @@ void Checkout(std::string commitid, std::string filename)
 		filename = FileSystem::GetRelativePath(filename).generic_string();
 	}
 	Index::IndexBase index;
-	if (commitid.empty()) {
+	if (commitID.empty()) {
 		index = Index::index;
 	} else {
-		index = Index::CommitIndex(commitid);
+		index = Index::CommitIndex(commitID);
 	}
 	const auto &idx(index.GetIndex());
 
@@ -254,8 +254,8 @@ void Checkout(std::string commitid, std::string filename)
 		}
 
 		Index::index.Save();
-		if (!commitid.empty()) {
-			Refs::Set("HEAD", commitid);
+		if (!commitID.empty()) {
+			Refs::Set("HEAD", commitID);
 		}
 	} else {
 		// File Checkout
