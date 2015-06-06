@@ -30,6 +30,8 @@ struct Commit {
 };
 
 void WriteCommit(const Commit &commit);
+Commit ReadCommit(const std::string &commitID);
+
 }
 }
 
