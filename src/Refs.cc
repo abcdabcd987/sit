@@ -1,4 +1,5 @@
 #include "Refs.hpp"
+#include "Commit.hpp"
 #include "FileSystem.hpp"
 #include "Util.hpp"
 #include <boost/algorithm/string.hpp>
@@ -6,29 +7,116 @@
 namespace Sit {
 namespace Refs {
 
-const std::string EMPTY_REF("0000000000000000000000000000000000000000");
+BranchList branches;
+std::string whichBranch;
 
-std::string Local(const std::string& name)
+boost::filesystem::path GetBranchPath(const std::string &ref)
 {
-	return std::string("refs/heads/") + name;
+	return FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "refs/heads" / ref;
 }
 
-std::string Get(const std::string& path)
+void LoadLocalBranch()
 {
-	const auto filepath(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / path);
-	if (!FileSystem::IsFile(filepath)) {
-		throw Util::SitException(std::string("Ref not exist: ") + path);
+	using namespace FileSystem;
+	auto refFileList = ListRecursive(REPO_ROOT / SIT_ROOT / "refs/heads", false, false);
+	for (const auto &file : refFileList) {
+		if (!IsDirectory(file)) {
+			const std::string commitID = Read(file);
+			const std::string branchName = GetRelativePath(file).filename().generic_string();
+			branches.insert(std::make_pair(branchName, commitID));
+		}
 	}
-	std::string id(FileSystem::Read(filepath));
-	boost::trim(id);
-	return id;
+
+	std::string headref = Read(REPO_ROOT / SIT_ROOT / "HEAD");
+	if (headref.substr(0, 4) == "ref:") {
+		//ref: refs/heads/master
+		headref.erase(0, 16);
+		boost::trim(headref);
+		whichBranch = headref;
+	} else {
+		branches.insert(std::make_pair("HEAD", headref));
+	}
 }
 
+void LoadLocalRefs()
+{
+	LoadLocalBranch();
+}
+
+std::string Get(const std::string& ref)
+{
+	if (ref == "HEAD") {
+		if (whichBranch.empty()) {
+			return branches.at("HEAD");
+		} else {
+			return branches.at(whichBranch);
+		}
+	} else {
+		if (branches.count(ref) > 0) {
+			return branches.at(ref);
+		} else {
+			throw Util::SitException("Fatal: No such a branch.");
+		}
+	}
+	return Commit::EMPTY_COMMIT;
+}
+
+void updateHEAD()
+{
+	if (branches.count("HEAD") > 0) {
+		const std::string headID = branches["HEAD"];
+		for (const auto &branch : branches) {
+			if (branch.first == "HEAD") {
+				continue;
+			} else {
+				if (branch.second == headID) {
+					whichBranch = branch.first;
+					branches.erase("HEAD");
+					return;
+				}
+			}
+		}
+		whichBranch = "";
+	}
+}
 void Set(const std::string& ref, const std::string& id)
 {
-	const auto path(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / ref);
-	FileSystem::Write(path, id);
+	if (ref == "HEAD") {
+		for (const auto &branch : branches) {
+			if (branch.first == "HEAD") {
+				continue;
+			} else {
+				if (branch.second == id) {
+					whichBranch = branch.first;
+					return;
+				}
+			}
+		}
+		branches["HEAD"] = id;
+		FileSystem::Write(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "HEAD", id);
+		whichBranch = "";
+	} else {
+		branches[ref] = id;
+		FileSystem::Write(GetBranchPath(ref), id);
+		updateHEAD();
+	}
 }
 
+void NewBranch(const std::string &branchName, const std::string &id)
+{
+	if (branches.count(branchName) > 0) {
+		throw Util::SitException("Fatal: There is a branch with the same name existed.");
+	}
+	branches.insert(std::make_pair(branchName, id));
+}
+
+void DelBranch(const std::string &branchName)
+{
+	if (branches.count(branchName) > 0) {
+		branches.erase(branchName);
+	} else {
+		throw Util::SitException("Fatal: No such a branch.");
+	}
+}
 }
 }

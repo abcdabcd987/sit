@@ -9,6 +9,8 @@
 namespace Sit {
 namespace Objects {
 
+extern const std::string EMPTY_OBJECT;
+
 /**
  * Object type
  */

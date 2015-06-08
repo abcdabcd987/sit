@@ -13,8 +13,7 @@ const boost::filesystem::path COMMIT_DIR("commits");
 
 boost::filesystem::path GetPath(std::string commitID)
 {
-	commitID[8] = '/';
-	return FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / COMMIT_DIR / commitID;
+	return FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / COMMIT_DIR / commitID.substr(0, 4) / commitID.substr(4);
 }
 
 bool IsExist(std::string commitID)
@@ -25,7 +24,11 @@ bool IsExist(std::string commitID)
 
 std::string NewCommitID()
 {
-	return boost::uuids::to_string(generator());
+	std::string newID;
+	do {
+		newID = boost::uuids::to_string(generator());
+	} while (!IsExist(newID));
+	return newID;
 }
 
 void WriteCommit(const Commit &commit)
@@ -37,8 +40,8 @@ void WriteCommit(const Commit &commit)
 	}
 	oss << "\n"
 		<< "child";
-	for (const auto &ch : commit.child) {
-		oss << " " << ch;
+	for (const auto &child : commit.child) {
+		oss << " " << child;
 	}
 	oss << "\n"
 		<< "tree " << commit.tree << "\n"

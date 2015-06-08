@@ -2,6 +2,7 @@
 #include "Index.hpp"
 #include "Util.hpp"
 #include "FileSystem.hpp"
+#include "Commit.hpp"
 
 #include <iostream>
 
@@ -158,10 +159,10 @@ void CommitIndex::flattenTree(const Objects::Tree &tree, const boost::filesystem
 
 void CommitIndex::load(const std::string& id)
 {
-	if (id == Refs::EMPTY_REF) {
+	if (id == Commit::EMPTY_COMMIT) {
 		return ;
 	}
-	const Objects::Commit commit(Objects::GetCommit(id));
+	const Commit::Commit commit = Commit::ReadCommit(id);
 	const Objects::Tree tree(Objects::GetTree(commit.tree));
 	flattenTree(tree, "");
 }

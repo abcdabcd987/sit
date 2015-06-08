@@ -12,6 +12,8 @@
 namespace Sit {
 namespace Objects {
 
+const std::string EMPTY_OBJECT("00000000000000000000000000000000000000");
+
 boost::filesystem::path GetPath(const std::string& id)
 {
 	return FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR / id.substr(0, 2) / id.substr(2);

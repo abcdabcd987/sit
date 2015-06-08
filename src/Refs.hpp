@@ -2,11 +2,19 @@
 #define _SRC_REFS_HPP
 
 #include <string>
+#include <map>
 
 namespace Sit {
 namespace Refs {
 
-extern const std::string EMPTY_REF;
+using BranchList = std::map<std::string, std::string>;
+extern BranchList branches;
+extern std::string whichBranch;
+
+void LoadLocalBranch();
+void LoadLocalRefs();
+void NewBranch(const std::string &branchName, const std::string &id);
+void DelBranch(const std::string &branchName);
 
 /**
  * `name` => `refs/heads/name`

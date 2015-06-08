@@ -7,6 +7,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "Core.hpp"
+#include "Commit.hpp"
 #include "FileSystem.hpp"
 #include "Util.hpp"
 #include "Index.hpp"
@@ -33,17 +34,25 @@ void Init()
 				throw Util::SitException("Fatal: .sit is existed but not a directory please check it.");
 			}
 		}
+
 		create_directories(".sit");
 #ifdef WIN32
 		SetFileAttributes(L".sit", FILE_ATTRIBUTE_HIDDEN);
 #endif
+		create_directories(".sit/commits");
 		create_directories(".sit/refs");
 		create_directories(".sit/refs/heads");
 		create_directories(".sit/objects");
-		FileSystem::Write(".sit/HEAD", Refs::EMPTY_REF);
+		FileSystem::Write(".sit/HEAD", "ref: refs/heads/master");
 		FileSystem::Write(".sit/COMMIT_MSG", "");
 		FileSystem::Write(".sit/config", "");
-		FileSystem::Write(".sit/refs/heads/master", Refs::EMPTY_REF);
+		FileSystem::Write(".sit/refs/heads/master", Commit::EMPTY_COMMIT);
+
+		Commit::Commit commit;
+		commit.selfID = Commit::EMPTY_COMMIT;
+		commit.tree = Objects::EMPTY_OBJECT;
+		Commit::WriteCommit(commit);
+
 	} catch (const boost::filesystem::filesystem_error &fe) {
 		std::cerr << fe.what() << std::endl;
 	} catch (const std::exception &stdEc) {
@@ -135,41 +144,29 @@ std::string getCommitMessage()
 	return out.str();
 }
 
-void amend(const std::string &oldid, const std::string &newid)
-{
-	std::vector<std::pair<std::string, Objects::Commit>> olds;
-	for (std::string id(Refs::Get(Refs::Local("master"))); id != oldid; ) {
-		const Objects::Commit commit(Objects::GetCommit(id));
-		olds.push_back(std::make_pair(id, commit));
-		id = commit.parent;
-	}
-
-	std::string last = newid;
-	for (auto iter = olds.rbegin(); iter != olds.rend(); ++iter) {
-		iter->second.parent = last;
-		last = Objects::WriteCommit(iter->second);
-	}
-
-	Refs::Set(Refs::Local("master"), last);
-}
-
 void Commit(const std::string &msg, const bool isAmend)
 {
 	using Util::SitException;
 	using boost::posix_time::to_simple_string;
 	using boost::posix_time::second_clock;
 
-	const std::string headref(Refs::Get("HEAD"));
-	const std::string masterref(Refs::Get(Refs::Local("master")));
+	Commit::Commit commit;
+	Commit::Commit parentCommit;
 
-	Objects::Commit commit;
-
-	if (headref != masterref && !isAmend) {
-		throw SitException("HEAD is not up-to-date with master. Cannot commit.");
+	if (Refs::whichBranch.empty() && !isAmend) {
+		throw SitException("HEAD is not up-to-date with any branch. Cannot commit.");
 	}
 	if (!FileSystem::IsFile(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "COMMIT_MSG")) {
 		throw SitException("Commit message not found.");
 	}
+	if (isAmend) {
+		commit = Commit::ReadCommit(Refs::Get("HEAD"));
+	} else {
+		commit.selfID = Commit::NewCommitID();
+		parentCommit = Commit::ReadCommit(Refs::Get("HEAD"));
+		commit.parent.push_back(parentCommit.selfID);
+	}
+
 	commit.message = msg.empty() ? getCommitMessage() : msg;
 	if (commit.message.empty()) {
 		throw SitException("Commit message is empty.");
@@ -187,22 +184,16 @@ void Commit(const std::string &msg, const bool isAmend)
 	commit.author = Util::AuthorString(user_name, user_email, datetime);
 	commit.committer = Util::AuthorString(user_name, user_email, datetime);
 
-	if (!isAmend) {
-		commit.parent = masterref;
-	} else {
-		const Objects::Commit oldcommit(Objects::GetCommit(headref));
-		commit.parent = oldcommit.parent;
-	}
 	commit.tree = Objects::WriteIndex();
 
-	const std::string id(Objects::WriteCommit(commit));
+	Commit::WriteCommit(commit);
+
+	parentCommit.child.push_back(commit.selfID);
+	Commit::WriteCommit(commit);
 
 	if (!isAmend) {
-		Refs::Set(Refs::Local("master"), id);
-	} else {
-		amend(headref, id);
+		Refs::Set(Refs::whichBranch, commit.selfID);
 	}
-	Refs::Set("HEAD", id);
 }
 
 void Status()
@@ -214,7 +205,7 @@ void Checkout(std::string commitID, std::string filename)
 {
 	commitID = Util::SHA1Complete(commitID);
 	if (commitID == "master") {
-		commitID = Refs::Get(Refs::Local("master"));
+		commitID = Refs::Get("master");
 	} else if (commitID == "HEAD") {
 		commitID = Refs::Get("HEAD");
 	} else if (commitID == "index") {
@@ -411,11 +402,11 @@ void Reset(std::ostream &stream, std::string id, const bool isHard)
 		if (inCommit) {
 			resetSingleFile(stream, anyfile.first, commitIndex.GetID(anyfile.first), inCommit, inIndex, isHard);
 		} else {
-			resetSingleFile(stream, anyfile.first, Refs::EMPTY_REF, inCommit, inIndex, isHard);
+			resetSingleFile(stream, anyfile.first, Objects::EMPTY_OBJECT, inCommit, inIndex, isHard);
 		}
 	}
 	Index::index.Save();
-	Refs::Set(Refs::Local("master"), id);
+	Refs::Set(Refs::whichBranch, id);
 }
 
 void Diff(const std::string &baseID, const std::string &targetID)
