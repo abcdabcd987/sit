@@ -167,7 +167,7 @@ void Commit(const std::string &msg, const bool isAmend)
 	} else {
 		commit.selfID = Commit::NewCommitID();
 		parentCommit = Commit::ReadCommit(Refs::Get("HEAD"));
-		commit.parent.push_back(parentCommit.selfID);
+		commit.pred.push_back(parentCommit.selfID);
 	}
 
 	commit.message = msg.empty() ? getCommitMessage() : msg;
@@ -191,7 +191,7 @@ void Commit(const std::string &msg, const bool isAmend)
 
 	Commit::WriteCommit(commit);
 
-	parentCommit.child.push_back(commit.selfID);
+	parentCommit.succ.push_back(commit.selfID);
 	Commit::WriteCommit(parentCommit);
 
 	if (!isAmend) {
@@ -204,7 +204,7 @@ void Status()
 	Status::PrintStatus(std::cout);
 }
 
-void Checkout(std::string commitID, std::string filename)
+void Checkout(std::string commitID, std::string filename, const std::string &branchName)
 {
 	commitID = Commit::CommitIDComplete(commitID);
 	if (commitID == "index") {
@@ -244,6 +244,9 @@ void Checkout(std::string commitID, std::string filename)
 		}
 
 		Index::index.Save();
+		if (!branchName.empty()) {
+			Refs::NewBranch(branchName, commitID);
+		}
 		if (!commitID.empty()) {
 			Refs::Set("HEAD", commitID);
 		}
@@ -297,7 +300,7 @@ void Log(std::string id)
 		while (id != Commit::EMPTY_COMMIT) {
 			Commit::Commit commit = Commit::ReadCommit(id);
 			printLog(std::cout, commit, id);
-			id = commit.parent.front();
+			id = commit.pred.front();
 		}
 	} else {
 		Commit::Commit commit = Commit::ReadCommit(id);
@@ -399,7 +402,12 @@ void Reset(std::string id, const bool isHard)
 		}
 	}
 	Index::index.Save();
-	Refs::Set(Refs::whichBranch, id);
+
+	if (!Refs::whichBranch.empty()) {
+		Refs::Set(Refs::whichBranch, id);
+	} else {
+		Refs::Set("HEAD", id);
+	}
 }
 
 void Diff(const std::string &baseID, const std::string &targetID)
@@ -442,17 +450,5 @@ void Diff(const std::string &baseID, const std::string &targetID, const std::vec
 	}
 }
 
-void GarbageCollection()
-{
-	auto existedList = Objects::ListExistedObjects();
-	auto refereddList = Objects::ListReferedObjects();
-	for (const auto &element : existedList) {
-		if (refereddList.count(element)) {
-			continue;
-		} else {
-			Objects::Remove(element);
-		}
-	}
-}
 }
 }

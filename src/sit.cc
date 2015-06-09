@@ -46,11 +46,13 @@ int add(int ac, char **av)
 int checkout(int ac, char **av)
 {
 	string commit;
+	string branchName;
 	vector<string> path;
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "Show this help message")
 		("commit", po::value<string>(&commit)->default_value(""), "Specify the commit which the file will checkout from. Be empty if you want to checkout files in index")
+		("branch,b", po::value<string>(&branchName)->default_value(""),  "Create a new branch at the specified commit. Cannot use with path.")
 		("path", po::value<vector<string>>(&path), "Path list to checkout. Be empty if you want to checkout the whole commit and update the HEAD to <commit>")
 	;
 	po::positional_options_description p;
@@ -67,11 +69,17 @@ int checkout(int ac, char **av)
 			 << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
+	if (!branchName.empty()) {
+		if (vm.count("path")) {
+			cout << "Fatal: the option `--branch` cannot be used when any path given." << endl;
+			return 1;
+		}
+	}
 	if (!vm.count("path")) {
 		path.push_back("");
 	}
 	for (const auto &p : path) {
-		Sit::Core::Checkout(commit, p);
+		Sit::Core::Checkout(commit, p, branchName);
 	}
 	return 0;
 }
@@ -175,11 +183,14 @@ int help(int argc, char** argv)
 
 int gc(int ac, char** av)
 {
+	/*
 	if (ac != 2) {
 		cout << "'sit gc' has no extra options" << endl;
 		return ac == 3 && strcmp(av[2], "--help") == 0 ? 0 : 1;
 	}
 	Sit::Core::GarbageCollection();
+	*/
+	cout << "Warning: Garbage collection is not available now." << endl;
 	return 0;
 }
 

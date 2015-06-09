@@ -14,7 +14,7 @@ extern const std::string EMPTY_OBJECT;
 /**
  * Object type
  */
-enum ObjectType { BLOB, TREE, COMMIT };
+enum ObjectType { BLOB, TREE };
 
 /**
  * A tree item
@@ -45,13 +45,6 @@ typedef std::vector<TreeItem> Tree;
  *
  *     This is my second commit.
  */
-struct Commit {
-	std::string tree;      // The sha1 value of the repo root tree
-	std::string parent;    // The sha1 value of the parent commit.
-	std::string author;    // The author's name, email, timestamp, timezone
-	std::string committer; // The committer's name, email, timestamp, timezone
-	std::string message;   // Commit log
-};
 
 /**
  * Get object filesystem path
@@ -79,7 +72,6 @@ Tree GetTree(const std::string& id);
  * Get the commit which has sh1 value `id`.
  * Throw exception if not found or not a commit
  */
-Commit GetCommit(const std::string& id);
 
 ///**
 // * Generate the additional header of the content
@@ -102,12 +94,6 @@ std::string WriteBlob(const std::string& blob);
  * Return object SHA1.
  */
 std::string WriteTree(const Tree& tree);
-
-/**
- * Write the commit object `commit` to file with additional header.
- * Return object SHA1.
- */
-std::string WriteCommit(const Commit& commit);
 
 /**
  * Write the tree object constructed from index

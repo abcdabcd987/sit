@@ -8,6 +8,7 @@
 #include "FileSystem.hpp"
 #include "Refs.hpp"
 #include "Util.hpp"
+#include "Commit.hpp"
 
 namespace Sit {
 namespace Objects {
@@ -47,47 +48,6 @@ Tree GetTree(const std::string& id)
 	return tree;
 }
 
-Commit GetCommit(const std::string& id)
-{
-	using std::getline;
-	std::istringstream ss(FileSystem::DecompressRead(GetPath(id)));
-	std::string line;
-	Commit commit;
-
-	// tree d8329fc1cc938780ffdd9f94e0d364e0ea74f579
-	getline(ss, commit.tree);
-	if (commit.tree.substr(0, 4) != "tree") {
-		throw Util::SitException("Fatal: Wrong Objects (Not a commit)", "GetCommit(" + id + ")");
-	}
-	commit.tree.erase(0, 5);
-
-	// parent 5a174a6c45eadc12180f5e9466e547777c3b3118
-	getline(ss, commit.parent);
-	if (commit.parent.substr(0, 6) != "parent") {
-		throw Util::SitException("Fatal: Wrong Objects (Not a commit)", "GetCommit(" + id + ")");
-	}
-	commit.parent.erase(0, 7);
-
-	// author Scott Chacon <schacon@gmail.com> 1243040974 -0700
-	getline(ss, commit.author);
-	commit.author.erase(0, 7);
-
-	// committer Scott Chacon <schacon@gmail.com> 1243040974 -0700
-	getline(ss, commit.committer);
-	commit.committer.erase(0, 10);
-
-	// Blank Line
-	getline(ss, line);
-
-	// Message
-	while (getline(ss, line)) {
-		commit.message += line;
-		commit.message += '\n';
-	}
-
-	return commit;
-}
-
 std::string WriteBlob(const std::string& blob)
 {
 	const std::string sha1(Util::SHA1sum(blob));
@@ -105,21 +65,6 @@ std::string WriteTree(const Tree& tree)
 		   << item.filename.string()
 		   << '\n';
 	}
-	const std::string str(ss.str());
-	const std::string sha1(Util::SHA1sum(str));
-	FileSystem::CompressWrite(GetPath(sha1), str);
-	return sha1;
-}
-
-std::string WriteCommit(const Commit& commit)
-{
-	std::ostringstream ss;
-	ss << "tree " << commit.tree << '\n'
-	   << "parent " << commit.parent << '\n'
-	   << "author " << commit.author << '\n'
-	   << "committer " << commit.committer << '\n'
-	   << '\n'
-	   << commit.message;
 	const std::string str(ss.str());
 	const std::string sha1(Util::SHA1sum(str));
 	FileSystem::CompressWrite(GetPath(sha1), str);
@@ -200,55 +145,8 @@ std::string WriteIndex()
 	return id;
 }
 
-std::vector<std::string> ListExistedObjects()
-{
-	std::vector<std::string> objectsList;
-	auto objectsFileList = FileSystem::ListRecursive(FileSystem::REPO_ROOT / FileSystem::OBJECTS_DIR, false, true);
-	const auto stdLen = std::string(".sit/objects/00/00000000000000000000000000000000000000").length();
-	//list objects as ".sit/objects/00/00000000000000000000000000000000000000"
-	for (const auto &object : objectsFileList) {
-		if (object.generic_string().length() == stdLen) {
-			std::string tmp = object.generic_string();
-			//erase ".sit/objects/" and remain "00/00000000000000000000000000000000000000"
-			tmp.erase(0, 13);
-			tmp.erase(2, 1);
-			objectsList.push_back(tmp);
-		}
-	}
-	return objectsList;
-}
-
-std::set<std::string> ListReferedObjects()
-{
-	std::set<std::string> objectsList;
-	std::list<Commit> commitList;
-	std::list<std::string> treeList;
-	for (std::string curCommit = FileSystem::Read(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "refs/heads/master"); curCommit != Objects::EMPTY_OBJECT;) {
-		auto commit = GetCommit(curCommit);
-		commitList.push_back(commit);
-		objectsList.insert(curCommit);
-		objectsList.insert(commit.tree);
-		treeList.push_back(commit.tree);
-		curCommit = commit.parent;
-	}
-	for (const auto &tree : treeList) {
-		auto treeMsg = GetTree(tree);
-		for (const auto &treeElement : treeMsg) {
-			if (treeElement.type == TREE) {
-				treeList.push_back(treeElement.id);
-			}
-			objectsList.insert(treeElement.id);
-		}
-	}
-	for (const auto &indexItem : Index::index.GetIndex()) {
-		objectsList.insert(indexItem.second);
-	}
-	return objectsList;
-}
-
 void Remove(const std::string &id)
 {
-	std::cout << "Removed object: " << id << std::endl;
 	boost::filesystem::remove(GetPath(id));
 }
 }

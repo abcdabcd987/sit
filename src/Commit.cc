@@ -36,14 +36,14 @@ std::string NewCommitID()
 void WriteCommit(const Commit &commit)
 {
 	std::ostringstream oss;
-	oss << "parent";
-	for (const auto &p : commit.parent) {
+	oss << "pred";
+	for (const auto &p : commit.pred) {
 		oss << " " << p;
 	}
 	oss << "\n"
-		<< "child";
-	for (const auto &child : commit.child) {
-		oss << " " << child;
+		<< "succ";
+	for (const auto &succ : commit.succ) {
+		oss << " " << succ;
 	}
 	oss << "\n"
 		<< "tree " << commit.tree << "\n"
@@ -59,18 +59,18 @@ Commit ReadCommit(const std::string &commitID)
 	Commit commit;
 	commit.selfID = commitID;
 	std::istringstream iss(FileSystem::DecompressRead(GetPath(commitID)));
-	//parent 00000000-0000-0000-0000-000000000000 00000000-0000-0000-0000-000000000000
+	//pred 00000000-0000-0000-0000-000000000000 00000000-0000-0000-0000-000000000000
 	std::string parentMsg;
 	std::getline(iss, parentMsg);
 	boost::trim(parentMsg);
-	parentMsg.erase(0, 7);
-	boost::split(commit.parent, parentMsg, boost::is_any_of(" "));
-	//child 00000000-0000-0000-0000-000000000000 00000000-0000-0000-0000-000000000000
+	parentMsg.erase(0, 5);
+	boost::split(commit.pred, parentMsg, boost::is_any_of(" "));
+	//succ 00000000-0000-0000-0000-000000000000 00000000-0000-0000-0000-000000000000
 	std::string childMsg;
 	std::getline(iss, childMsg);
 	boost::trim(childMsg);
-	childMsg.erase(0, 6);
-	boost::split(commit.child, childMsg, boost::is_any_of(" "));
+	childMsg.erase(0, 5);
+	boost::split(commit.succ, childMsg, boost::is_any_of(" "));
 
 	//tree 0000000000000000000000000000000000000000
 	std::getline(iss, commit.tree);
@@ -123,5 +123,11 @@ std::string CommitIDComplete(const std::string &_id)
 	}
 	return result;
 }
+
+void Remove(const std::string &id)
+{
+	boost::filesystem::remove(GetPath(id));
+}
+
 }
 }

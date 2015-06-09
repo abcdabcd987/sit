@@ -15,7 +15,7 @@ boost::filesystem::path GetBranchPath(const std::string &ref)
 	return FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "refs/heads" / ref;
 }
 
-void LoadLocalBranch()
+void loadLocalBranch()
 {
 	using namespace FileSystem;
 	auto refFileList = ListRecursive(REPO_ROOT / SIT_ROOT / "refs/heads", false, false);
@@ -40,7 +40,7 @@ void LoadLocalBranch()
 
 void LoadLocalRefs()
 {
-	LoadLocalBranch();
+	loadLocalBranch();
 }
 
 std::string Get(const std::string& ref)
