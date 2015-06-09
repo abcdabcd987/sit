@@ -28,10 +28,11 @@ std::string Local(const std::string& name);
 std::string Get(const std::string& path);
 
 /**
- * Set the sha1 value of ref path.
+ * Set the uuid of ref path.
  */
 void Set(const std::string& ref, const std::string& id);
 
+std::string GetRealID(const std::string &ref);
 }
 }
 

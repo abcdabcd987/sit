@@ -68,6 +68,7 @@ void LoadRepo()
 		if (is_directory(curPath / ".sit")) {
 			FileSystem::REPO_ROOT = curPath;
 			Index::index.Load();
+			Refs::LoadLocalRefs();
 			return ;
 		}
 		curPath = curPath.parent_path();
@@ -156,9 +157,11 @@ void Commit(const std::string &msg, const bool isAmend)
 	if (Refs::whichBranch.empty() && !isAmend) {
 		throw SitException("HEAD is not up-to-date with any branch. Cannot commit.");
 	}
+
 	if (!FileSystem::IsFile(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "COMMIT_MSG")) {
 		throw SitException("Commit message not found.");
 	}
+
 	if (isAmend) {
 		commit = Commit::ReadCommit(Refs::Get("HEAD"));
 	} else {
@@ -189,7 +192,7 @@ void Commit(const std::string &msg, const bool isAmend)
 	Commit::WriteCommit(commit);
 
 	parentCommit.child.push_back(commit.selfID);
-	Commit::WriteCommit(commit);
+	Commit::WriteCommit(parentCommit);
 
 	if (!isAmend) {
 		Refs::Set(Refs::whichBranch, commit.selfID);
@@ -203,15 +206,11 @@ void Status()
 
 void Checkout(std::string commitID, std::string filename)
 {
-	commitID = Util::SHA1Complete(commitID);
-	if (commitID == "master") {
-		commitID = Refs::Get("master");
-	} else if (commitID == "HEAD") {
-		commitID = Refs::Get("HEAD");
-	} else if (commitID == "index") {
+	commitID = Commit::CommitIDComplete(commitID);
+	if (commitID == "index") {
 		commitID = "";
 	} else {
-		if (!commitID.empty() && !Objects::IsExist(commitID)) {
+		if (!commitID.empty() && !Commit::IsExist(commitID)) {
 			std::cerr << "Error: Commit " << commitID << " doesn't exist." << std::endl;
 			return;
 		}
@@ -280,7 +279,7 @@ void CheckoutObjects(const std::string &id, const std::string &filename)
 	FileSystem::DecompressCopy(src, dst);
 }
 
-void printLog(std::ostream &out, const Objects::Commit &commit, const std::string &id)
+void printLog(std::ostream &out, const Commit::Commit &commit, const std::string &id)
 {
 	out << Color::BROWN << "Commit " << id << Color::RESET << std::endl
 	    << "Author: " << commit.author << std::endl
@@ -294,35 +293,35 @@ void printLog(std::ostream &out, const Objects::Commit &commit, const std::strin
 void Log(std::string id)
 {
 	if (id == "master") {
-		id = Refs::Get(Refs::Local("master"));
-		while (id != Refs::EMPTY_REF) {
-			Objects::Commit commit(Objects::GetCommit(id));
+		id = Refs::Get("master");
+		while (id != Commit::EMPTY_COMMIT) {
+			Commit::Commit commit = Commit::ReadCommit(id);
 			printLog(std::cout, commit, id);
-			id = commit.parent;
+			id = commit.parent.front();
 		}
 	} else {
-		Objects::Commit commit(Objects::GetCommit(id));
+		Commit::Commit commit = Commit::ReadCommit(id);
 		printLog(std::cout, commit, id);
 	}
 }
 
-void resetSingleFile(std::ostream &stream, const std::string &filename, const std::string &objectID, const bool &inCommit, const bool &inIndex, const bool isHard)
+void resetSingleFile(const std::string &filename, const std::string &objectID, const bool &inCommit, const bool &inIndex, const bool isHard)
 {
 
 	if (inCommit && !inIndex) {
-		stream << "  index <++ ";
+		std::cout << "  index <++ ";
 		Index::index.Insert(filename, objectID);
 		if (isHard) {
 			CheckoutObjects(objectID, filename);
 		}
 	} else if (!inCommit && inIndex) {
-		stream << "  index --> ";
+		std::cout << "  index --> ";
 		Index::index.Remove(filename);
 		if (isHard) {
 			FileSystem::Remove(filename);
 		}
 	} else if (inCommit && inIndex) {
-		stream << objectID << " ==> ";
+		std::cout << objectID << " ==> ";
 		Index::index.Remove(filename);
 		Index::index.Insert(filename, objectID);
 		if (isHard) {
@@ -332,18 +331,15 @@ void resetSingleFile(std::ostream &stream, const std::string &filename, const st
 		std::cerr << "Error: " << filename << " is not tracked" << std::endl;
 		return;
 	}
-	stream << boost::filesystem::path(filename) << std::endl;
+	std::cout << boost::filesystem::path(filename) << std::endl;
 }
 
-void Reset(std::ostream &stream, std::string id, std::string filename)
+void Reset(std::string id, std::string filename)
 {
-	if (id == "master") {
-		id = Refs::Get(Refs::Local("master"));
-	} else if (id == "HEAD" || id.empty()) {
+	id = Refs::GetRealID(id);
+	if (id.empty()) {
 		id = Refs::Get("HEAD");
 	}
-
-	id = Sit::Util::SHA1Complete(id);
 
 	if (!filename.empty()) {
 		filename = FileSystem::GetRelativePath(filename).generic_string();
@@ -364,20 +360,17 @@ void Reset(std::ostream &stream, std::string id, std::string filename)
 	for (const auto &anyfile : allSet) {
 		const bool inCommit = commitSet.count(anyfile) > 0;
 		const bool inIndex = indexSet.count(anyfile) > 0;
-		resetSingleFile(stream, anyfile, commitIndex.GetID(anyfile), inCommit, inIndex, false);
+		resetSingleFile(anyfile, commitIndex.GetID(anyfile), inCommit, inIndex, false);
 	}
 	Index::index.Save();
 }
 
-void Reset(std::ostream &stream, std::string id, const bool isHard)
+void Reset(std::string id, const bool isHard)
 {
-	if (id == "master") {
-		id = Refs::Get(Refs::Local("master"));
-	} else if (id == "HEAD" || id.empty()) {
+	id = Refs::GetRealID(id);
+	if (id.empty()) {
 		id = Refs::Get("HEAD");
 	}
-
-	id = Sit::Util::SHA1Complete(id);
 
 	const Index::CommitIndex commitIndex(id);
 	const auto &commitSet = commitIndex.GetIndex();
@@ -400,9 +393,9 @@ void Reset(std::ostream &stream, std::string id, const bool isHard)
 			inCommit = false, inIndex = true;
 		}
 		if (inCommit) {
-			resetSingleFile(stream, anyfile.first, commitIndex.GetID(anyfile.first), inCommit, inIndex, isHard);
+			resetSingleFile(anyfile.first, commitIndex.GetID(anyfile.first), inCommit, inIndex, isHard);
 		} else {
-			resetSingleFile(stream, anyfile.first, Objects::EMPTY_OBJECT, inCommit, inIndex, isHard);
+			resetSingleFile(anyfile.first, Objects::EMPTY_OBJECT, inCommit, inIndex, isHard);
 		}
 	}
 	Index::index.Save();
@@ -411,13 +404,13 @@ void Reset(std::ostream &stream, std::string id, const bool isHard)
 
 void Diff(const std::string &baseID, const std::string &targetID)
 {
-	Diff::DiffIndex(std::cout, Util::SHA1Complete(baseID), Util::SHA1Complete(targetID));
+	Diff::DiffIndex(std::cout, Refs::GetRealID(baseID), Refs::GetRealID(targetID));
 }
 
 void Diff(const std::string &baseID, const std::string &targetID, const std::vector<std::string> &fileList)
 {
-	const auto cBaseID = Util::SHA1Complete(baseID);
-	const auto cTargetID = Util::SHA1Complete(targetID);
+	const auto cBaseID = Refs::GetRealID(baseID);
+	const auto cTargetID = Refs::GetRealID(targetID);
 	const Index::IndexBase base(Index::GetIndex(cBaseID));
 	const Index::IndexBase target(Index::GetIndex(cTargetID));
 	const Diff::DiffList diff(Diff::Diff(base, target));

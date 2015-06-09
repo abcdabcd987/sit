@@ -223,7 +223,7 @@ std::set<std::string> ListReferedObjects()
 	std::set<std::string> objectsList;
 	std::list<Commit> commitList;
 	std::list<std::string> treeList;
-	for (std::string curCommit = FileSystem::Read(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "refs/heads/master"); curCommit != Refs::EMPTY_REF;) {
+	for (std::string curCommit = FileSystem::Read(FileSystem::REPO_ROOT / FileSystem::SIT_ROOT / "refs/heads/master"); curCommit != Objects::EMPTY_OBJECT;) {
 		auto commit = GetCommit(curCommit);
 		commitList.push_back(commit);
 		objectsList.insert(curCommit);

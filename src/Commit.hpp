@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 
-#include "FileSystem.hpp"
 #include "Objects.hpp"
 
 namespace Sit {
@@ -31,6 +30,8 @@ struct Commit {
 
 void WriteCommit(const Commit &commit);
 Commit ReadCommit(const std::string &commitID);
+
+std::string CommitIDComplete(const std::string &_id);
 
 }
 }

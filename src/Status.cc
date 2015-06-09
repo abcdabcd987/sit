@@ -83,7 +83,7 @@ void PrintStatus(std::ostream &out)
 	const std::string headref(Refs::Get("HEAD"));
 
 	Index::IndexBase head;
-	if (headref != Refs::EMPTY_REF) {
+	if (headref != Objects::EMPTY_OBJECT) {
 		head = Index::CommitIndex(headref);
 	}
 	const Index::WorkingIndex work;
@@ -94,7 +94,7 @@ void PrintStatus(std::ostream &out)
 	List notStaged(getNotStaged(index, work));
 
 	out << "On branch: master" << std::endl;
-	if (headref != Refs::Get(Refs::Local("master"))) {
+	if (headref != Refs::Get("master")) {
 		out << "HEAD detached at " << headref << std::endl;
 	}
 
@@ -137,7 +137,7 @@ void PrintStatus(std::ostream &out)
 bool IsClean()
 {
 	const std::string headref(Refs::Get("HEAD"));
-	if (headref == Refs::EMPTY_REF) {
+	if (headref == Objects::EMPTY_OBJECT) {
 		throw Util::SitException("The current repo is empty.");
 	}
 	const Index::CommitIndex head(headref);

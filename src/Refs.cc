@@ -102,21 +102,43 @@ void Set(const std::string& ref, const std::string& id)
 	}
 }
 
-void NewBranch(const std::string &branchName, const std::string &id)
+void NewBranch(std::string branchName, const std::string &id)
 {
+	boost::trim(branchName);
 	if (branches.count(branchName) > 0) {
 		throw Util::SitException("Fatal: There is a branch with the same name existed.");
+	} else {
+		if (branchName == "work" || branchName == "index" || branchName == "HEAD") {
+			throw Util::SitException("Fatal: " + branchName + " cannot be a branch name.");
+		}
 	}
 	branches.insert(std::make_pair(branchName, id));
 }
 
 void DelBranch(const std::string &branchName)
 {
-	if (branches.count(branchName) > 0) {
+	if (branchName != "HEAD" && branches.count(branchName) > 0) {
 		branches.erase(branchName);
 	} else {
 		throw Util::SitException("Fatal: No such a branch.");
 	}
 }
+
+std::string GetRealID(const std::string &ref)
+{
+	if (ref.empty()) {
+		return ref;
+	}
+	if (ref == "work" || ref == "index") {
+		return ref;
+	} else {
+		if (branches.count(ref) > 0 || ref == "HEAD") {
+			return Get(ref);
+		} else {
+			return Commit::CommitIDComplete(ref);
+		}
+	}
+}
+
 }
 }

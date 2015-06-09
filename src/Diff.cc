@@ -27,8 +27,8 @@ DiffList Diff(const Index::IndexBase& base, const Index::IndexBase& target)
 	for (const auto &path : paths) {
 		const bool inBase = base.InIndex(path);
 		const bool inTarget = target.InIndex(path);
-		const std::string &baseID(inBase ? base.GetID(path) : Refs::EMPTY_REF);
-		const std::string &targetID(inTarget ? target.GetID(path) : Refs::EMPTY_REF);
+		const std::string &baseID(inBase ? base.GetID(path) : Objects::EMPTY_OBJECT);
+		const std::string &targetID(inTarget ? target.GetID(path) : Objects::EMPTY_OBJECT);
 		if (inBase && !inTarget) {
 			diff.insert(std::make_pair(path, DiffItem({baseID, targetID, path, Deleted})));
 		} else if (!inBase && inTarget) {
@@ -178,7 +178,7 @@ void lcs(std::vector<std::pair<int, int>> &out,
 std::vector<std::string> lines(const std::string &objectID, const std::string &indexID, const boost::filesystem::path &path)
 {
 	std::vector<std::string> v;
-	if (objectID == Refs::EMPTY_REF)
+	if (objectID == Objects::EMPTY_OBJECT)
 		return v;
 	std::istringstream ss(indexID != "work" ? Objects::GetBlob(objectID) : FileSystem::Read(path));
 	std::string line;

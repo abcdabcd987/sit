@@ -246,22 +246,16 @@ int reset(int ac, char** av)
 			 << desc << endl;
 		return vm.count("help") ? 0 : 1;
 	}
-
-	std::ostringstream oss;
-
+	cout << "The following files have been reset:" << endl << endl;
 	if (path.empty()) {
-		Sit::Core::Reset(oss, commit, vm.count("hard") > 0);
+		Sit::Core::Reset(commit, vm.count("hard") > 0);
 	} else {
 		if (vm.count("hard") > 0) {
 			throw Sit::Util::SitException("Fatal: the option \"--hard\" cannot be together with path");
 		}
 		for (const auto &p : path) {
-			Sit::Core::Reset(oss, commit, p);
+			Sit::Core::Reset(commit, p);
 		}
-	}
-	if (!oss.str().empty()) {
-		cout << "The following files have been reset:" << endl;
-		cout << oss.str();
 	}
 	return 0;
 }

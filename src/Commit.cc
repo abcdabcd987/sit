@@ -1,5 +1,7 @@
 #include "Commit.hpp"
 #include "Refs.hpp"
+#include "Util.hpp"
+#include "FileSystem.hpp"
 
 #include <sstream>
 #include <boost/algorithm/string.hpp>
@@ -27,7 +29,7 @@ std::string NewCommitID()
 	std::string newID;
 	do {
 		newID = boost::uuids::to_string(generator());
-	} while (!IsExist(newID));
+	} while (IsExist(newID));
 	return newID;
 }
 
@@ -62,13 +64,13 @@ Commit ReadCommit(const std::string &commitID)
 	std::getline(iss, parentMsg);
 	boost::trim(parentMsg);
 	parentMsg.erase(0, 7);
-	boost::split(commit.parent, parentMsg, boost::is_any_of(' '));
+	boost::split(commit.parent, parentMsg, boost::is_any_of(" "));
 	//child 00000000-0000-0000-0000-000000000000 00000000-0000-0000-0000-000000000000
 	std::string childMsg;
 	std::getline(iss, childMsg);
 	boost::trim(childMsg);
 	childMsg.erase(0, 6);
-	boost::split(commit.child, childMsg, boost::is_any_of(' '));
+	boost::split(commit.child, childMsg, boost::is_any_of(" "));
 
 	//tree 0000000000000000000000000000000000000000
 	std::getline(iss, commit.tree);
@@ -95,5 +97,31 @@ Commit ReadCommit(const std::string &commitID)
 	return commit;
 }
 
+std::string CommitIDComplete(const std::string &_id)
+{
+	if (_id.length() < 4) {
+		throw Util::SitException("Fatal: the commit ID is too short. Please input 4 letters at letters.");
+	}
+	std::string result;
+	using namespace FileSystem;
+	auto commitList = ListRecursive(REPO_ROOT / SIT_ROOT / COMMIT_DIR / _id.substr(0, 4), false, true);
+	for (const auto &item : commitList) {
+		auto commitID = item.generic_string();
+		//.sit/commits/0000/0000-0000-0000-0000-000000000000
+		commitID.erase(0, 13); 
+		commitID.erase(4, 1);
+		if (commitID.find(_id) == 0) {
+			if (result.empty()) {
+				result = commitID;
+			} else {
+				throw Util::SitException("Fatal: There are several matches. Please input more letters.");
+			}
+		}
+	}
+	if (result.empty()) {
+		throw Util::SitException("Fatal: There is no match for the given commit-id.");
+	}
+	return result;
+}
 }
 }

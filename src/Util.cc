@@ -1,5 +1,6 @@
 #include "Util.hpp"
 #include "Refs.hpp"
+#include "Objects.hpp"
 #include <cctype>
 
 namespace Sit {
@@ -68,6 +69,7 @@ std::string AuthorString(const std::string& name, const std::string& email, cons
 
 std::string SHA1Complete(std::string _id)
 {
+	/*
 	if (_id == "" || _id == "index" || _id == "master" || _id == "HEAD" || _id == "work")
 		return _id;
 	boost::filesystem::path path = _id.substr(0, 2);
@@ -85,14 +87,16 @@ std::string SHA1Complete(std::string _id)
 			}
 		}
 	}
-	if (Refs::EMPTY_REF.find(_id) == 0) {
-		return Refs::EMPTY_REF;
+	if (Objects::EMPTY_OBJECT.find(_id) == 0) {
+		return Objects::EMPTY_OBJECT;
 	}
 	if (result.empty()) {
 		throw SitException("Fatal: No such a object.");
 	} else {
 		return path.generic_string() + result.generic_string();
 	}
+	*/
+	return "";
 }
 
 }

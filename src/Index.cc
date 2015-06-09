@@ -181,8 +181,6 @@ IndexBase GetIndex(const std::string &id)
 {
 	if (id == "index")
 		return index;
-	if (id == "master")
-		return CommitIndex(Refs::Get(Refs::Local("master")));
 	if (id == "HEAD")
 		return CommitIndex(Refs::Get("HEAD"));
 	if (id == "work")
